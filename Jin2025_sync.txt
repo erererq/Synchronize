@@ -1,0 +1,978 @@
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS                                                                                                            1
+
+
+
+
+    A Deep Reinforcement Learning Approach for
+   Synchronization Between Two Memristor Chaotic
+    Systems and Application for Image Encryption
+                      Shitao Jin, Jie Chen , Jie Wu , Xiaofeng Wang, Xiaoli Luan , Member, IEEE,
+                      Junjie Fu , Senior Member, IEEE, and Guanghui Wen , Senior Member, IEEE
+
+
+   Abstract—This study proposes a novel synchronization frame-                           Index Terms—Memristor chaotic circuits, deep reinforcement
+work for memristive chaotic systems (MCSs) through an                                 learning, synchronization, image encryption.
+enhanced deep reinforcement learning (DRL) approach, featuring
+an improved proximal policy optimization (PPO) algorithm. Dis-
+                                                                                                                   I. I NTRODUCTION
+tinguished from traditional linear/nonlinear control paradigms
+                                                                                             HAOTIC systems, characterized as deterministic non-
+that necessitate precise mathematical modeling, our DRL-based
+methodology operates without prior knowledge of system dynam-
+ics or analytical model requirements. The developed data-driven
+                                                                                      C      linear dynamical systems with extreme sensitivity to
+                                                                                      initial conditions, generate seemingly stochastic behaviors
+control strategy demonstrates significant advantages by reducing
+the required control forces from four to three dimensions,                            despite their inherent mathematical predictability. The foun-
+thereby substantially decreasing control complexity and oper-                         dational understanding of chaos theory emerged from Edward
+ational costs compared to conventional item-by-item control                           Lorenz’s seminal 1960s meteorological simulations [1], which
+methods. Through systematic optimization of the reward function                       revealed that infinitesimal perturbations in initial states could
+architecture in classical PPO algorithms, we achieve acceler-                         yield exponentially divergent outcomes-a paradigm now ubiq-
+ated synchronization convergence rates for MCSs, in which an
+optimal exponential parameter is obtained accordingly. Finally,                       uitously referenced as the “butterfly effect”. Subsequent
+the practical efficacy of our DRL-driven synchronization frame-                       investigations have extensively documented chaotic phenom-
+work is successfully validated in image encryption applications.                      ena across multidisciplinary domains, including physics [2],
+Comprehensive numerical simulations and comparative analyses                          chemistry [3], biology [4], and financial market analyses
+demonstrate that the proposed methodology not only maintains                          [5], with comprehensive theoretical frameworks established in
+robust performance under Gaussian noise perturbations but also
+achieves synchronization efficiency improvements.                                     authoritative surveys [6].
+                                                                                         One prominent application lies in cryptography, where the
+                                                                                      inherent unpredictability of chaotic attractors is exploited to
+   Received 20 April 2025; revised 13 June 2025 and 2 July 2025;                      design permutation-substitution architectures with enhanced
+accepted 16 July 2025. This work was supported in part by the National
+Natural Science Foundation of China under Grant 62103166, Grant 62172191,             avalanche effects, thereby improving encryption security and
+Grant 62173085, Grant 62325304, Grant U22B2046, and Grant U24A20279;                  diffusion properties [7]. In the domain of secure communi-
+in part by Jiangsu Science Fund for Distinguished Young Scholars under Grant          cations, chaos-based spread spectrum techniques have been
+BK20240072; in part by Jiangsu Provincial Scientific Research Center of
+Applied Mathematics under Grant BK20233002; in part by the Shuangchuang               shown to achieve superior bit error rate performance com-
+Doctoral Talent Program of Jiangsu Province under Grant JSSCBS20210840;               pared to conventional modulation schemes, offering greater
+and in part by the Southeast University Interdisciplinary Research Program            robustness against noise and interference [8]. Beyond infor-
+for Young Scholars. This article was recommended by Associate Editor
+Y. Tang. (Corresponding author: Jie Wu.)                                              mation security, chaotic dynamics have also found meaningful
+   Shitao Jin is with the School of Artificial Intelligence and Computer              applications in biological modeling, particularly in the study
+Science, Jiangnan University, Wuxi 214122, China (e-mail: 6233114014@                 of complex physiological rhythms such as cardiac arrhythmias
+stu.jiangnan.edu.cn).
+   Jie Chen is with the College of Electronic Engineering, National Univer-           and neural synchronization patterns [9]. These diverse applica-
+sity of Defense Technology, Hefei 230027, China (e-mail: jchen202209@                 tions underscore the broad utility of chaos theory in addressing
+163.com).                                                                             real-world challenges across multiple domains.
+   Jie Wu is with the School of Artificial Intelligence and Computer Science,
+Jiangnan University, Wuxi 214122, China, and also with the Peng Cheng                    As a newly emerging concept within the realm of nonlinear
+Laboratory, Shenzhen 518000, China (e-mail: jiewu20@jiangnan.edu.cn).                 dynamics, memristive chaotic systems (MCSs) have arisen as
+   Xiaofeng Wang is with the Peng Cheng Laboratory, Shenzhen 518000,                  a revolutionary framework in contemporary chaos research.
+China (e-mail: wangxf@pcl.ac.cn).
+   Xiaoli Luan is with the Key Laboratory of Advanced Process Control                 Chua first postulated the memristor as the fourth fundamental
+for Light Industry, Ministry of Education, School of Internet of Things               circuit element in 1971 [10], and its physical realization
+Engineering, Jiangnan University, Wuxi 214122, China (e-mail: xlluan@                 was achieved by Hewlett-Packard (HP) Labs in 2008 [11].
+jiangnan.edu.cn).
+   Junjie Fu is with the Department of Systems Science, School of Math-               Since then, numerous studies have demonstrated that MCSs
+ematics, Southeast University, Nanjing 211189, China (e-mail: fujunjie@               exhibit heightened dynamical complexity and extreme sen-
+seu.edu.cn).                                                                          sitivity to initial conditions [12], [13], prompting extensive
+   Guanghui Wen is with the School of Automation, Southeast University,
+Nanjing 210096, China (e-mail: ghwen@seu.edu.cn).                                     exploration into their modeling, control, and application [14],
+   Digital Object Identifier 10.1109/TCSI.2025.3592187                                [15], [16], [17], [18]. Significant progress has been made in
+             1549-8328 © 2025 IEEE. All rights reserved, including rights for text and data mining, and training of artificial intelligence and
+                       similar technologies. Personal use is permitted, but republication/redistribution requires IEEE permission.
+                                     See https://www.ieee.org/publications/rights/index.html for more information.
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                  This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+2                                                                                       IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+synchronizing MCSs using various control strategies. Adaptive
+controllers have successfully synchronized memristor-based
+Chua’s circuits [19], while fuzzy modeling approaches have
+been applied to analyze and synchronize such systems under
+uncertainty [20]. Advanced sliding mode control techniques
+have enabled fixed-time synchronization in fractional-order
+memristive neural networks [21]. Recent efforts have extended
+to adaptive synchronization of delayed systems [22] and
+intermittent stabilization via a Takagi and Sugeno (T-S) fuzzy
+model [23], demonstrating improved robustness and flexibility.
+   The inherent unpredictability and extreme sensitivity of
+MCSs have made them particularly valuable for image encryp-
+tion applications. Initial developments focused on MCS-based
+decryption algorithms [24] and sophisticated chaotic network                        Fig. 1. The diagram of memristor chaotic circuit [31].
+encryption schemes [25], with finite-time synchronization fur-
+ther enhancing performance [26]. Subsequent architectural                           synchronization challenge of MCSs through DRL methodolo-
+innovations introduced multi-memristor circuits [27] and spe-                       gies. Additionally, an image encryption algorithm grounded
+cialized color image encryption systems [28], while hybrid                          in MCSs is put forth. The overarching goal is to capitalize
+approaches combining MCSs with traditional cryptography                             on the distinctive features of MCSs-such as their pronounced
+achieved enhanced security [29], [30]. Most recently, advanced                      sensitivity to initial conditions and intricate dynamics-to fortify
+control frameworks using sliding-mode synchronization [31]                          the security and resilience of the encryption algorithm. The key
+and novel 3D memristive cubic maps with dual memristors                             contributions of this study are delineated as follows:
+[32] have demonstrated significant improvements in both                               (1) A novel DRL approach, anchored in the proximal policy
+security and efficiency for image protection.                                             optimization (PPO) algorithm, is proposed to resolve
+   However, traditional methods employed for achieving syn-                               the synchronization problem of MCSs, which is distin-
+chronization in MCSs heavily rely on precise knowledge                                    guished from the traditional methods requiring the prior
+of system equations — a condition that is rarely met in                                   knowledge of system dynamics or analytical model.
+practical applications due to factors such as approximate                             (2) Departing from the conventional practice of item-by-
+modeling, inaccurate observations, data transmission loss, and                            item control (involving four control terms) during MCSs
+external noise disturbances. To address this limitation, deep                             synchronization, this investigation streamlines the con-
+reinforcement learning (DRL) has emerged as a promising                                   trol architecture by reducing the number of control
+alternative by enabling synchronization without the need for                              forces to three. This optimization effectively curtails the
+explicit mathematical models or prior analytical knowledge.                               control cost.
+This model-free approach significantly relaxes the con-                               (3) This paper enhances the classical PPO algorithm for
+straints imposed by classical control strategies and enhances                             agent training. Specifically, the reward function is
+adaptability in uncertain or dynamic environments. Notably,                               refined through the introduction of an additional term.
+Bucci et al. applied the deep deterministic policy gradi-                                 This modification enables MCSs to achieve synchroniza-
+ent (DDPG) algorithm — a representative DRL method —                                      tion with a rapid convergence rate and endows them with
+to stabilize a one-dimensional chaotic Kuramoto-Sivashinsky                               robustness against Gaussian noise interference.
+system [33], demonstrating the feasibility of model-free con-                         (4) The improved DRL method for achieving synchro-
+trol in chaotic settings. Similarly, Chen et al. developed a                              nization of MCSs is successfully applied into image
+DRL-based approach to achieve synchronization between two                                 encryption, thereby broadening the application domain
+identical chaotic systems [34], further validating the potential                          of DRL algorithms.
+of these algorithms in complex dynamical control tasks. Col-
+lectively, the studies cited in [33], [34], [35], [36], and [37]                       The following structure of this article is organized as
+have laid a solid foundation for applying DRL techniques to                         follows. Section II introduces the MCSs and the enhanced
+chaotic synchronization.                                                            PPO algorithm. Sections III and IV present the experimental
+   Despite these achievements [33], [34], [35], [36], [37], there                   results and the application in image encryption. Finally, the
+are still many urgent issues that have not been effectively                         conclusions and future directions are given in Section V.
+resolved. Firstly, no research has focused on the synchro-
+nization of MCSs based on DRL as well as their application
+in image encryption. Secondly, the existed studies have used                                   II. T HE M ODEL OF MCS S AND D ESIGNING
+                                                                                                          OF DRL A LGORITHM
+item-by-item control and have not focused on reducing the
+cost and complexity of control inputs. Thirdly, the traditional
+                                                                                    A. Model Description of MCSs
+reward functions have been directly used without effective
+improvement, resulting in a slow synchronization conver-                               For simplicity and without loss of generality, this article
+gence speed of systems. These gaps will be bridged in this                          considers the following memristor chaotic circuit [31] as
+investigation. Therefore, this paper endeavors to tackle the                        illustrated in Fig. 1. Therefore, based on Chua’s circuit and
+
+      Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                      This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+JIN et al.: DEEP REINFORCEMENT LEARNING APPROACH FOR SYNCHRONIZATION                                                                                                     3
+
+
+
+
+                                                                                        Fig. 3. The chaotic phase diagrams of system (2).
+Fig. 2. The trajectories of state variables xi (t), i = 1, 2, 3, 4, of system (2).
+
+                                                                                          Since this investigation considers the synchronization of
+Kirchhoff’s current law [38], the dynamical model of the                                MCSs, we set Eq. (2) as the drive system and the correspond-
+studied MCS is governed by                                                              ing controlled response system is described as
+                                                                                             ẏ1 (t) = a 2 y24 (t)(y2 (t) − y1 (t)) + dy1 (t) + a1 (t),
+                                                                                           8                                                
+       8
+                    1  2                                                                  ˆ
+         V̇1 (t) =     ηz (t)(V2 (t) − V1 (t)) + GV1 (t) ,
+                                                                                          ˆ
+       ˆ
+       ˆ                                                                                   <ẏ (t) = b 2 y2 (t)(y (t) − y (t)) − y (t) + a (t),
+                                                                                           ˆ                                              
+       ˆ
+                   C1                                                                          2               4     1         2        3      2
+       ˆ
+       ˆ                                                                                                                                                (4)
+                    1  2                                                                            =                       +
+       ˆ
+       ˆ
+       <
+         V̇2 (t) =     ηz (t)(V1 (t) − V2 (t)) − IL (t) ,
+                                                                                          ˆ
+                                                                                           ˆ ẏ3 (t)   c(y 2 (t) − hy 3 (t))   a 3 (t),
+                                                            (1)
+                                                                                           ˆ
+                   C2                                                                      :
+                                                                                             ẏ4 (t) = y2 (t) − y1 (t) − 0.01 y4 (t) + a4 (t),
+                   1
+         IL (t) = (V2 (t) − RIL (t)),
+       ˆ
+       ˆ ˙
+                                                                                        where ai (t), i = 1, 2, 3, 4, are the control forces to be trained.
+       ˆ
+       ˆ
+       ˆ
+       ˆ           L
+       :ż(t) = (V (t) − V (t)) − ζz(t),
+                                                                                        For measuring synchronization, we define the errors ei (t) =
+       ˆ
+                       2         1
+                                                                                        xi (t) − yi (t), i = 1, 2, 3, 4, and we can get the following error
+where V1 (t)(V2 (t)) denotes the instantaneous voltage across                           dynamic system
+capacitor C1 (C2 ), −G signifies a negative conductance, L is
+                                                                                               ė1 (t) = a 2 y24 (t)(y2 (t) − y1 (t))
+                                                                                             8               
+an inductor, R is a common resistor, and IL (t) indicates the                                ˆ
+                                                                                             ˆ
+                                                                                             ˆ                                                        
+                                                                                                            −2 x42 (t)(x2 (t) − x1 (t)) + de1 (t) + a1 (t),
+                                                                                             ˆ
+current flowing through both the resistor R and the inductor                                 ˆ
+                                                                                             ˆ
+                                                                                             ˆ
+L.                                                                                           <ė (t) = b 2 y2 (t)(y (t) − y (t))
+                                                                                             ˆ
+                                                                                                 2                4       1        2
+   Let x1 (t) = V1 (t), x2 (t) = V2 (t), x3 (t) = IL (t), x4 (t) = z(t),                                          2
+                                                                                                                                                               (5)
+                                                                                             ˆ              −2  x 4 (t)(x1 (t) − x 2 (t)) − e 3 (t)   + a2 (t),
+a = 1/C1 , b = 1/C2 , c = 1/L, d = G, h = R, η = 2, ζ = 0.01,
+                                                                                             ˆ
+                                                                                             ˆ
+                                                                                               ė3 (t) = c (e2 (t) − he3 (t)) + a3 (t),
+                                                                                             ˆ
+                                                                                             ˆ
+                                                                                             ˆ
+then the system (1) can be rewritten as                                                      ˆ
+                                                                                               ė4 (t) = e2 (t) − e1 (t) − 0.01 e4 (t) + a4 (t).
+                                                                                             ˆ
+                                                                                             :
+
+            ẋ1 (t) = a 2 x42 (t)(x2 (t) − x1 (t)) + dx1 (t) ,
+          8                                                
+          ˆ
+          ˆ                                                                                Remark 1: The synchronization problem of drive-response
+          < ẋ (t) = b 2 x2 (t)(x (t) − x (t)) − x (t) ,
+          ˆ
+                                                                                        MCSs (2) and (4) is transformed into the stability analysis of
+              2               4     1       2         3
+                                                                                (2)     error dynamic system (3).
+          ˆ
+          ˆ ẋ3 (t) = c(x2 (t) − hx3 (t)),
+          ˆ                                                                                Definition 1: The synchronization between the
+            ẋ4 (t) = x2 (t) − x1 (t) − 0.01 x4 (t).
+          :
+                                                                                        drive-response MCSs (2) and (4) is achieved, if
+To ensure the MCS (2) is programmable, we consider its                                          lim |xi (t) − yi (t)| , lim |ei (t)| → 0,            i = 1, 2, 3, 4.
+                                                                                               t→∞                       t→∞
+discrete-time form as follows:
+                                                                                          Remark 2: For the response system (4) and the error
+                  x1 (t + 1) = x1 (t) + ẋ1 (t)dt,
+                8
+                ˆ
+                ˆ                                                                       system (3), we also consider their discrete-time forms in
+                < x (t + 1) = x (t) + ẋ (t)dt,
+                ˆ
+                                                                                        programming.
+                   2            2         2
+                                                   (3)
+                ˆ
+                ˆ x3 (t + 1) = x3 (t) + ẋ3 (t)dt,
+                                                                                        B. The Enhanced PPO Algorithm
+                ˆ
+                  x4 (t + 1) = x4 (t) + ẋ4 (t)dt.
+                :
+                                                                                          In the realm of artificial intelligence (AI), one of the
+   We set the parameters of system (2) as a = 30, b = 1, c =                            central objectives is to engineer systems that can ren-
+36, d = 0.5, h = 0.003 and the inital state [x1 , x2 , x3 , x4 ]T =                     der optimal decisions within intricate and ever-evolving
+[0, 0.01, 0.01, 0]T . Figure 2 shows the trajectories of state                          environments. Conventional algorithms frequently encounter
+variables x1 (t), i = 1, 2, 3, 4, of system (2), and the 3-D phase                      challenges when dealing with high-dimensional data and
+diagrams are depicted in Fig. 3.                                                        necessitate explicit programming rules to operate efficiently.
+
+         Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                   This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+4                                                                                        IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+                                                                                     into a stochastic gradient ascent optimization framework. The
+                                                                                     most commonly used form of the gradient estimator ĝ is
+                                                                                     structured as follows [39]:
+
+                                                                                                     ĝ = Ê st ∼ρ(·|π) ∇θ log π(at |st )Ât ,
+                                                                                                                                           
+                                                                                                                                                (6)
+
+                                                                                     where the expectation Ê[·] denotes the empirical average over
+                                                                                     a batch of finite samples, π represents a stochastic policy that
+                                                                                     defines the probability distribution over actions given states,
+                                                                                     ρ(·|π) denotes the distribution of states encountered when an
+                                                                                     agent follows policy π, ∇θ represents the policy gradient,
+                                                                                     θ denotes the current policy parameters, and Ât represents the
+Fig. 4. The framework of DRL.
+                                                                                     advantage function, measuring how much better the chosen
+                                                                                     action is compared to the average action in a given state.
+                                                                                        PPO, as an advanced policy gradient method, has become
+                                                                                     a predominant solution for policy optimization challenges
+This is precisely where reinforcement learning (RL) demon-
+                                                                                     in continuous action spaces, particularly effective in high-
+strates its exceptional utility. Through continuous interaction
+                                                                                     dimensional continuous control tasks. The algorithm manifests
+with their environment and receiving feedback in the form of
+                                                                                     in two distinct algorithmic implementations: the Lagrangian
+rewards or penalties, RL empowers agents to learn and execute
+                                                                                     penalty-based variant (PPO-Penalty) and the clipped proba-
+optimal behaviors.
+                                                                                     bility ratio method (PPO-Clip). The rationale for selecting
+   At the core of deep learning (DL) lie deep neural net-
+                                                                                     PPO-Clip principally stems from its theoretically-grounded
+works. These networks are capable of learning high-level
+                                                                                     advantages: (1) enhanced training stability through bounded
+abstract representations of data via multiple layers of nonlinear
+                                                                                     policy updates, (2) implementation simplicity eliminating
+transformations. This enables DL models to capture complex
+                                                                                     adaptive penalty coefficient tuning, (3) computational effi-
+patterns and features inherent in the data. The integration of
+                                                                                     ciency suitable for large-scale learning paradigms, (4) gener-
+neural networks with RL substantially bolsters RL’s ability to
+                                                                                     alized applicability across diverse environment configurations,
+address high-dimensional problems. Referred to as DRL, this
+                                                                                     and (5) robust community-driven development ecosystem
+convergence capitalizes on the advantages of both methodolo-
+                                                                                     facilitating reproducible implementations. These combined
+gies.
+                                                                                     merits motivate our adoption of PPO-Clip as the core optimiza-
+   In DRL, the primary goal of an agent is to continually refine
+                                                                                     tion framework in the present study. The objective function of
+its decision-making abilities through learning from experience.
+                                                                                     the PPO-Clip algorithm is presented as following [39]:
+The agent aims to execute a sequence of actions that ulti-
+mately maximizes cumulative rewards. The DRL framework,
+                                                                                                                           π (a|s)
+                                                                                                                               θ
+illustrated in Fig. 4, outlines the fundamental interaction loop                        L(s, a, θk , θ) = E s,a∼πθk min                Aπθk (s, a),
+                                                                                                                             πθk (a|s)
+between an agent and its environment. This interaction occurs                                                  
+                                                                                                                  πθ (a|s)
+                                                                                                                                                   
+                                                                                                                                                πθk
+over a series of discrete time steps, denoted as t. At each                                              clip              , 1 − , 1 +  A (s, a) , (7)
+                                                                                                                 πθk (a|s)
+time step t, the agent first observes the current state of the
+environment st and receives rt as a reward, then selects an                          where L stands for the objective function, a is the action, θk
+action at based on its policy. The chosen action influences                          represents the parameters before the update, Aπθk is the advan-
+the environment, leading to a transition to a new state st+1                         tage function, the clip function limits the probability ratio
+and the generation of a reward signal rt+1 , which provides                          between the new and old policies, and  is a hyperparameter.
+feedback on the quality of the action taken. In this framework,                      According to [39], the PPO algorithm clips the policy ratio
+the environment represents the error dynamic system (3), while                       rt (θ) = ππθ θ (a(at |st |st )t ) within [1−, 1+] to prevent excessively large
+                                                                                                 old
+the agent is represented by a neural network trained using the                       policy updates that could destabilize training. The symmetric
+PPO algorithm.                                                                       range ensures balanced constraints for both increased and
+   Remark 3: Given its powerful functionality, robust perfor-                        decreased action probabilities. The default  = 0.2 was
+mance, and straightforward implementation, we choose the                             empirically found to optimally balance learning speed and
+PPO algorithm to control the error dynamic system (3) in this                        stability across various environments, though values between
+investigation.                                                                       0.1-0.3 are commonly used depending on task sensitivity.
+   As the PPO algorithm builds upon policy gradient methods                          This clipping mechanism provides a simpler alternative to the
+as its foundation, we begin with an introduction of these                            constrained trust region policy optimization while maintaining
+fundamental RL techniques. Policy gradient methods consti-                           similar performance guarantees.
+tute a class of model-free RL approaches designed to enable                              To evaluate the performance of an action in comparison
+autonomous agents to learn optimal action selection strate-                          to the average performance, it is necessary to calculate the
+gies that maximize cumulative rewards. The core mechanism                            advantage function. For this task, we select the generalized
+involves policy gradient estimation, where agents systemati-                         advantage estimation (GAE) [40]:
+cally compute gradients of expected returns with respect to
+policy parameters, subsequently integrating these gradients                                                 Aπθk (s, a) = Qπ (s, a) − V π (s),                        (8)
+
+       Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+JIN et al.: DEEP REINFORCEMENT LEARNING APPROACH FOR SYNCHRONIZATION                                                                                                       5
+
+
+
+where Q represents the action-value function and V stands                              enables efficient training of the model. In our study, the reward
+for the state-value function. When Aπθk > 0, it implies that                           function is formulated as:
+the current policy is more effective than the previous one,                                                                         T
+                                                                                                                                    X
+thereby increasing the probability of generating the trajectory.                                                      reward =             rt ,                         (11)
+However, this increase is restricted such that the parameters θ                                                                      t=1
+and θk are maintained within the range of 1 + . On the
+                                                                                       where rt = −(|e1 (t)| + |e2 (t)| + |e3 (t)| + |e4 (t)|) −
+contrary, when Aπθk < 0, it decreases the probability of
+                                                                                       (|e1 (t)| + |e2 (t)| + |e3 (t)| + |e4 (t)|)α quantifies the cumulative
+generating trajectories while ensuring that the parameters θ
+                                                                                       value of positional errors. The exponential parameter α ∈
+and θk do not fall below the range of 1 − .
+                                                                                       (0, 1). Consequently, as the reward rt approaches zero, it
+   In this study, we utilize the DRL method to train an agent
+                                                                                       signifies a closer convergence towards the stable point. Since
+which serves as the controller, substituting traditional control
+                                                                                       our principal objective is to guide the error dynamic system
+techniques. From the DRL viewpoint, this problem can be
+                                                                                       towards a stable state, we expect to observe a declining trend
+formulated as guiding an agent to get a suitable action policy,
+                                                                                       in the error values. However, the agent is designed to find
+enabling the system’s output vector to attain a objective state.
+                                                                                       sequences of actions that maximize rewards. This goal conflict
+The formulation of the action policy generated by the agent
+                                                                                       with our aim to minimize system errors. To address this issue,
+is presented as follows:
+                                                                                       we use the negative of the positional errors. By doing so, we
+     at = a1 , a2 , a3 , a4 , − fmax ≤ ai ≤ fmax , i = 1, 2, 3, 4,
+                          
+                                                                   (9)                 ensure that the system error is minimized while still keeping
+                                                                                       the reward values high.
+in which we set a3 = 0 for decreasing control complexity and                              Remark 5: This reward formulation offers several advan-
+operational costs, fmax is the maximum value of the action                             tages for PPO-based training. First, by introducing the
+vector. The initial values for the environment are obtained from                       non-linear term with exponent α, it emphasizes sparsity in
+a random distribution.                                                                 the error space, particularly when 0 < α < 1. This encourages
+   Reducing one control dimension can effectively decrease                             the agent to prioritize states where errors can be significantly
+the computational load per iteration, resulting in faster simula-                      reduced, similar to the behavior observed in ` p -norm mini-
+tion time. More importantly, reducing the dimensionality also                          mization with 0 < p < 1. Second, the structure helps balance
+decreases the output dimension of the deep neural networks,                            exploration and exploitation by reducing the impact of large
+thereby improving both the training and inference speed of the                         errors while amplifying smaller ones, promoting stable and
+model. In real-time systems, this reduction enhances response                          efficient learning. Lastly, the tunable parameter α provides
+speed by reducing latency.                                                             flexibility, allowing the reward sensitivity to be adapted for
+   Remark 4: The traditional linear and nonlinear methods                              different tasks and environments, thereby enhancing the overall
+mainly adopted item-by-item control, that is, ai , 0, i =                              robustness and performance of the learned policy.
+1, 2, 3, 4, before synchronization is achieved. In this study, we                         In sum, Fig. 5 shows the whole training process of our
+adopt a DRL-based method to break through this bottleneck                              method based on PPO algorithm. Additionally, as illustrated
+and minimize the number of control terms as much as possible                           in Algorithm 1, we outline a procedure for implementing the
+so as to streamline the control process and cut down on control                        PPO algorithm in the error dynamic system (3). This process
+cost. Specifically, we have attempted to fix any of the control                        involves using mt to approximate the mean of the gradients,
+parameters a1 , a2 , a3 , a4 at 0. However, experimental results                       which is calculated as mt = β1 mt−1 +(1−β1 )∇φ L(φt ), where β1
+show that only when a3 is fixed at 0 can we achieve the desired                        is the decay rate for the first moment estimates. Additionally,
+outcomes.                                                                              vt is employed to estimate the uncentered variance of the
+   The termination criterion for the environment training is as                        gradients, computed by vt = β2 vt−1 + (1 − β2 )(∇φ L(φt ))2 , with
+follows: either reaching the predefined number of time steps                           β2 being the decay rate for the second moment estimates.
+or when the reward becomes exceedingly small.                                          Bias correction is applied through m̂t = 1−β          mt
+                                                                                                                                                 t and v̂t =
+                                                                                                                                                                vt
+                                                                                                                                                              1−βt2 ,
+                                                                                                                                                 1
+   At the commencement of the agent’s training, closely                                ensuring more accurate updates. The parameters are then
+monitoring its performance throughout the training process                             updated using these bias-corrected estimates to achieve more
+is of utmost significance. Consequently, the proper setting of                         stable convergence, following φt+1 = φt −η √v̂m̂+         t
+                                                                                                                                                    . The resultant
+                                                                                                                                               t
+observation values holds particular importance. The observa-                           experimental findings are discussed in detail in the following
+tion value Ot at the present time step is defined in the following                     section.
+manner:
+                                                                          T                                III. E XPERIMENTAL R ESULTS
+   Ot = e1 (t), e2 (t), e3 (t), e4 (t), ė1 (t), ė2 (t), ė3 (t), ė4 (t) . (10)
+          
+                                                                                          This section provides the experimental details on a computer
+Merely taking into account the current position is insufficient                        equipped with a ray tracing texel (RTX) 4090D. All programs
+to comprehensively and thoroughly evaluate whether the cur-                            are written in Python. The training process covers a duration
+rent state corresponds to the desired target state. Thus, our                          of 500, 000 time steps. For the differential equation resolution,
+observations incorporate not only the current errors but also                          each time step is 0.001 unit. The control force is constrained
+their derivatives.                                                                     to the interval [−200, 200]. The initialization of the system is
+   The design of the reward function plays a crucial role during                       carried out with variable values sampled from the range [0, 5].
+the agent’s training process. A well-designed reward function                          The learning rate is 0.0003, and the policy is implemented
+
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                   This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+6                                                                                        IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+
+Fig. 5. The training process of our method based on PPO algorithm.
+
+
+
+using a multi-layer perceptron. The expoential parameter α is                                                    TABLE I
+set as 1/2.                                                                                     MAE AND RMSE W ITH O UR P ROPOSED R EWARD (11)
+   Firstly, regarding our contribution (2), we conducted test
+experiments with the number of control forces set to 3 and
+4. The test process covered a duration of 5,000 time steps.
+Initially, we simulated the scenario where the control forces
+were randomly generated (i.e., not produced by our model,
+but assigned random values). In this case, when the number
+of control forces was 3, the execution time was 0.0956 s; when
+it was increased to 4, the execution time was 0.1053 s. When
+the control forces were instead generated through our model,                         where N is the total number of data points, p̂ is the position
+the computational cost naturally increased due to the inference                      of error dynamic system, and p represents the objective value.
+process. Specifically, for 3 control forces, the execution time                      In our study, we use the MAE and RMSE as the primary
+was 2.0181 s; for 4 control forces, it was 2.4707 s. It                              performance comparison metrics of e1 , e2 , e3 , e4 and their
+is evident that reducing one control dimension significantly                         averages.
+decreases the computational load per iteration, resulting in                            In our initial analysis, we evaluate the convergence behavior
+faster simulation times. By comparing the performance with                           of e1 , e2 , e3 and e4 in error system (3) under ten different
+and without passing through our model, we aim to demonstrate                         random initial conditions. As illustrated in Fig. 6, these
+that the reduction in the number of control forces brings                            errors quickly converge to zero. Additionally, to simulate real-
+greater improvement within the DRL framework.                                        world conditions, we introduce noise into the system, focusing
+   In machine learning, the root-mean-square error (RMSE)                            primarily on Gaussian noise. The outcomes under noisy con-
+and mean absolute error (MAE) are usually utilized to evaluate                       ditions are presented in Fig. 7. It is evident that, despite
+the difference between the predicted outputs and the true                            the presence of noise, the errors rapidly converge towards
+values, which are given as following:                                                zero. This demonstrates that our method exhibits excellent
+                                                                                     robustness against Gaussian noise interference. Meanwhile,
+                                 s                                                   the computed metrics MAE and RMSE are summarized in
+                                     PN                    2                         Table I.
+                                        i=1 ( p̂i − pi )
+                   RMSE =                                      ,           (12)         Remark 6: The model’s robustness to varying initial con-
+                                             N                                       ditions stems from its training on a sufficiently large and
+                                PN
+                                        |
+                                     i=1 ip̂ − pi |                                  diverse dataset, enabling it to generalize effectively across
+                     MAE =                          ,                      (13)
+                                        N                                            different starting states. Crucially, performance degradation
+
+       Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+JIN et al.: DEEP REINFORCEMENT LEARNING APPROACH FOR SYNCHRONIZATION                                                                                                   7
+
+
+Algorithm 1 PPO Algorithm for Error Dynamic System (3)
+  Initialize Parameters:
+  Set initial policy parameters θ0 to define action-selection
+  policy π.
+  Initialize value-function parameters φ0 for state-value esti-
+  mation.
+  Establish the initial system state s0 of the error dynamic
+  system (3).
+  Define trajectory collection Γ to store sequences of states,
+  actions, and rewards.
+  Specify learning rate η, decay rates β1 and β2 for Adam
+  optimizer, along with other network weights and hyperpa-
+  rameters.
+  for k = 0, 1, 2, . . . do
+     Generate trajectory collection Γk by executing policy
+     πk = π(θk ) in the environment.
+     Select action ak based on policy πk .
+     Compute rewards-to-go rk .
+     Calculate advantage estimates Ak using current value
+     function Vφk .
+     Update policy parameters θ by maximizing the PPO-Clip
+     objective:
+                                       T
+                                                πθ (at |st ) πθ
+                                              
+                            1 XX
+       θk+1 = arg max                     min                 A k (st , at ),
+                     θ |Γk |T                   πθk (at |st )
+                                 τ∈Γk t=0
+                     πθ (a|s)
+                                                         
+             clip             , 1 − , 1 +  Aπθk (s, a) .
+                    πθk (a|s)
+      Adjust value function parameters φ by minimizing mean-
+      squared error:
+                                                   T
+                                      1 XX
+                φk+1 = arg min             (Vφ (st ) − rt )2 .
+                                φ   |Γk |T
+                                            τ∈Γk t=0
+
+      Apply Adam optimization rules for step updates to solve
+      the function at previous step:
+                      mt = β1 mt−1 + (1 − β1 )∇φ L(φt ),
+                       vt = β2 vt−1 + (1 − β2 )(∇φ L(φt ))2 ,
+                              mt                 vt
+                      m̂t =         , v̂t =            ,
+                            1 − βt1            1 − βt2
+                                      m̂t
+                    φt+1 = φt − η √          .
+                                     v̂t + 
+   end for
+
+
+due to larger initial errors is mitigated as long as the
+training data adequately covers a broad range of initial con-                         Fig. 6. The variations of errors e1 , e2 , e3 and e4 by the improved PPO
+ditions. Since our training process incorporates randomly                             algorithm.
+generated initial errors, the model does not exhibit bias
+toward any specific error magnitude. Thus, provided the
+training distribution is sufficiently wide, the model main-                           sustained error minimization. Second, the deep neural policy
+tains stable performance even when faced with larger initial                          inherently learns rich state representations during training,
+deviations.                                                                           enabling generalization to noisy observations at deployment.
+   Remark 7: The DRL algorithm’s robustness to Gaus-                                  Third, the control strategy adapts to overall system dynamics
+sian noise can be attributed to three key factors. First, its                         rather than reacting to instantaneous noise, which stabilizes
+reward function penalizes both immediate absolute errors and                          decision-making. Notably, this robustness emerges naturally
+their cumulative effect through an exponential term, ensuring                         without explicit noise injection during training.
+
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+8                                                                                          IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+
+Fig. 7. The variations of errors e1 , e2 , e3 and e4 with noise by the improved        Fig. 8. The variations of errors e1 , e2 , e3 and e4 for the traditional reward (14).
+PPO algorithm.
+
+                                                                                          In traditional DRL, one of the commonly used rewards is
+   As shown in Fig. 10 from [31], which used the sliding-mode                          selected as follows:
+control method to solve the synchronization problem of MCSs,                                                rt = − (|e1 | + |e2 | + |e3 | + |e4 |) ,                    (14)
+it is evident that at 0.1 s, 0.2 s, 0.3 s, the errors e1 , e2 , e3 , and
+e4 remain significant. In contrast, our method achieves much                           which is the negative Manhattan distance. Our study also
+smaller errors by the same time point in table II. Therefore, it                       experiment with this reward function for comparison. The
+is reasonable to conclude that our method exhibits relatively                          results are illustrated in Figs. 8 and 9. It is evident that when
+ideal convergence speed under specific conditions.                                     the environment includes Gaussian noise, it is difficult for the
+
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                      This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+JIN et al.: DEEP REINFORCEMENT LEARNING APPROACH FOR SYNCHRONIZATION                                                                                                     9
+
+
+
+
+                                                                                        Fig. 10. The variations of errors e1 , e2 , e3 and e4 in [31].
+
+
+                                                                                                                        TABLE II
+                                                                                                      T HE VARIATIONS OF E RRORS e1 , e2 , e3 AND e4 AT
+                                                                                                             D IFFERENT T IMES IN T HIS S TUDY
+
+
+
+
+                                                                                                                     TABLE III
+                                                                                                         MAE AND RMSE W ITH THE T RADITIONAL
+                                                                                                          M ANHATTAN D ISTANCE R EWARD (14)
+
+
+
+
+                                                                                        become a hot and important topic. Among the numerous
+                                                                                        encryption algorithms that have been proposed, one well-
+                                                                                        known approach is deoxyribonucleic acid (DNA) encryption,
+                                                                                        in which information is first converted into DNA sequences
+                                                                                        composed of base pairs (A, T, C, G), and each binary digit
+                                                                                        or group of digits can be mapped to specific combinations
+                                                                                        of these bases according to predefined coding rules. Once
+                                                                                        encoded, various biochemical techniques are applied to further
+                                                                                        process the DNA sequence for encryption, such as adding
+                                                                                        additional DNA fragments as keys. Only recipients with the
+Fig. 9. The variations of errors e1 , e2 , e3 and e4 with noise for the traditional     correct key can decode the original message by identifying
+reward (14).
+                                                                                        and removing these key sequences and then converting the
+errors to rapidly converge towards zero. The specific MAE                               DNA sequence back to its original digital form using the same
+and RMSE results are shown in Table III.                                                coding rules. The advantages of DNA encryption include its
+   Furthermore, different values of exponential parameter α =                           ability to store vast amounts of information in an extremely
+1/10, 1/7, 1/5, 1/4, 1/3, 1/2 are tested, and the results of MAE                        small space, good stability allowing long-term preservation of
+and RMSE are summarized in Fig. 11, which shows that                                    data, and high security due to the complexity of biochemical
+α = 1/2 is optimal.                                                                     reactions and specialized knowledge required. Table IV shows
+                                                                                        the DNA coding rules that we used.
+                                                                                           The flow chart of our method in image encryption is shown
+           IV. A PPLICATION TO I MAGE E NCRYPTION                                       in Fig. 12. The image encryption process begins with the
+  With the advancement of chaos theory, the application                                 original image, which is separated into its R, G, and B chan-
+of chaotic synchronization in communication security has                                nels. The process then involves generating sequences using a
+
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+10                                                                                         IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+                                                                                               is calculated as follows:
+                                                                                                                           Sum(I1 ) + Sum(I2 )
+                                                                                                                    k0 =                       ,                        (16)
+                                                                                                                           255 × M × N × 2
+                                                                                             where Sum(I1 ) and Sum(I2 ) represent the sums of all
+                                                                                             elements in matrices I1 and I2 , respectively. Through
+                                                                                             the utilization of the specified parameters and initial
+                                                                                             conditions, a chaotic sequence K1 of length M × N is
+                                                                                             generated, which is non-periodic and non-converging.
+                                                                                          4) To adjust values of K1 to the range 0-255, the following
+                                                                                             transformation is applied:
+
+                                                                                                                    k0j = mod[round(k j ), 256].                        (17)
+
+                                                                                             This transformed sequence is then reshaped into a matrix
+                                                                                             Q of size M × N.
+                                                                                          5) An XOR operation is performed between the corre-
+                                                                                             sponding blocks of I1 , I2 , I3 , and Q, resulting in modified
+                                                                                             matrices I10 , I20 , and I30 .
+                                                                                          6) Solve the system (3) to generate four chaotic sequences
+                                                                                             X1 , X2 , X3 , and X4 , each of length M×N  p2 .
+                                                                                          7) One-dimensional Kalman filtering is applied each of the
+Fig. 11. The MAE and RMSE variations in the parameter α with or without
+                                                                                             sequences X1 , X2 , X3 , X4 . The implementation employs
+noise: (a) MAE without noise, (b) RMSE without noise, (c) MAE with noise,                    a custom one-dimensional Kalman filter that per-
+and (d) RMSE without noise.                                                                  forms sequential state estimation using the standard
+                                                                                             prediction-update mechanism. Each sequence is pro-
+                                  TABLE IV                                                   cessed independently, with the filter initialized based
+                       T HE C ODING RULES OF DNA                                             on the first value of the sequence. The filtering process
+                                                                                             iteratively applies the Kalman update equations to effec-
+                                                                                             tively reduce noise or random perturbations present in
+                                                                                             the data.
+                                                                                          8) The DNA coding method for sub-blocks at identical
+                                                                                             positions in I10 , I20 , and I30 is determined by X1 , X2 . The
+                                                                                             values of X1 , X2 are converted to integers ranging from
+                                                                                             1 to 8 by using
+                                                                                                           (
+                                                                                                            o0m = mod (round(om ), 8) + 1,
+                                                                                                                                                         (18)
+logistic map and a drive circuit referring to the system (2).                                                p0m = mod (round(pm ), 8) + 1,
+These sequences are further processed through exclusive OR
+(XOR) operations and modulo arithmetic. Subsequently, the                                      where om and pm (m = 0, . . . , M×N
+                                                                                                                                 p2 − 1) denote the ele-
+sequences are filtered using a Kalman filter and then encoded                                  ments of the chaotic sequences X1 and X2 , respectively.
+and decoded using a DNA algorithm. The response ciruit is                                      The sequences I10 , I20 , and I30 are first encoded using
+the system (4). Finally, the encrypted image is generated. The                                 DNA coding rules according to o0m . Following this, DNA
+specific steps of encryption are as follows:                                                   decoding is carried out based on the values of p0m .
+     1) The colored digital image is segmented into three sep-                             9) Repeat steps (7) and (8), substituting X1 and X2 with X3
+        arate pixel matrices, each of size M × N (where the ×                                  and X4 , respectively.
+        denotes multiplication), corresponding to the R, G, and                          10) Finally, the two-dimensional matrices obtained after
+        B color channels. These matrices are denoted as I1 , I2 ,                              the second substitution are combined into a three-
+        and I3 . Each element within these matrices has a value                                dimensional matrix to form the encrypted image.
+        range from 0 to 255.                                                               Remark 8: The steps for decryption are the reverse of
+     2) A sub-block size of p × p is defined. Consequently,                            the encryption process. In our approach, Kalman filtering
+        each of the image pixel matrices is divided into M×Np2
+                                                                                       plays a crucial role. Kalman filtering enhances both image
+        segments.                                                                      encryption and chaotic sequence generation. In image encryp-
+     3) The Logistic map is characterized by the equation:                             tion, it improves data integrity and mitigates noise effects by
+                                                                                       predicting and correcting errors during transmission. Kalman
+                              kn = ηkn−1 (1 − kn−1 ),                        (15)      filtering optimizes sequence quality through noise reduction
+                                                                                       and synchronization enhancement, resulting in more unpre-
+        where η represents the bifurcation parameter. η is set to                      dictable and reliable sequences. Without the Kalman filtering
+        3.9999 as one of the encryption keys. Another key, k0 ,                        step, however, the image cannot be fully restored, as this
+
+         Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                   This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+JIN et al.: DEEP REINFORCEMENT LEARNING APPROACH FOR SYNCHRONIZATION                                                                                                    11
+
+
+
+
+Fig. 12. The flow chart of our method in image encryption.
+
+
+
+
+Fig. 13. Original, encrypted, and decrypted images.
+                                                                                     Fig. 14. Histograms of original image.
+
+process is essential for error correction and noise reduction,
+ensuring the integrity of the decrypted image.
+   To illustrate the effectiveness of our encryption method, we
+apply it to a color image. As illustrated in Fig. 13(a) and
+Fig. 13(b), there is no significant visual similarity between
+the original and encrypted images, confirming the encryption’s
+effectiveness. Fig. 13(c) demonstrates successful recovery of
+the original image from its encrypted form. The histograms of
+the encrypted image in the R, G, and B channels, shown in
+Fig. 14 and Fig. 15, exhibit closely resemble uniform distri-
+                                                                                     Fig. 15. Histograms of encrypted image.
+butions, further indicating the robustness of the encryption.
+   A lower correlation between the gray values of adjacent
+regions indicates a higher resistance of the image to various                        correlation coefficient is given by
+attacks. Therefore, in this section, we analyze the pixel corre-
+                                                                                                                        Cov(δ, σ)
+lation along horizontal, vertical, and diagonal axes to evaluate                                                  ϕδσ = √          ,                                  (19)
+the encryption performance. At the same time, our comparison                                                              D(δ)D(σ)
+of previous image encryption methods primarily centers on                            where δ and σ represent the gray values of two adjacent
+their correlation properties. The formula for calculating the                        pixels in the image. Here, Cov(δ, σ) denotes the covariance
+
+       Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                   This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+12                                                                                         IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+                                                                                     an extremely large key space, making it highly resistant to
+                                                                                     exhaustive key search attacks aimed at cracking the image.
+
+                                                                                                                   V. C ONCLUSION
+                                                                                        This paper puts forward an AI-based control strategy aimed
+                                                                                     at synchronizing two MCSs without the requirement of prior
+                                                                                     knowledge about their dynamic behaviors. Different from
+Fig. 16. Correlations of adjacent pixels in B channel of original image.
+                                                                                     traditional linear and nonlinear control techniques that rely on
+(a) Horizontal direction. (b) Vertical direction. (c) Diagonal direction.            precise mathematical models, the proposed approach leverages
+                                                                                     DRL. By integrating only the essential control signals, the
+                                                                                     improved PPO algorithm significantly reduces the complexity
+                                                                                     of system synchronization.
+                                                                                        Specifically, the method is based on an enhanced DRL
+                                                                                     approach with an improved PPO algorithm. It simplifies the
+                                                                                     control architecture by reducing the number of control forces
+                                                                                     compared to the conventional item-by-item control method.
+                                                                                     Additionally, the classical PPO algorithm is enhanced through
+                                                                                     refining the reward function, which not only enables MCSs
+Fig. 17. Correlations of adjacent pixels in B channel of encrypted image.            to synchronize with a faster convergence rate but also endows
+(a) Horizontal direction. (b) Vertical direction. (c) Diagonal direction.            them with robustness against Gaussian noise interference.
+                                                                                        The effectiveness of this method has been verified through
+                                 TABLE V                                             its successful application in image encryption. In this appli-
+C ORRELATION C OEFFICIENTS OF THE O RIGINAL AND E NCRYPTED I MAGES                   cation, the synchronized MCSs show robust performance and
+                                                                                     enhanced security features. Given that real-world situations
+                                                                                     often involve unpredictable perturbations, future research can
+                                                                                     focus on training these chaotic systems in noisy environments
+                                                                                     to further enhance their resilience. Another promising research
+                                                                                     direction is to explore alternative DRL methods to achieve bet-
+                                                                                     ter convergence properties in chaotic system synchronization.
+                                                                                     These advancements have the potential to be extended to a
+                                                                                     broader range of applications, such as secure communications
+                                                                                     and data protection.
+between these pixels, while the mean E(δ) and variance D(δ)
+are defined as follows:                                                                                               R EFERENCES
+                             n                                                       [1]  E. N. Lorenz, “Deterministic nonperiodic flow,” J. Atmos. Sci., vol. 20,
+                          1X
+                   E(δ) =       δi ,                   (20)                               no. 2, pp. 130–141, Mar. 1963.
+                          n                                                          [2] J. P. Crutchfield, “Between order and chaos,” Nature Phys., vol. 8, no. 1,
+                                   i=1
+                              n
+                                                                                          pp. 17–24, Jan. 2011.
+                            1X                                                       [3] J. M. Ottino, F. J. Muzzio, M. Tjahjadi, J. G. Franjione, S. C. Jana,
+                     D(δ) =     (δi − E(δ))2 .                             (21)           and H. A. Kusch, “Chaos, symmetry, and self-similarity: Exploiting
+                            n                                                             order and disorder in mixing processes,” Science, vol. 257, no. 5071,
+                                   i=1
+                                                                                          pp. 754–760, Aug. 1992.
+   Figure 16 presents the distribution of adjacent pixel values                      [4] E. Benincà et al., “Chaos in a long-term experiment with a plankton
+in channel B of Fig. 13(a). It is evident that this distribu-                             community,” Nature, vol. 451, no. 7180, pp. 822–825, Feb. 2008.
+                                                                                     [5] D. A. Hsieh, “Chaos and nonlinear dynamics: Application to financial
+tion closely resembles a positively sloped curve, indicating a                            markets,” J. Finance, vol. 46, no. 5, pp. 1839–1877, Dec. 1991.
+strong direct correlation among adjacent pixels. In contrast,                        [6] S. H. Strogatz, Nonlinear Dynamics and Chaos: With Applications to
+Fig. 17 illustrates the distribution of adjacent pixel values for                         Physics, Biology, Chemistry, and Engineering. New York, NY, USA:
+Fig. 13(b), showing how the encryption process disrupts such                              CRC Press, 2024.
+                                                                                     [7] T. Umar, M. Nadeem, and F. Anwer, “Chaos based image encryption
+correlations.                                                                             scheme to secure sensitive multimedia content in cloud storage,” Exp.
+   In addition, Table V summarizes the correlation coefficients                           Syst. Appl., vol. 257, Aug. 2024, Art. no. 125050.
+between adjacent pixels of the original and encrypted images                         [8] X. Liu, C. Li, S. S. Ge, and D. Li, “Time-synchronized control of chaotic
+                                                                                          systems in secure communication,” IEEE Trans. Circuits Syst. I, Reg.
+obtained using our method, further demonstrating the effec-                               Papers, vol. 69, no. 9, pp. 3748–3761, Sep. 2022.
+tiveness of the encryption.                                                          [9] Z. Zhong, W. Lin, and B.-W. Qin, “Modulating biological rhythms:
+   To prevent attacks, an effective encryption algorithm should                           A noncomputational strategy harnessing nonlinearity and decoupling
+                                                                                          frequency and amplitude,” Phys. Rev. Lett., vol. 131, no. 13, Sep. 2023,
+have a sufficiently large key space, generally assumed to be at                           Art. no. 138401.
+least 2100 . The size of the key space can be evaluated based                        [10] L. Chua, “Memristor—The missing circuit element,” IEEE Trans. Cir-
+on the sensitivity of each individual key. Since our parameters                           cuit Theory, vol. CT-18, no. 5, pp. 507–519, Sep. 1971.
+                                                                                     [11] D. B. Strukov, G. S. Snider, D. R. Stewart, and R. S. Williams, “The
+are closely related to those in [31], our key space is also on                            missing memristor found,” Nature, vol. 453, no. 7191, pp. 80–83, May
+the order of 1095 . There is no doubt that this design provides                           2008.
+
+       Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+JIN et al.: DEEP REINFORCEMENT LEARNING APPROACH FOR SYNCHRONIZATION                                                                                                    13
+
+
+
+[12] L. V. Gambuzza, A. Buscarino, L. Fortuna, and M. Frasca, “Memristor-              [35] H.-T. Yau, P.-H. Kuo, P.-C. Luan, and Y.-R. Tseng, “Proximal policy
+     based adaptive coupling for consensus and synchronization,” IEEE                       optimization-based controller for chaotic systems,” Int. J. Robust Non-
+     Trans. Circuits Syst. I, Reg. Papers, vol. 62, no. 4, pp. 1175–1184, Apr.              linear Control, vol. 34, no. 1, pp. 586–601, Jan. 2024.
+     2015.                                                                             [36] S. Vashishtha and S. Verma, “Restoring chaos using deep reinforcement
+[13] M. Di Marco, M. Forti, and L. Pancioni, “New conditions for global                     learning,” Chaos, Interdiscipl. J. Nonlinear Sci., vol. 30, no. 3, Mar.
+     asymptotic stability of memristor neural networks,” IEEE Trans. Neural                 2020, Art. no. 031102.
+     Netw. Learn. Syst., vol. 29, no. 5, pp. 1822–1834, May 2018.                      [37] L. Xu, R. Ma, J. Wu, and P. Rao, “Proximal policy optimization approach
+[14] B. Muthuswamy and P. Kokate, “Memristor-based chaotic circuits,”                       to stabilize the chaotic food web system,” Chaos Solitons Fractals,
+     IETE Tech. Rev., vol. 26, no. 6, pp. 417–429, Dec. 2009.                               vol. 192, Mar. 2025, Art. no. 116033.
+[15] B. Bao, Z. Ma, J. Xu, Z. Liu, and Q. Xu, “A simple memristor chaotic              [38] M. Itoh and L. O. Chua, “Memristor oscillators,” Int. J. Bifurcation
+     circuit with complex dynamics,” Int. J. Bifurcation Chaos, vol. 21, no. 9,             Chaos, vol. 18, no. 11, pp. 3183–3206, Nov. 2008.
+     pp. 2629–2645, Sep. 2011.                                                         [39] J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov,
+[16] H. Li, L. Wang, and S. Duan, “A memristor-based scroll chaotic                         “Proximal policy optimization algorithms,” 2017, arXiv:1707.06347.
+     system—Design, analysis and circuit implementation,” Int. J. Bifurca-             [40] J. Schulman, P. Moritz, S. Levine, M. Jordan, and P. Abbeel, “High-
+     tion Chaos, vol. 24, no. 7, Jul. 2014, Art. no. 1450099.                               dimensional continuous control using generalized advantage estimation,”
+[17] S. Yang, C. Li, and T. Huang, “Impulsive control and synchronization                   2015, arXiv:1506.02438.
+     of memristor-based chaotic circuits,” Int. J. Bifurcation Chaos, vol. 24,         [41] W. Hao, T. Zhang, X. Chen, and X. Zhou, “A hybrid NEQR
+     no. 12, Dec. 2014, Art. no. 1450162.                                                   image encryption cryptosystem using two-dimensional quantum walks
+[18] L. Wang, Z. Zeng, M.-F. Ge, and J. Hu, “Global stabilization analysis                  and quantum coding,” Signal Process., vol. 205, Apr. 2023, Art.
+     of inertial memristive recurrent neural networks with discrete and                     no. 108890.
+     distributed delays,” Neural Netw., vol. 105, pp. 65–74, Sep. 2018.                [42] L. Li, “A novel chaotic map application in image encryption algorithm,”
+[19] S. Wen, Z. Zeng, and T. Huang, “Adaptive synchronization of memristor-                 Expert Syst. Appl., vol. 252, Oct. 2024, Art. no. 124316.
+     based Chua’s circuits,” Phys. Lett. A, vol. 376, no. 44, pp. 2775–2780,           [43] V. Verma and S. Kumar, “Quantum image encryption algorithm
+     Sep. 2012.                                                                             based on 3D-BNM chaotic map,” Nonlinear Dyn., vol. 113, no. 4,
+[20] S. Wen, Z. Zeng, T. Huang, and Y. Chen, “Fuzzy modeling and                            pp. 3829–3855, Feb. 2025.
+     synchronization of different memristor-based chaotic circuits,” Phys.
+     Lett. A, vol. 377, nos. 34–36, pp. 2016–2021, Nov. 2013.
+[21] W. Wang et al., “Fixed-time synchronization of fractional order memris-
+     tive MAM neural networks by sliding mode control,” Neurocomputing,
+     vol. 401, pp. 364–376, Aug. 2020.
+[22] Y. Xin and Z. Cheng, “Adaptive synchronization for delayed chaotic
+     memristor-based neural networks,” IEEE Trans. Neural Netw. Learn.                                             Shitao Jin received the B.S. degree from the School
+     Syst., vol. 34, no. 2, pp. 601–610, Feb. 2023.                                                                of Computer Science, Yangtze University, Jingzhou,
+[23] L. Wang, Q. Wang, and G. Zhang, “Adaptive intermittent stabilization of                                       China, in 2023. He is currently pursuing the M.S.
+     memristive chaotic system via T-S fuzzy model,” IEEE Trans. Circuits                                          degree in software engineering with the School of
+     Syst. II, Exp. Briefs, vol. 71, no. 3, pp. 1351–1355, Mar. 2024.                                              Artificial Intelligence and Computer Science, Jiang-
+[24] C. Li, F. Min, Q. Jin, and H. Ma, “Extreme multistability analy-                                              nan University.
+     sis of memristor-based chaotic system and its application in image                                               His current research interests include stability and
+     decryption,” AIP Adv., vol. 7, no. 12, Dec. 2017, Art. no. 125204.                                            synchronization of chaotic systems and complex
+[25] H. Liu, H. Wan, C. K. Tse, and J. Lü, “An encryption scheme based                                            networks with applications.
+     on synchronization of two-layered complex dynamical networks,” IEEE
+     Trans. Circuits Syst. I, Reg. Papers, vol. 63, no. 11, pp. 2010–2021, Nov.
+     2016.
+[26] L. Wang, T. Dong, and M.-F. Ge, “Finite-time synchronization of
+     memristor chaotic systems and its application in image encryption,”
+     Appl. Math. Comput., vol. 347, pp. 293–305, Apr. 2019.
+[27] M. E. Sahin, Z. G. Cam Taskiran, H. Guler, and S. E. Hamamci,
+     “Application and modeling of a novel 4D memristive chaotic system                                             Jie Chen received the M.S. degree from the School
+     for communication systems,” Circuits, Syst., Signal Process., vol. 39,                                        of Automation, Central South University, Changsha,
+     no. 7, pp. 3320–3349, Jan. 2020.                                                                              China, in 2018, and the Ph.D. degree from School
+[28] M. Yuan, W. Wang, Z. Wang, X. Luo, and J. Kurths, “Exponential                                                of Information Science and Engineering, Fudan Uni-
+     synchronization of delayed memristor-based uncertain complex-valued                                           versity, Shanghai, China, in 2023.
+     neural networks for image protection,” IEEE Trans. Neural Netw. Learn.                                           He is currently a Lecturer at the National Uni-
+     Syst., vol. 32, no. 1, pp. 151–165, Jan. 2021.                                                                versity of Defense Technology. His current research
+[29] J. Luo, S. Qu, Y. Chen, and Z. Xiong, “Synchronization of memristor-                                          interests include multiagent task assignment, evolu-
+     based chaotic systems by a simplified control and its application to                                          tionary game theory, and game-theoretical optimiza-
+     image en-/decryption using DNA encoding,” Chin. J. Phys., vol. 62,                                            tion of complex networks.
+     pp. 374–387, Dec. 2019.
+[30] G. Peng and F. Min, “Multistability analysis, circuit implementations and
+     application in image encryption of a novel memristive chaotic circuit,”
+     Nonlinear Dyn., vol. 90, no. 3, pp. 1607–1625, Nov. 2017.
+[31] L. Wang, S. Jiang, M.-F. Ge, C. Hu, and J. Hu, “Finite-/fixed-time
+     synchronization of memristor chaotic systems and image encryption
+     application,” IEEE Trans. Circuits Syst. I, Reg. Papers, vol. 68, no. 12,
+     pp. 4957–4969, Dec. 2021.                                                                                     Jie Wu received the B.S. degree in applied math-
+[32] S. Gao et al., “A 3D memristive cubic map with dual discrete mem-                                             ematics from Hainan Normal University, Haikou,
+     ristors: Design, implementation, and application in image encryption,”                                        China, in 2013, the M.S. degree in mathematics
+     IEEE Trans. Circuits Syst. Video Tech., early access, Feb. 26, 2025, doi:                                     from China University of Mining and Technology,
+     10.1109/TCSVT.2025.3545868.                                                                                   Xuzhou, China, in 2015, and the Ph.D. degree in
+[33] M. A. Bucci, O. Semeraro, A. Allauzen, G. Wisniewski, L. Cordier,                                             circuits and system from Fudan University, Shang-
+     and L. Mathelin, “Control of chaotic systems by deep reinforcement                                            hai, China, in 2020.
+     learning,” Proc. Roy. Soc. A, vol. 475, no. 2231, Jun. 2019, Art. no.                                            Since June 2020, he has been joining the School
+     20190351.                                                                                                     of Artificial Intelligence and Computer Science,
+[34] H. Cheng, H. Li, Q. Dai, and J. Yang, “A deep reinforcement learn-                                            Jiangnan University, Wuxi, China, where he is cur-
+     ing method to control chaos synchronization between two identical                                             rently an Associate Professor. His current research
+     chaotic systems,” Chaos, Solitons Fractals, vol. 174, Sep. 2023, Art.             interests include stability and synchronization of chaotic systems and complex
+     no. 113809.                                                                       networks with applications.
+
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+14                                                                                         IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS–I: REGULAR PAPERS
+
+
+
+                          Xiaofeng Wang was born in Wuxi, Jiangsu, China,                                        Junjie Fu (Senior Member, IEEE) received the B.S.
+                          in 1978. He received the B.S. degree in communica-                                     and Ph.D. degrees from Peking University, Beijing,
+                          tion engineering, the M.S. degree in communication                                     China, in 2011 and 2017, respectively.
+                          and information system, and the Ph.D. degree in                                          He is currently a Professor with the School of
+                          computer system structure from Harbin Institute of                                     Mathematics, Southeast University, Nanjing, China.
+                          Technology, Harbin, China, in 2001, 2003, and 2007,                                    His research interests include coordination of multi-
+                          respectively.                                                                          agent systems, distributed collision avoidance, and
+                             He is currently a Research Fellow at the Peng                                       multi-agent reinforcement learning. He served as a
+                          Cheng Laboratory, Shenzhen, China. His research                                        program committee member for several international
+                          interests include network science, artificial intelli-                                 conferences. He was a recipient of the APNNS
+                          gence, and network security with applications.                                         Young Researcher Award and has received several
+                                                                                       best conference paper awards, including the 2022 IEEE ICUS Best Paper
+                                                                                       Award and the 2020 IEEE ICCSS Zadeh Best Conference Paper Award. He
+                                                                                       is an Associate Editor of IEEE Systems, Man, and Cybernetics Magazine and
+                                                                                       a Youth Editor of The Innovation.
+
+
+                                                                                                                Guanghui Wen (Senior Member, IEEE) received
+                                                                                                                the Ph.D. degree in mechanical systems and control
+                                                                                                                from Peking University, Beijing, China, in 2012.
+                                                                                                                   He is currently the Endowed Chair Professor and
+                                                                                                                the Vice Dean of the School of Automation, South-
+                                                                                                                east University, Nanjing, China. His current research
+                                                                                                                interests include autonomous intelligent systems,
+                                                                                                                complex networked systems, distributed control and
+                                                                                                                optimization, resilient control, and distributed rein-
+                                                                                                                forcement learning.
+                          Xiaoli Luan (Member, IEEE) received the B.Sc.                                            Prof. Wen is a fellow of IET. He was a recipient
+                          degree in industrial automation and the M.Sc. and            of the National Science Fund for Distinguished Young Scholars, China
+                          Ph.D. degrees in control theory and control engi-            Youth Science and Technology Award, Australian Research Council Dis-
+                          neering from Jiangnan University, Wuxi, China, in            covery Early Career Researcher Award, and Asia–Pacific Neural Network
+                          2002, 2006, and 2010, respectively.                          Society Young Researcher Award. He serves as a Technical Editor for
+                             In 2016, she was a Visiting Professor with the            IEEE/ASME T RANSACTIONS ON M ECHATRONICS and an Associate Editor
+                          University of Alberta, Edmonton, AB, Canada. She             for IEEE T RANSACTIONS ON C ONTROL OF N ETWORK S YSTEMS, IEEE
+                          is currently a Professor with the Institute of Automa-       T RANSACTIONS ON I NDUSTRIAL I NFORMATICS, IEEE T RANSACTIONS ON
+                          tion and the Dean of the School of Internet of Things        N EURAL N ETWORKS AND L EARNING S YSTEMS, IEEE T RANSACTIONS
+                          Engineering, Jiangnan University. Her research inter-        ON I NTELLIGENT V EHICLES , IEEE T RANSACTIONS ON F UZZY S YSTEMS ,
+                          ests include robust control and optimization of              IEEE T RANSACTIONS ON S YSTEMS , M AN , AND C YBERNETICS : S YSTEMS,
+complex industrial process. She has authored or co-authored more than 100              IEEE O PEN J OURNAL OF THE I NDUSTRIAL E LECTRONICS S OCIETY, and
+papers in professional journals, conference proceedings, and technical reports         Asian Journal of Control. He has been named a Highly Cited Researcher by
+in the above areas.                                                                    Clarivate Analytics since 2018.
+
+
+
+
+        Authorized licensed use limited to: Peng Cheng Laboratory. Downloaded on August 15,2025 at 01:01:27 UTC from IEEE Xplore. Restrictions apply.
+

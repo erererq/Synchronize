@@ -1,0 +1,3 @@
+﻿method,model_name,train_seed,node,test_seed,message_amplitude,message_frequency,message_mae,message_rmse,message_max_abs_error,message_corrcoef
+PPO,ppo_continuous_hopfield_node3_final_seed_1024,1024,3,2026,0.1,0.8,0.028186889365315437,0.06723430752754211,0.3831314146518707,0.769444234545156
+Linear,linear_feedback,-1,3,2026,0.1,0.8,0.04197624325752258,0.0987241268157959,0.4400976598262787,0.6445684304998096

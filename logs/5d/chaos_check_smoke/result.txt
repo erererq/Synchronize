@@ -1,0 +1,7 @@
+5D HOHNN uncontrolled chaos check
+parameters: w11=1.0, w22=4.0, w44=170.0
+dt=0.001, rk4_steps=10, steps=200, burn_in=20
+largest Lyapunov exponent estimate: -1.032537
+initial distance after burn-in: 3.405756e-06
+final distance after burn-in: 5.309582e-07
+verdict: not clearly chaotic

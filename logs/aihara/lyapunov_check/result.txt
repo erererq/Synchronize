@@ -1,0 +1,8 @@
+k=0.940000
+alpha=0.810000
+beta=0.120000
+bias=0.180000
+epsilon=0.050000
+steps=100000
+burn_in=20000
+largest_lyapunov_exponent=0.00000239

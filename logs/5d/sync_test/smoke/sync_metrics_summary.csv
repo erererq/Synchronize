@@ -1,0 +1,2 @@
+﻿model_label,node,n_runs,mae_mean,mae_std,rmse_mean,rmse_std,mean_l1_mean,mean_l1_std,final_l1_mean,final_l1_std,mean_abs_u_mean,mean_abs_u_std,energy_u_mean,energy_u_std
+node 1,1,1,0.7452379465103149,0.0,1.2158231735229492,0.0,3.726189136505127,0.0,2.1749401092529297,0.0,2.8749516010284424,0.0,73.65713500976562,0.0

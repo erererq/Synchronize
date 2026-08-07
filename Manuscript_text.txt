@@ -1,0 +1,1214 @@
+Optimal Pinning Synchronization of Hopﬁeld Chaotic Neural Networks
+Based on DRL Algorithm and Application for Image Encryption
+
+ARTICLE INFO                                   ABSTRACT
+Keywords:                                      We develop a deep reinforcement learning (DRL)-based single-input pinning synchronization control
+Image encryption                               framework for continuous-time Hopﬁeld chaotic neural networks and explore its application to image
+Synchronization                                encryption. In the proposed framework, only one scalar control input is injected into a selected node
+Deep reinforcement learning                    of the response system, and proximal policy optimization (PPO) is adopted as a representative DRL
+Neural network                                 algorithm to learn the constrained nonlinear control policy. To support pinning-node selection, a multi-
+                                               index local analysis is performed, and the drive–response synchronization process is formulated as
+                                               a continuous-state and continuous-action reinforcement learning problem. The learned controller is
+                                               evaluated under nominal and non-ideal settings. Based on the synchronized chaotic trajectories, an
+                                               image encryption and decryption scheme is constructed using Logistic-map diﬀusion and dynamic
+                                               DNA coding. Numerical results show that the local node-ranking result is generally consistent with
+                                               the closed-loop synchronization behavior and provides practical guidance for selecting the controlled
+                                               node. Compared with a ﬁxed-gain linear feedback baseline, the PPO-implemented DRL controller
+                                               maintains eﬀective synchronization in several non-ideal scenarios and shows stronger adaptability
+                                               under less favorable pinning channels. Finally, statistical analysis shows that the encrypted images
+                                               exhibit reduced statistical redundancy, verifying the potential value of the proposed framework in
+                                               chaos-based secure image encryption. These results suggest that DRL-based single-input pinning
+                                               control is feasible for synchronizing Hopﬁeld chaotic neural networks under constrained actuation
+                                               and limited observation.
+
+
+
+1. Introduction                                                          they usually rely on explicit system models, stability analy-
+                                                                         sis, and carefully designed feedback laws. For complex non-
+    Chaotic systems have been widely studied in nonlinear                linear systems with uncertain dynamics, limited observation
+science [1], complex networks [2], and neural dynamics [3]
+                                                                         information, or diﬃcult-to-model behaviors, such require-
+because of their sensitive dependence on initial conditions, a
+                                                                         ments may restrict their applicability. To reduce the depen-
+property in which small diﬀerences in initial states may grow            dence on analytical controller design, the deep reinforcement
+rapidly and lead to markedly diﬀerent trajectories over time.            learning (DRL) has been increasingly explored as a model-
+This sensitivity makes chaotic systems diﬃcult to predict                free data-driven control approach for complex dynamical
+and control, and also raises the fundamental problem of                  systems [25–27]. Through interaction with the environment,
+whether chaotic motions can be coordinated or synchronized
+                                                                         DRL learns nonlinear control policies directly from state
+through appropriate coupling or control. In 1990, Pecora
+                                                                         observations and reward feedback, making it suitable for con-
+and Carroll demonstrated drive–response synchronization                  tinuous control and decision-making tasks. Existing studies
+in chaotic systems [4], showing that two chaotic systems                 have introduced learning-based methods into chaos control
+can evolve coherently under suitable conditions. Since then,             and synchronization tasks, showing that DRL controllers
+the analysis, control, and synchronization of chaotic sys-               can achieve eﬀective control or synchronization in several
+tems have attracted extensive attention, with applications in
+                                                                         typical chaotic systems [28–34]. Some recent works [35, 36]
+secure communication [5–7], image encryption [8, 9], and
+                                                                         have further considered reduced control inputs, noisy envi-
+coordinated control of complex systems [10, 11].                         ronments, or incomplete state information, suggesting that
+    For chaotic systems, synchronization refers to the pro-              learning-based controllers may retain certain adaptability
+cess by which two or more systems evolve toward a con-                   under non-ideal conditions.
+sistent dynamical relationship through appropriate coupling                   As a representative neural dynamical model, the Hop-
+or control mechanisms. Diﬀerent synchronization forms
+                                                                         ﬁeld neural network has also been widely used to study non-
+have been widely investigated, including complete syn-
+                                                                         linear dynamics and chaos. In the classical graded-response
+chronization [12], generalized synchronization [13], phase               Hopﬁeld model, suitable symmetric-connection conditions
+synchronization [14], and lag synchronization [15]. To                   usually lead the network state to converge to equilibrium
+realize these synchronization objectives and control chaotic             points [37]. However, the modiﬁed Hopﬁeld-type neural
+behaviors, a variety of classical control methods have been              networks can exhibit rich nonlinear dynamics, including
+developed [16, 17], such as linear feedback control [18],
+                                                                         bifurcation, multistability, and chaotic attractors [38–40].
+adaptive control [19], sliding-mode control [20–22], impul-
+                                                                         Existing studies on Hopﬁeld-type chaotic neural networks
+sive control [23], and pinning control [24].                             have mainly focused on dynamical analysis and model-based
+    Although these classical methods have provided eﬀec-                 control or synchronization, such as fractional-order dynam-
+tive tools for stabilizing and synchronizing chaotic systems,            ics, chaos control, weak synchronization, and impulsive or
+     ORCID (s):                                                          intermittent synchronization [41–44]. These studies provide
+
+
+First Author et al.: Preprint submitted to Elsevier                                                                                   Page 1 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+useful foundations for understanding and controlling Hop-            • A DRL-based synchronization control framework is
+ﬁeld chaotic dynamics, especially from the perspectives of             developed for two continuous-time Hopﬁeld chaotic
+dynamical characterization and model-based control design.             neural networks, where the control policy is learned
+    Despite recent progress in both Hopﬁeld chaotic dy-                from interaction data without requiring an analytically
+namics and DRL-based chaos control, the synchronization                designed control law or detailed prior knowledge of
+of continuous-time Hopﬁeld chaotic neural networks un-                 the system.
+der constrained pinning control has received less attention.
+Many existing DRL-based chaotic synchronization studies              • A single-input pinning control strategy is formulated,
+have mainly focused on typical low-dimensional chaotic sys-            in which only one scalar control signal is applied to
+tems, such as the Lorenz system, Rössler system, and Chua              a selected node of the response system, reducing the
+circuit [31, 32], or have adopted relatively ﬂexible multi-            control cost.
+variable control structures. In contrast, in a single-input          • An optimal pinning-node selection analysis is per-
+pinning setting, only one scalar control signal is applied to a        formed by combining the maximum conditional Lya-
+selected response node, making the pinning-node choice crit-           punov exponent, Riccati-based cost, feedback gain
+ical to the synchronization performance of the learned con-            norm, and local control propagation index.
+troller. Moreover, practical control systems are often subject
+to actuator limitations, model uncertainty, external perturba-       • The robustness of the PPO-implemented DRL con-
+tions, stochastic measurement or process noise, and limited            troller is evaluated under parameter mismatch, global
+sensing information [36, 42, 43]. In this context, single-input        impulse disturbance, Gaussian noise perturbation, and
+pinning control can be interpreted as a constrained-actuation          partial-observation settings.
+scenario, where only one control channel is available for
+synchronization. Therefore, it is necessary to evaluate not          • A chaos-based image encryption scheme is developed
+only nominal synchronization performance but also the ro-              using synchronized Hopﬁeld trajectories, Logistic-
+bustness and adaptability of the learned controller under non-         map diﬀusion, and dynamic DNA coding. This appli-
+ideal operating conditions.                                            cation extends the use of DRL-based chaotic synchro-
+    In addition to synchronization control itself, chaotic syn-        nization from control-oriented tasks to secure image
+chronization also has potential value in secure image en-              protection.
+cryption. Owing to their sensitivity to initial conditions and        The remainder of this paper is organized as follows. Sec-
+pseudo-random dynamical behavior, chaotic systems have            tion 2 introduces the continuous-time Hopﬁeld chaotic neu-
+been widely used to construct key streams, permutation–           ral network and formulates the single-input pinning synchro-
+diﬀusion mechanisms, and DNA-coding-based encryption              nization problem. Section 3 presents the local pinning-node
+procedures [8, 45–48]. In a drive–response synchronization        selection analysis and the DRL-based control framework im-
+framework, the synchronized chaotic trajectories can pro-         plemented by PPO. Section 4 reports the experimental setup,
+vide consistent key streams for encryption and decryption,        results, and discussion. Section 5 presents the application
+while their irregular dynamics help reduce the statistical        in image encryption. Finally, Section 6 concludes this paper
+redundancy of the encrypted image. This motivates us to           and outlines possible future work.
+further examine whether the synchronized trajectories gen-
+erated by the learned Hopﬁeld controller can be used in a
+chaos-based image encryption scheme.                              2. Preliminaries
+    Motivated by these considerations, this paper inves-             Hopﬁeld’s continuous neural network model proposed in
+tigates the single-input pinning synchronization problem          1984 [37] can be written as
+for a continuous-time Hopﬁeld chaotic neural network and
+                                                                                 𝑛
+further explores its application to image encryption. A                    𝑑𝑢𝑖 ∑             𝑢
+DRL-based data-driven framework is developed, in which                  𝐶𝑖    =     𝑇𝑖𝑗 𝑉𝑗 − 𝑖 + 𝐼𝑖 ,                        (1)
+                                                                           𝑑𝑡   𝑗=1
+                                                                                            𝑅  𝑖
+proximal policy optimization (PPO) is adopted to learn a
+constrained nonlinear control policy. The proposed method         with the static nonlinear input–output mapping 𝑉𝑖 = 𝑔𝑖 (𝑢𝑖 ).
+integrates local pinning-node analysis with reinforcement-        Here, 𝑢𝑖 denotes the internal state variable of the 𝑖th neuron,
+learning-based control, allowing the node-selection result        𝑉𝑖 is the neuron output, 𝐶𝑖 and 𝑅𝑖 represent the equivalent
+and the learned policy to be evaluated within a uniﬁed drive–     capacitance and resistance, respectively, 𝑇𝑖𝑗 denotes the
+response synchronization setting. The learned controller is       synaptic connection weight, and 𝐼𝑖 is the external bias input.
+further tested under nominal synchronization, parameter               In Hopﬁeld’s original study, the matrix 𝑇 was assumed
+mismatch, global impulse disturbance, Gaussian noise per-         to be symmetric so as to guarantee the monotonic decrease
+turbation, and partial-observation settings. Finally, the syn-    of the system energy function in a mathematical sense. How-
+chronized chaotic trajectories are used to construct an image     ever, such a setting leads the network to eventually converge
+encryption and decryption scheme based on Logistic-map            to a static equilibrium point and thus prevents the emergence
+diﬀusion and dynamic DNA coding. The main contributions           of chaotic behavior. To focus on the nonlinear bifurcation
+of this paper are summarized as follows:                          and chaotic attractor characteristics induced by the complex
+
+First Author et al.: Preprint submitted to Elsevier                                                                Page 2 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+internal topological coupling of the neural network, the orig-
+inal equations are often nondimensionalized in the control
+literature [38, 41].
+     Introducing the parameter substitutions 𝑎𝑖 = 𝑅1𝐶 , 𝑤𝑖𝑗 =
+                                                      𝑖 𝑖
+𝑇𝑖𝑗             𝐼𝑖
+ 𝐶𝑖
+    , and 𝑏𝑖 =  𝐶𝑖
+                   , and assuming that all neurons share the
+same leakage coeﬃcient (𝑎𝑖 = 1), neglecting the constant
+bias term (𝐛 = 𝟎), and choosing tanh(⋅) to characterize the
+saturating nonlinearity of the neuron output, one obtains the
+continuous-time Hopﬁeld-type neural network model used
+in the subsequent analysis:
+
+      ̇ = −𝐱(𝑡) + 𝑊 tanh(𝐱(𝑡)),
+      𝐱(𝑡)                                                  (2)
+
+where 𝐱(𝑡) = [𝑥1 (𝑡), 𝑥2 (𝑡), 𝑥3 (𝑡)]𝑇 is the state vector of
+the system (2). Following the three-neuron Hopﬁeld-type
+chaotic model studied in [41], in this paper, the network         Figure 2: Time-domain state trajectories of the continuous-
+weight matrix is speciﬁed as                                      time Hopﬁeld-type chaotic neural network.
+
+          ⎡−1.4 1.2 −7.0⎤
+      𝑊 = ⎢ 1.1 0.0  2.8 ⎥ .                                (3)
+          ⎢              ⎥                                        to have slight hardware-induced parameter mismatch with
+          ⎣ 0.8 −2.0 4.0 ⎦
+                                                                  respect to 𝑊 ; 𝑢(𝑡) ∈ ℝ is the scalar control input; and 𝐵 ∈
+                                                                  ℝ3×1 is the pinning-node selection vector, which determines
+                                                                  the speciﬁc physical node into which the control signal is
+                                                                  injected. Only one of its three components is equal to 1,
+                                                                  while the others are 0.
+                                                                       For this parameter setting, the initial condition 𝐱(0) =
+                                                                  (0, 0.01, 0)T , which has been used as a representative ini-
+                                                                  tial state in previous studies on Hopﬁeld chaotic neural
+                                                                  networks [41], is adopted to illustrate the basic chaotic
+                                                                  behavior of the system. The fourth-order RungeKutta (RK4)
+                                                                  simulation results show that the system exhibits chaotic be-
+                                                                  havior. To further illustrate the uncontrolled drive–response
+                                                                  behavior before applying the proposed pinning controller,
+                                                                  two identical Hopﬁeld chaotic neural networks are simu-
+                                                                  lated with the same system parameters but diﬀerent initial
+                                                                  states sampled from Uniform([−1, 1]3 ). As shown in Fig. 1,
+                                                                  the two trajectories evolve around the same double-scroll
+                                                                  chaotic attractor but do not naturally synchronize.
+                                                                       The time-domain trajectories of 𝑥1 (𝑡), 𝑥2 (𝑡), and 𝑥3 (𝑡)
+                                                                  obtained from the representative initial condition 𝐱(0) =
+                                                                  (0, 0.01, 0)T are shown in Fig. 2. These trajectories exhibit
+                                                                  non-periodic oscillatory behaviors, further indicating the
+Figure 1: Uncontrolled phase-space trajectories of the drive      chaotic dynamical characteristics of the continuous-time
+and response Hopﬁeld chaotic neural networks under diﬀerent       Hopﬁeld neural network under the current parameter setting.
+randomly sampled initial conditions.                                   Deﬁne the synchronization error as 𝐞(𝑡) = 𝐲(𝑡) − 𝐱(𝑡).
+                                                                  Then, the drive–response synchronization problem can be
+    To achieve the asymptotic synchronization between two         transformed into the asymptotic stability problem of the
+systems, the Hopﬁeld-type chaotic neural network described        error system [49], and the corresponding error dynamics can
+by (2) is taken as the drive system. The response system is       be obtained as:
+constructed by introducing a single-input pinning controller
+                                                                      ̇ = −𝐞(𝑡) + 𝑊𝑟 tanh(𝐲(𝑡)) − 𝑊 tanh(𝐱(𝑡)) + 𝐵𝑢(𝑡). (5)
+                                                                      𝐞(𝑡)
+into one selected node, and its dynamics can be generally
+written as:
+                                                                      The following deﬁnition mainly corresponds to the nom-
+      ̇ = −𝐲(𝑡) + 𝑊𝑟 tanh(𝐲(𝑡)) + 𝐵𝑢(𝑡),
+      𝐲(𝑡)                                                  (4)   inal synchronization control problem.
+                                                                  Deﬁnition 1. For the drive system (2) and the response
+where 𝐲(𝑡) ∈ ℝ3 is the state of the response system; 𝑊𝑟 is
+                                                                  system with pinning control (4), if under the action of the
+the weight matrix of the response system, which is allowed
+
+First Author et al.: Preprint submitted to Elsevier                                                                Page 3 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+control law 𝑢(𝑡) one has lim𝑡→∞ ‖𝐞(𝑡)‖ = 0, then the systems      Here, 𝐵1 , 𝐵2 , and 𝐵3 represent the cases where the control
+are said to achieve asymptotic synchronization.                   input is injected into Nodes 1, 2, and 3, respectively.
+                                                                      First, to characterize the evolution tendency of small
+                                                                  perturbations in the transverse subspace associated with
+3. PPO-Based Single-Input Pinning Control
+                                                                  diﬀerent pinning nodes, the maximum conditional Lyapunov
+   Method                                                         exponent (MCLE) [51] is introduced as a reference index for
+    Deriving an eﬀective control law 𝑢(𝑡) for the nonlinear       local transverse stability. Along the chaotic trajectory of the
+underactuated error system (5) is challenging, especially         drive system, the instantaneous Jacobian matrix is evaluated,
+under the single-input pinning constraint. Traditional analyt-    and a local variational analysis is performed in the transverse
+ical control methods usually rely heavily on accurate mathe-      subspace complementary to the candidate pinning node. The
+matical models and carefully designed controller structures.      corresponding MCLE is formally expressed as
+To address this issue, this paper adopts a data-driven DRL
+framework based on PPO. Before policy learning, a local                                       1        ‖𝛿𝐞𝑖 (𝑡)‖
+                                                                        𝜆(𝑐)
+                                                                         max (𝐵𝑖 ) = lim          ln             ,   𝑖 = 1, 2, 3,     (9)
+node-selection analysis is ﬁrst performed to provide theoret-                          𝑡→∞ 𝑡           ‖𝛿𝐞𝑖 (0)‖
+ical guidance for choosing the pinning node. Then, the syn-
+chronization control problem is formulated as a continuous-       where 𝛿𝐞𝑖 (𝑡) denotes the perturbation trajectory in the trans-
+state and continuous-action reinforcement learning task.          verse subspace complementary to the 𝑖th candidate pinning
+                                                                                                                     (𝑐)
+                                                                  node, and ‖ ⋅ ‖ denotes the vector norm. If 𝜆max       (𝐵𝑖 ) <
+3.1. Local Pinning-Node Selection Analysis                        0, small perturbations in the corresponding transverse sub-
+    To provide theoretical guidance for the selection of a        space tend to decay locally; if 𝜆(𝑐)max (𝐵𝑖 ) > 0, locally di-
+single-input pinning node, this paper analyzes the local          vergent directions still exist in that subspace. In this work,
+properties of the error system in the neighborhood of the         the MCLE is used as a local reference index for node pre-
+synchronization manifold. The local control characteristics       screening under the ideal pinning assumption.
+of Nodes 1, 2, and 3 are compared from three perspectives:            Second, to compare the local control diﬃculty associated
+local transverse stability, local linear quadratic regulation     with diﬀerent pinning nodes, a time-invariant local proxy
+cost, and local control propagation capability. It should be      model is further considered. Speciﬁcally, the Jacobian ma-
+emphasized that this analysis is used to establish a local        trix is frozen at the reference point 𝐱 = 𝟎, where 𝐷(𝟎) = 𝐼,
+ranking criterion for candidate pinning nodes, rather than        leading to 𝐴 = 𝑊 − 𝐼. Based on this local approximation,
+to provide a strict global stability proof for the subsequent     the linear quadratic regulator (LQR) framework [52] is used
+PPO-based closed-loop policy.                                     only as an auxiliary indicator for comparing candidate pin-
+    For the local pinning-node analysis, we ﬁrst consider         ning nodes, rather than as the actual controller used in the
+the baseline identical-system setting, where the drive and        nonlinear closed-loop system.
+response systems share the same weight matrix, i.e., 𝑊𝑟 =             For each candidate input vector 𝐵𝑖 , the standard LQR
+𝑊 , and no external disturbance is imposed. When the syn-         performance index is introduced as
+chronization error approaches zero, i.e., 𝐞 → 𝟎, the nonlinear                    ∞(                )
+term can be expanded to the ﬁrst order around the syn-                  𝐽=             𝐞T 𝑄𝐞 + 𝑢T 𝑅𝑢 𝑑𝑡,                             (10)
+chronization manifold. This gives the following local linear                 ∫0
+approximation of the error system [50]:
+                                                                  where 𝑄 is the state weighting matrix and 𝑅 is the input
+      ̇ ≈ [−𝐼 + 𝑊 𝐷(𝐱(𝑡))] 𝐞(𝑡) + 𝐵𝑢(𝑡),
+      𝐞(𝑡)                                                 (6)    weighting matrix. The corresponding local state-feedback
+                                                                  control law is
+where 𝐼 is the 3 × 3 identity matrix, 𝑊 is the weight matrix
+of the drive system, 𝑢(𝑡) ∈ ℝ is the scalar control input,              𝑢 = −𝐾𝑖 𝐞,                                                   (11)
+and 𝐵 ∈ ℝ3×1 is the control allocation vector indicating the
+node at which the control signal is injected. The diagonal        where the feedback gain matrix is given by
+matrix 𝐷(𝐱) is composed of the derivatives of the activation
+function:                                                               𝐾𝑖 = 𝑅−1 𝐵𝑖T 𝑃𝑖 ,                                            (12)
+             (                                               )    and 𝑃𝑖 is determined by the continuous algebraic Riccati
+𝐷(𝐱) = diag 1 − tanh2 (𝑥1 ), 1 − tanh2 (𝑥2 ), 1 − tanh2 (𝑥3 ) ,
+                                                                  equation associated with (𝐴, 𝐵𝑖 ).
+                                                           (7)       In this paper, the Riccati-based cost index is deﬁned as
+where 𝑥1 , 𝑥2 , and 𝑥3 are the state variables of the drive
+                                                                        𝐽𝑅 (𝐵𝑖 ) = tr(𝑃𝑖 ),                                          (13)
+system.
+    For single-input pinning control, diﬀerent node selec-        which provides an initial-condition-independent relative
+tions correspond to diﬀerent control allocation vectors:          measure of the local control diﬃculty associated with the
+           ⎡1⎤            ⎡0⎤            ⎡0⎤                      candidate pinning node 𝐵𝑖 . In addition, the gain norm ‖𝐾𝑖 ‖
+      𝐵1 = ⎢0⎥ ,     𝐵2 = ⎢1⎥ ,     𝐵3 = ⎢0⎥ .             (8)    is used to measure the required local feedback strength.
+           ⎢ ⎥            ⎢ ⎥            ⎢ ⎥                      These indices are used only for relative comparison among
+           ⎣0⎦            ⎣0⎦            ⎣1⎦
+
+First Author et al.: Preprint submitted to Elsevier                                                                          Page 4 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+candidate nodes under the same local proxy model, rather                 In summary, among the considered local auxiliary in-
+than as the exact integral optimal cost for a speciﬁc initial        dicators, Node 3 shows the most favorable overall perfor-
+condition.                                                           mance, followed by Node 2, whereas Node 1 performs worst.
+    Finally, to measure how eﬀectively the control action            Therefore, for the current continuous-time Hopﬁeld chaotic
+propagates from diﬀerent nodes to the entire local state             neural network, Node 3 is identiﬁed as the primary candidate
+space, the same frozen local matrix 𝐴 = 𝑊 − 𝐼 is used.               for single-input pinning control, while Node 2 is retained as a
+Based on this matrix, the controllability matrices corre-            challenging candidate for further evaluating the adaptability
+sponding to the three candidate pinning nodes are con-               of the learned controller.
+                                                                                                                       (𝑐)
+structed as [53]                                                         It should be emphasized that the MCLE 𝜆max        , Riccati-
+             [              ]                                        based cost index 𝐽𝑅 , gain norm ‖𝐾𝑖 ‖, and local control
+       𝐶𝑖 = 𝐵𝑖 , 𝐴𝐵𝑖 , 𝐴2 𝐵𝑖 , 𝑖 = 1, 2, 3,             (14)
+                                                                     volume index 𝑉𝑖 reported in Table 1 are derived from the
+and the local control volume index is deﬁned as                      locally linearized error system near the synchronization man-
+                                                                     ifold. These indicators provide local guidance for pinning-
+       𝑉𝑖 = det(𝐶𝑖 )2 .                                      (15)    node selection, but they do not constitute a global stability
+Here, 𝐶𝑖 characterizes the ability of the control input injected     guarantee for the PPO-based closed-loop policy. Therefore,
+through the 𝑖th node to propagate over the entire local              the PPO experiments in Section 4 are used to empirically
+state space. Since this determinant-based index depends on           examine whether the local ranking can be reﬂected in actual
+the chosen state scaling, it is used only as a relative local        nonlinear closed-loop synchronization.
+propagation proxy among candidate nodes under the same
+coordinate system.                                                   3.2. PPO-Based Control Formulation and
+                                                                          Training Procedure
+Table 1                                                                  After the pinning node is selected, the synchronization
+Local auxiliary indicators for comparing candidate pinning           process of the drive–response system is formulated as a
+nodes.                                                               Markov decision process (MDP) with continuous states and
+                                                                     continuous actions. In this formulation, the agent observes
+        Pinning
+                    𝜆(𝑐)
+                     max
+                                𝐽𝑅       ‖𝐾𝑖 ‖        𝑉𝑖             the current system information, outputs a bounded continu-
+         Node
+                                                                     ous action, and receives a reward determined by the synchro-
+        Node 1 +0.6061 280.2686 20.3937 0.479                        nization error.
+        Node 2 +1.5793 15.5170 6.7286 262.18                             To enable the agent to perceive both the instantaneous
+        Node 3 -0.5853 7.8327 4.3829 290.77                          dynamical state of the drive system and the current synchro-
+                                                                     nization deviation, the full observation vector is deﬁned as
+    Table 1 shows that diﬀerent pinning nodes exhibit sig-
+niﬁcantly diﬀerent local auxiliary indicators in the current                      1 [                                              ]T
+continuous-time Hopﬁeld chaotic neural network. For Node                   𝑂𝑡 =      𝑥1 (𝑡), 𝑥2 (𝑡), 𝑥3 (𝑡), 𝑒1 (𝑡), 𝑒2 (𝑡), 𝑒3 (𝑡) ,   (17)
+                                                                                  𝑐𝑜
+3, 𝜆(𝑐)
+     max < 0, indicating that under the ideal pinning as-
+sumption, small perturbations in the transverse subspace             where 𝑐𝑜 = 5.0 is a normalization factor used to suppress the
+complementary to this node tend to decay overall. Mean-              inﬂuence of extreme state values on neural network training
+while, its 𝐽𝑅 and ‖𝐾𝑖 ‖ are the smallest and 𝑉𝑖 is the largest,      stability. The notation 𝑐𝑜 is used here to avoid confusion
+suggesting relative advantages in both local control diﬃculty        with the Gaussian noise intensity 𝜎 used in the robustness
+and control propagation capability. Therefore, Node 3 can be         experiments.
+regarded as the preferred single-input pinning candidate for             The policy network outputs a raw action 𝑎𝑡 constrained
+the current system.                                                  to the continuous interval [−1, 1]. Considering the actuator
+    By contrast, Node 2 has a relatively large 𝑉𝑖 and a mod-         magnitude limitation, it is mapped to the actual physical
+erate 𝐽𝑅 , implying that the control action can still propagate      control input as
+eﬀectively over the local state space. However, its MCLE is                𝑢(𝑡) = 𝜅𝑎𝑡 ,                                                 (18)
+positive, indicating that locally divergent directions still exist
+in the corresponding transverse subspace. Therefore, Node            where 𝜅 is the control scaling factor, and 𝜅 = 4 is adopted
+2 is more suitable as a candidate node with certain control          in this paper.
+potential but a more challenging synchronization task. Node              In this study, the reward function is designed to mainly
+1 is clearly less favorable: its MCLE is positive, its 𝐽𝑅 and        promote the rapid convergence of the synchronization error.
+‖𝐾𝑖 ‖ are both signiﬁcantly higher than those of the other           Therefore, the reward is directly constructed from the global
+two nodes, and its 𝑉𝑖 is extremely small. This indicates             synchronization error:
+weak local control eﬃciency and poor control propagation
+                                                                                                          ∑
+                                                                                                          3
+capability.                                                                𝑟𝑡 = −0.1‖𝐞(𝑡)‖1 = −0.1              |𝑒𝑖 (𝑡)|.               (19)
+    Based on the above theoretical indicators, the following                                              𝑖=1
+local ranking can be obtained:
+                                                                     This reward has a clear physical interpretation: the smaller
+       Node 3 > Node 2 ≫ Node 1.                             (16)    the synchronization error, the higher the reward. At the same
+
+First Author et al.: Preprint submitted to Elsevier                                                                          Page 5 of 18
+                                               DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+                                                           Policy Network             predicted and target state values. Through repeated interac-
+                                                                 (Actor)
+       Environment
+                                a                                                     tion and parameter updates, PPO improves the control pol-
+    Reward Model                                                                      icy while limiting excessively large policy changes during
+                                                     old
+                                                             current
+                                                                                      training.
+                                                                              new
+                                                                                          The overall training procedure is summarized in Algo-
+                                                                                      rithm 1. In each iteration, trajectories are ﬁrst collected by
+                                                            update
+                                                                                      executing the current policy in the error-system environment.
+                                                           paramete
+                                                                                      The collected data are then used to estimate the advantage
+                                    PPO-clip
+                                                                                      function and update the policy network with the PPO clipped
+  Trajectory
+                                      Loss                   Value Network
+                                                           Old              New
+                                                                                      objective. The value network is updated by minimizing the
+    Buffer                                                                            squared value loss. After repeated interaction and optimiza-
+                                                                                      tion, the trained policy is used as the single-input pinning
+                                                                                      controller for the response system.
+                     GAE
+                   Advantage                       MSE                      update
+                                                   Loss                    paramete
+                   Estimation                                                         4. Experimental Results and Analysis
+Figure 3: General training process of the PPO-based DRL                 This section evaluates the proposed PPO-based single-
+framework.                                                         input pinning synchronization strategy from two main per-
+                                                                   spectives. First, the closed-loop synchronization performance
+                                                                   under diﬀerent pinning nodes is examined to verify whether
+time, it avoids introducing excessive manually designed            the local node-ranking analysis in Section 3 can be reﬂected
+shaping terms, thereby highlighting the direct response of         in actual data-driven control. Second, the robustness and
+policy learning to the synchronization objective itself. The       adaptability of the learned policy are further investigated
+trade-oﬀ between control eﬀort and synchronization perfor-         under parameter mismatch [55], global impulse disturbance,
+mance is further evaluated in the experimental section.            Gaussian noise perturbation, and partial observability.
+     To solve the optimal control policy in the above continuous-       All experiments were conducted on a computer equipped
+action setting, this paper employs the PPO algorithm [54].         with an NVIDIA RTX 5070Ti GPU. The programs were
+PPO is a typical Actor–Critic method. By introducing a             implemented in Python, and the PPO algorithm was imple-
+clipping mechanism to restrict the update magnitude of the         mented using Stable Baselines3. The total training length
+policy, it achieves relatively high sample eﬃciency while          was set to 4 × 105 time steps.
+maintaining training stability. The PPO objective function is           During environment interaction, the continuous-time
+written as                                                         system dynamics were integrated using the classical fourth-
+                 [      (             (                    ) )]    order Runge–Kutta (RK4) method. The basic integration
+     𝐿(𝜃) = 𝔼̂ 𝑡 min 𝜌𝑡 (𝜃)𝐴̂ 𝑡 , clip 𝜌𝑡 (𝜃), 1 − 𝜖, 1 + 𝜖 𝐴̂ 𝑡 , step size was set to 0.01 time units. To improve numerical
+                                                              (20) stability,  ﬁve RK4 substeps were performed within each
+                                                                   control step. Therefore, each control update corresponded to
+where                                                              an eﬀective time interval of 0.05 time units. The maximum
+                                                                   magnitude of the physical control input was constrained to
+                   𝜋𝜃 (𝑎𝑡 |𝑂𝑡 )                                    4 units.
+        𝜌𝑡 (𝜃) =                  .                           (21)
+                  𝜋𝜃old (𝑎𝑡 |𝑂𝑡 )                                       At initialization, the initial states of both the drive system
+                                                                   and the response system, denoted by 𝐱(0) and 𝐲(0), were sam-
+where 𝜌𝑡 (𝜃) denotes the likelihood ratio between the new and      pled from the uniform distribution [−1.0, 1.0]. This interval
+old policies, 𝜖 is the clipping hyperparameter, and 𝐴̂ 𝑡 is the    covers the strongly nonlinear and non-saturated region of the
+advantage estimate obtained using generalized advantage            tanh(⋅) activation function, which increases the diversity of
+estimation (GAE). Through interaction with the continuous-         initial dynamical states and avoids ineﬀective simulations
+time Hopﬁeld chaotic system, PPO can progressively learn           caused by excessive saturation.
+a nonlinear control policy that minimizes the long-term                 For the reinforcement learning conﬁguration, both the
+synchronization error under the constraint of single-input         policy network and the value network were represented by
+pinning control.                                                   multilayer perceptrons (MLPs). The Adam optimizer was
+     As shown in Fig. 3, PPO follows an interaction–update         adopted with a learning rate of 3 × 10−4 , so as to balance
+training process. The agent ﬁrst interacts with the environ-       exploration eﬃciency and policy-update stability.
+ment using the current policy and stores the collected states,          As a traditional control baseline, a ﬁxed-gain linear
+actions, rewards, and value estimates in a trajectory buﬀer.       feedback controller [18] is usually adopted:
+The advantage function is then estimated, typically using
+GAE, and the policy network is updated by maximizing a
+clipped surrogate objective. Meanwhile, the value network
+is trained by minimizing the mean squared error between the
+
+
+First Author et al.: Preprint submitted to Elsevier                                                                                   Page 6 of 18
+                                      DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+Algorithm 1 PPO-based Single-Input Pinning Control for            nominal conditions, 𝑘 = 8.0 was used throughout the
+the Error System                                                  experiments.
+Require: Error-system environment ; policy network 𝜋𝜃 ;              To avoid additional bias caused by diﬀerent actuator
+    value network 𝑉𝜙 ; learning rate 𝜂; clipping parameter 𝜖;     limits, the PPO controller and the linear feedback controller
+    discount factor 𝛾; GAE parameter 𝜆.                           were evaluated under the same input magnitude constraint.
+Ensure: Optimized policy parameters 𝜃.                            It should be noted that this setting only uniﬁes the actuator
+ 1: Initialize policy parameters 𝜃0 and value-function pa-        capability boundary. The performance diﬀerences observed
+    rameters 𝜙0 .                                                 in diﬀerent experimental scenarios may still be aﬀected
+ 2: Initialize the drive–response system and obtain the ini-      by the pinning node, observation dimension, and controller
+    tial observation 𝑂0 .                                         structure.
+ 3: Deﬁne a trajectory buﬀer Γ to store observations, ac-             To evaluate the synchronization performance of diﬀerent
+    tions, rewards, and value estimates.                          control methods, several metrics are introduced from the
+ 4: for 𝑘 = 0, 1, 2, … , 𝐾 − 1 do                                 perspectives of overall synchronization accuracy, steady-
+ 5:      Collect trajectories Γ𝑘 by executing the current pol-    state error, transient recovery capability, and control eﬀort.
+    icy 𝜋𝜃𝑘 in the environment.                                   Let 𝑇 denote the total number of testing steps, 𝑁 denote the
+ 6:      for each time step 𝑡 in Γ𝑘 do                            system dimension, and the synchronization error vector be
+ 7:          Select action 𝑎𝑡 ∼ 𝜋𝜃𝑘 (⋅|𝑂𝑡 ).
+                                                                        𝐞(𝑡) = 𝐲(𝑡) − 𝐱(𝑡) = [𝑒1 (𝑡), 𝑒2 (𝑡), … , 𝑒𝑁 (𝑡)]T .   (23)
+ 8:          Map the action to the physical control input
+    𝑢(𝑡) = 𝜅𝑎𝑡 .                                                      The mean absolute error (MAE) is used to measure the
+ 9:          Apply 𝑢(𝑡) to the response system and observe        average synchronization deviation over the whole testing
+    reward 𝑟𝑡 and next observation 𝑂𝑡+1 .                         interval:
+10:      end for
+11:      Compute advantage estimates 𝐴̂ 𝑡 using generalized                        1 ∑∑
+                                                                                         𝑇   𝑁
+    advantage estimation.                                               MAE =                |𝑒 (𝑡)|.                          (24)
+                                                                                  𝑇 𝑁 𝑡=1 𝑖=1 𝑖
+12:      Update policy parameters by maximizing the PPO
+    clipped objective:
+                                                               MAE provides an intuitive measure of the overall error level
+                                                               by assigning equal weights to diﬀerent time steps and state
+                   [     (           (                    ) )] components.
+                 ̂                 ̂                       ̂
+𝜃𝑘+1 = arg max 𝔼𝑡 min 𝜌𝑡 (𝜃)𝐴𝑡 , clip 𝜌𝑡 (𝜃), 1 − 𝜖, 1 + 𝜖 𝐴𝑡 ,
+              𝜃                                                    The root mean square error (RMSE) is used to character-
+                                                               ize the overall error level while being more sensitive to large
+    where
+                                                               deviations:
+                   𝜋𝜃 (𝑎𝑡 |𝑂𝑡 )                                                  √
+          𝜌𝑡 (𝜃) =               .                                               √
+                   𝜋𝜃𝑘 (𝑎𝑡 |𝑂𝑡 )                                                 √ 1 ∑     𝑇 ∑𝑁
+                                                                      RMSE = √                   𝑒2 (𝑡).                  (25)
+                                                                                    𝑇 𝑁 𝑡=1 𝑖=1 𝑖
+13:     Update value-function parameters by minimizing
+    the squared value loss:                                    Compared with MAE, RMSE is more sensitive to transient
+                                                                  large errors and is therefore useful for evaluating error ﬂuctu-
+                              [(               )2 ]               ations under parameter mismatch and impulse disturbance.
+           𝜙𝑘+1 = arg min 𝔼̂ 𝑡 𝑉𝜙 (𝑂𝑡 ) − 𝑅̂ 𝑡      .
+                          𝜙                                           The ﬁnal L1 error is used to measure the synchronization
+                                                                  accuracy at the end of testing:
+14: end for
+15: return optimized policy 𝜋𝜃 .                                                             𝑁
+                                                                                             ∑
+                                                                        𝐸𝑓 = ‖𝐞(𝑇 )‖1 =            |𝑒𝑖 (𝑇 )|.                  (26)
+                                                                                             𝑖=1
+
+                                                                  This metric reﬂects how closely the response system ap-
+             ⎧−4,             −𝑘𝑒𝑖 (𝑡) < −4,                      proaches the drive system at the ﬁnal testing instant.
+             ⎪                                                       In the impulse disturbance experiment, the maximum
+      𝑢(𝑡) = ⎨−𝑘𝑒𝑖 (𝑡),       −4 ≤ −𝑘𝑒𝑖 (𝑡) ≤ 4,          (22)
+             ⎪4,                                                  post-pulse error is used to describe the largest error over-
+             ⎩                −𝑘𝑒𝑖 (𝑡) > 4,                       shoot after the disturbance is injected:
+where 𝑒𝑖 (𝑡) denotes the synchronization error at the con-
+                                                                        𝑀𝑝 = max ‖𝐞(𝑡)‖1 ,                                     (27)
+trolled node 𝑖. Since the main purpose of this baseline is not                  𝑡≥𝑡𝑝
+to obtain an optimally tuned linear controller, but to provide
+a simple and easily implementable traditional reference for       where 𝑡𝑝 denotes the impulse injection time. A smaller
+comparison with the proposed PPO-based method, the gain           value indicates stronger peak-suppression capability against
+𝑘 was selected empirically through preliminary experiments.       sudden disturbances.
+Considering both convergence speed and stability under
+
+First Author et al.: Preprint submitted to Elsevier                                                                    Page 7 of 18
+                                                                          DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+       The post-pulse mean error is deﬁned as the average                                                       further used to quantitatively compare the synchronization
+   global synchronization error from the impulse injection time                                                 performance under diﬀerent pinning nodes. The results in
+   to the end of testing:                                                                                       Table 2 further conﬁrm the above observation. In terms
+                                                        𝑇
+                                                                                                                of both average error and terminal error, Node 3 achieves
+                                                1      ∑                                                        the best overall synchronization performance. This result is
+                               𝐸post =                     ‖𝐞(𝑡)‖1 ,                                    (28)
+                                            𝑇 − 𝑡𝑝 + 1 𝑡=𝑡                                                      generally consistent with the local auxiliary indicators in
+                                                              𝑝
+                                                                                                                Table 1, including the 𝜆(𝑐)
+                                                                                                                                        max , 𝐽𝑅 , ‖𝐾𝑖 ‖, and 𝑉𝑖 . Therefore, the
+  where 𝑡𝑝 is the impulse injection time and 𝑇 is the ﬁnal                                                      local theoretical analysis in Section 3 provides meaningful
+  testing step.                                                                                                 guidance for pinning-node selection in the considered Hop-
+      The control energy is used to measure the cumulative                                                      ﬁeld chaotic neural network.
+  control eﬀort over the testing process:
+                                      𝑇                                                                         Table 2
+                                      ∑
+                               𝐸𝑢 =          𝑢 (𝑡)Δ𝑡,
+                                              2
+                                                                                                        (29)    Quantitative synchronization performance under diﬀerent pin-
+                                      𝑡=1
+                                                                                                                ning nodes.
+
+  where Δ𝑡 denotes the eﬀective control update interval. This                                                                                           Final L1
+                                                                                                                            Node      MAE      RMSE              𝐸𝑓
+  metric is more sensitive to large-amplitude control inputs                                                                                             Error
+  and is commonly used to evaluate the control eﬀort.                                                                       Node 1 4.1341 4.7337          4.0429
+      In summary, MAE and RMSE are used to evaluate the                                                                     Node 2 0.2557 0.7188          0.0338
+  overall synchronization performance, Final L1 Error is used                                                               Node 3 0.1059 0.3050          0.0079
+  to describe the terminal synchronization accuracy, 𝑀𝑝 and
+  𝐸post are used to characterize transient recovery capability
+  under impulse disturbance, and 𝐸𝑢 is used to assess the                                                            To further observe the error evolution at the state-
+  control cost.                                                                                                 component level, the three-dimensional error surfaces under
+      To evaluate the guidance provided by the local node-                                                      diﬀerent random initial conditions are plotted for Nodes
+  selection analysis in Section 3, the single control input was                                                 3, 2, and 1, as shown in Figs. 5–7. For Node 3, the error
+  ﬁrst applied to Nodes 1, 2, and 3 under the same PPO                                                          components 𝑒1 , 𝑒2 , and 𝑒3 generally decay rapidly and
+  framework and identical training conﬁguration. The purpose                                                    remain close to zero after a short transient period. For Node
+  of this experiment is not to recompute the local theoretical                                                  2, the error also shows a convergence tendency, but its
+  indicators, but to empirically examine how diﬀerent pinning                                                   transient ﬂuctuation is more pronounced than that of Node 3.
+  nodes aﬀect synchronization reachability and training perfor-                                                 In contrast, for Node 1, large error ﬂuctuations persist over a
+  mance in the closed-loop data-driven control setting.                                                         longer time interval, indicating a much weaker synchroniza-
+      As shown in Fig. 4, the synchronization error evolves                                                     tion reachability. These observations are consistent with the
+  quite diﬀerently under diﬀerent pinning nodes. When Node                                                      quantitative results in Table 2 and further support the node
+  3 is selected as the controlled node, the error decays more                                                   ranking obtained in the local analysis.
+  rapidly and remains at a relatively low level, indicating                                                          Based on the above results, Node 3 is selected as the main
+  the most favorable synchronization reachability. By contrast,                                                 pinning node in the subsequent experiments, since it exhibits
+  although Node 2 can also achieve synchronization under                                                        the most favorable synchronization reachability in both local
+  certain conditions, its convergence speed and ﬁnal error level                                                theoretical analysis and closed-loop PPO evaluation. Mean-
+  are generally less stable than those of Node 3. Node 1 ex-                                                    while, Node 2 is retained as a supplementary challenging
+  hibits the weakest control performance and is more diﬃcult                                                    scenario. Although it is not the locally preferred node, it
+  to synchronize reliably under the same training setting.                                                      still possesses certain control propagation capability and is
+                                                                                                                therefore useful for testing the adaptability of the proposed
+                           2
+                     10
+                                                                                     PPO Models Node 1 (Mean)
+                                                                                                                method under a more diﬃcult control channel.
+                           1
+                                                                                     PPO Models Node 2 (Mean)        After validating the pinning-node selection, the robust-
+                     10                                                              PPO Models Node 3 (Mean)
+                                                                                                                ness of the learned control policy is ﬁrst examined under pa-
+Total Error Norm e
+
+
+
+
+                     10
+                           0
+                                                                                                                rameter mismatch [42]. To model uncertainty in the response
+                          −1
+                                                                                                                system, a mismatch is introduced into the weight matrix. Let
+                     10
+                                                                                                                𝑊 be the weight matrix of the drive system. The mismatched
+                     10
+                          −2                                                                                    weight matrix of the response system is constructed as
+
+                     10
+                          −3
+                               0.0    2.5         5.0   7.5        10.0      12.5   15.0     17.5       20.0
+                                                                                                                      𝑊𝑟 = 𝑊 + 𝜂(𝑊 ⊙ Δ),                                    (30)
+                                                                  Time/s
+
+   Figure 4: Comparison of synchronization error evolution under                                                where 𝜂 denotes the mismatch intensity coeﬃcient, ⊙ de-
+   diﬀerent pinning nodes.                                                                                      notes the Hadamard product, and Δ = [𝛿𝑖𝑗 ] is a random
+                                                                                                                perturbation matrix with
+        To avoid relying only on a single error curve for qual-                                                       𝛿𝑖𝑗 ∼ 𝑈 (−0.03, 0.03).                                (31)
+   itative judgment, MAE, RMSE, and Final L1 Error are
+
+   First Author et al.: Preprint submitted to Elsevier                                                                                                             Page 8 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+
+
+
+Figure 5: Evolution of synchronization error components under    Figure 6: Evolution of synchronization error components under
+diﬀerent random initial conditions for Node 3.                   diﬀerent random initial conditions for Node 2.
+
+
+This formulation corresponds to a relative multiplicative            It should be noted that 𝜂 is a normalized scaling coeﬃ-
+mismatch. That is, each nonzero connection weight in the         cient rather than the direct percentage of mismatch. When
+response system is perturbed around its nominal value, while     𝜂 = 1.0, the relative perturbation range is approximately
+zero entries remain unchanged. This modeling approach pre-       ±3% of the original weight; when 𝜂 = 2.0, the range is
+serves the original network topology and is also consistent      approximately ±6%. In this work, the following mismatch
+with practical parameter deviations caused by manufacturing      levels are considered:
+errors, calibration bias, and component tolerances.
+                                                                       𝜂 ∈ {0.0, 0.5, 1.0, 1.5, 2.0}.                    (32)
+
+First Author et al.: Preprint submitted to Elsevier                                                              Page 9 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+                                                                 trained controller is evaluated under ﬁxed mismatch levels
+                                                                 and compared with the linear feedback baseline.
+                                                                     Fig. 8 and Table 3 show the results under the Node 3
+                                                                 scenario. As the mismatch intensity increases, both PPO and
+                                                                 linear feedback exhibit increasing synchronization errors,
+                                                                 indicating that parameter uncertainty indeed degrades syn-
+                                                                 chronization performance. However, PPO maintains slightly
+                                                                 lower MAE than the traditional linear feedback controller
+                                                                 over most mismatch levels, suggesting that the learned non-
+                                                                 linear policy can preserve eﬀective synchronization under
+                                                                 moderate parameter uncertainty.
+
+                                                                            0.035
+                                                                                            PPO
+                                                                                            Linear
+                                                                            0.030
+
+
+
+
+                                                                      MAE
+                                                                            0.025
+
+
+                                                                            0.020
+                                                                                    0.0      0.5         1.0         1.5        2.0
+                                                                                              Mismatch Scale η
+                                                                 Figure 8: Mean absolute error comparison between PPO and
+                                                                 traditional linear feedback under diﬀerent parameter mismatch
+                                                                 levels for Node 3.
+
+
+
+                                                                 Table 3
+                                                                 Quantitative comparison between PPO and linear feedback
+                                                                 under diﬀerent parameter mismatch levels for Node 3.
+
+                                                                                                                Final L1
+                                                                            Mismatch          MAE
+                                                                                                                Error 𝐸𝑓
+                                                                             Scale 𝜂
+                                                                                          PPO        Linear    PPO     Linear
+                                                                               0.0        0.0212 0.0252 0.0125 0.0001
+                                                                               0.5        0.0192 0.0198 0.0308 0.0222
+                                                                               1.0        0.0226 0.0245 0.0459 0.0441
+                                                                               1.5        0.0261 0.0295 0.0611 0.0657
+                                                                               2.0        0.0299 0.0345 0.0763 0.0870
+
+                                                                     To further examine the adaptability of the proposed
+                                                                 method under a less favorable control channel, the parameter
+                                                                 mismatch experiment is also conducted for Node 2. Accord-
+Figure 7: Evolution of synchronization error components under    ing to the local stability and controllability analysis, Node
+diﬀerent random initial conditions for Node 1.                   2 has certain control propagation capability, but its local
+                                                                 transverse stability is weaker than that of Node 3. There-
+                                                                 fore, it represents a more challenging single-input control
+Here, 𝜂 = 0.0 corresponds to the nominal case without            scenario. As shown in Fig. 9, the PPO and traditional linear
+mismatch, while larger values represent stronger parameter       feedback exhibit a much more signiﬁcant performance diﬀer-
+uncertainty.                                                     ence under Node 2. Across the whole mismatch range, PPO
+    For the parameter-mismatch experiment, the response-         maintains a relatively low average synchronization error,
+system mismatch matrix is randomly generated at each envi-       whereas the linear feedback controller shows substantially
+ronment reset during training, so that the policy is exposed     larger MAE. This indicates that the PPO policy has stronger
+to a range of parameter-perturbed dynamics. In testing, the      adaptability when the selected control node is not locally
+                                                                 preferred.
+
+First Author et al.: Preprint submitted to Elsevier                                                                        Page 10 of 18
+                                        DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+
+           3
+
+
+           2
+                                                    PPO
+     MAE
+
+
+                                                    Linear
+           1
+
+
+           0
+               0.0       0.5      1.0         1.5       2.0
+                          Mismatch Scale η
+Figure 9: Mean absolute error comparison between PPO and
+traditional linear feedback under diﬀerent parameter mismatch
+levels for Node 2.
+                                                                     Figure 10: Recovery performance under the same global
+                                                                     impulse disturbance for Nodes 2 and 3.
+    In addition to parameter uncertainty, sudden impulse dis-
+turbance is also considered to evaluate the transient recovery
+capability of the controllers [43]. In the testing process, a        much lower 𝐸post than traditional linear feedback while us-
+global impulse disturbance is injected into all three state          ing substantially lower 𝐸𝑢 , indicating better recovery quality
+components at step 200. The impulse vector is set as                 and lower overall control cost under this challenging Node 2
+                                                                     disturbance scenario.
+      𝐩 = [5, 5, 5]T .                                        (33)
+                                                                     Table 4
+This setting avoids the asymmetry caused by disturbing only          Recovery performance under global impulse disturbance for
+a single state component and provides a fairer comparison            Node 2.
+of recovery performance under diﬀerent pinning nodes.
+    Fig. 10 shows the evolution of the global synchronization                    Method              𝑀𝑝   𝐸post     𝐸𝑢
+error before and after the impulse disturbance for Nodes                         PPO             14.9924 2.0650 19.4115
+2 and 3. Under the Node 3 scenario, both the PPO and                             Linear Feedback 17.3844 5.5145 61.8433
+traditional linear feedback can suppress the error increase                      Zero Input      14.9924 4.4985 0.0000
+after the impulse and gradually recover to a low-error level.
+Therefore, when the control input is applied to the locally
+preferred node, the transient recovery performance of the                To further evaluate the robustness of the learned con-
+two methods is relatively close. This suggests that the tra-         troller under persistent random perturbations, zero-mean
+ditional linear feedback controller can already achieve sat-         Gaussian noise is added to the response system during
+isfactory disturbance recovery when the control channel is           testing, while the training stage remains noise-free. This
+favorable, while the PPO controller can at least maintain            setting directly examines the generalization robustness of the
+comparable recovery capability.                                      trained policy under unseen stochastic disturbances. Specif-
+    By contrast, the diﬀerence between the two methods               ically, after each control step and numerical integration,
+becomes much more evident under the Node 2 scenario.                 additive Gaussian noise is imposed on the response state:
+Since Node 2 is not the locally preferred pinning node,                       noisy
+                                                                             𝐲𝑘+1 = 𝐲𝑘+1 + 𝝃 𝑘 ,                               (34)
+the linear feedback controller exhibits a higher post-pulse
+error level and a larger mean error after the disturbance. In        where
+contrast, PPO can still suppress the error growth eﬀectively
+and maintain a lower post-pulse mean error. Therefore, under                 𝝃 𝑘 ∼  (𝟎, 𝜎 2 𝐼3 ).                             (35)
+a more challenging control channel, the data-driven PPO
+policy exhibits stronger adaptability and recovery capability        Here, 𝜎 denotes the noise intensity and 𝐼3 is the 3×3 identity
+than the ﬁxed-structure linear feedback controller.                  matrix. The tested noise levels are
+    Since the traditional linear feedback controller fails to                𝜎 ∈ {0, 0.01, 0.02, 0.05}.                        (36)
+re-enter the predeﬁned error threshold band within the given
+testing horizon under Node 2, recovery time is not used as               The Gaussian noise experiment is conducted under the
+the main comparison metric. Instead, 𝑀𝑝 , 𝐸post , and 𝐸𝑢             Node 3 scenario. As shown in Fig. 11, the MAE of both
+are used for quantitative evaluation, as reported in Table 4.        PPO and linear feedback increases as the noise intensity
+The 𝑀𝑝 is mainly determined by the injected impulse and              becomes larger, which indicates that persistent stochastic
+the immediate system response, whereas the 𝐸post better              perturbations degrade synchronization performance. Never-
+reﬂects the subsequent recovery process. PPO achieves a              theless, PPO consistently achieves lower MAE than linear
+
+First Author et al.: Preprint submitted to Elsevier                                                                  Page 11 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+feedback at all tested noise levels. This suggests that the pro-   Table 5
+posed method can maintain relatively stable synchronization        Synchronization performance under diﬀerent Gaussian noise
+performance even when the testing environment contains             levels for Node 3.
+random disturbances that were not present during training.                  Noise std Linear PPO Linear  PPO
+                                                                                𝜎     MAE MAE Final L1 Final L1
+                                                                               0.00    0.0421 0.0398   0.0003   0.0081
+                                                                               0.01    0.0646 0.0557   0.1112   0.0858
+                                                                               0.02    0.0886 0.0747   0.2221   0.1694
+                                                                               0.05    0.1613 0.1333   0.5474   0.4152
+
+
+
+                                                                   to sensor placement, communication bandwidth, or measure-
+                                                                   ment limitations. Therefore, after verifying the controller
+                                                                   under full observation, it is necessary to examine the syn-
+                                                                   chronization performance under reduced observation dimen-
+                                                                   sions.
+                                                                       In this experiment, Node 3 is ﬁrst used as the main single-
+                                                                   input pinning node, following the local theoretical analysis
+                                                                   and the closed-loop node comparison discussed above. To
+Figure 11: Mean absolute error comparison between PPO and          further examine the coupling between observation informa-
+linear feedback under diﬀerent Gaussian noise levels for Node      tion and pinning-node selection, Node 2 is also included as
+3.                                                                 a more challenging case. To keep the comparison focused,
+                                                                   the control structure, training procedure, and pinning node
+    Fig. 12 further compares the instantaneous global syn-         are ﬁxed, while only the observation information available
+chronization error ‖𝐞(𝑡)‖1 at the highest tested noise level       to the policy is changed. The full-observation policy has
+𝜎 = 0.05. PPO maintains a lower error level over most              access to all drive states and synchronization errors. The
+of the testing interval, while the traditional linear feedback     four-dimensional partial-observation policy uses
+controller shows larger ﬂuctuations. The quantitative results
+in Table 5 also conﬁrm that PPO achieves lower MAE and                   𝑂4𝐷 = {𝑥1 , 𝑥3 , 𝑒1 , 𝑒3 },                         (37)
+Final L1 Error under noisy testing conditions. These results
+                                                                   whereas the two-dimensional local-observation policy only
+demonstrate that the proposed PPO-based controller has
+                                                                   uses
+better adaptability to persistent stochastic perturbations than
+the ﬁxed-gain linear feedback baseline.                                  𝑂2𝐷 = {𝑥3 , 𝑒3 }.                                   (38)
+
+                                                                   For Node 2, the corresponding four-dimensional and two-
+                                                                   dimensional observations are deﬁned as {𝑥1 , 𝑥2 , 𝑒1 , 𝑒2 }
+                                                                   and {𝑥2 , 𝑒2 }, respectively. Fig. 13 shows the synchroniza-
+                                                                   tion error evolution under diﬀerent observation settings,
+                                                                   and Table 6 reports the corresponding quantitative results.
+                                                                   The full-observation PPO and the four-dimensional partial-
+                                                                   observation PPO exhibit similar error evolution trends. Both
+                                                                   can rapidly reduce the synchronization error and maintain a
+                                                                   low error level in the later stage. This indicates that, under
+                                                                   the Node 3 scenario, the policy can still extract suﬃcient
+                                                                   dynamical information from the reduced four-dimensional
+                                                                   observation to achieve eﬀective synchronization.
+                                                                       By contrast, when the observation space is further com-
+Figure 12: Evolution of the instantaneous global synchroniza-      pressed to the two-dimensional local observation {𝑥3 , 𝑒3 },
+tion error ‖𝐞(𝑡)‖1 under Gaussian noise with 𝜎 = 0.05 for Node     the synchronization performance deteriorates noticeably.
+3. The shaded region denotes the mean ± standard deviation         Both MAE and Final L1 Error increase compared with the
+over multiple independent tests.                                   full-observation and four-dimensional cases. This suggests
+                                                                   that excessive reduction of observation information limits
+                                                                   the policy’s ability to infer the system dynamics, thereby
+    Finally, partial observability is considered to evaluate
+                                                                   increasing the learning diﬃculty and degrading the ﬁnal
+how the learned synchronization policy is aﬀected by re-
+                                                                   synchronization accuracy.
+duced observation information [36]. In practical control
+systems, complete state information is often unavailable due
+
+First Author et al.: Preprint submitted to Elsevier                                                                Page 12 of 18
+                                                                                                         DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+                                                                                                                                      2 E V H U Y D W L R Q  7 \ S H
+                                                                                                                                                                        reduced. This indicates that observation information and
+                                                                                                                                                       2 E V          pinning-node selection are coupled in the learning-based
+                                                                                                                                                    2 E V  
+                                                                                                                                                                        synchronization task. A favorable pinning node can reduce
+  /   ( U U R U   0 H D Q       & , 
+
+                                                                                                                                                       2 E V  
+                                                                                                                                                                        the diﬃculty of policy learning under limited observations,
+                                                                                                                                                                        whereas a less favorable control channel becomes much
+                                                                                                                                                                     more sensitive to information loss.
+                                                                                                                                                                             Overall, these results support the eﬀectiveness and adapt-
+                                                                                                                                                                        ability of the proposed PPO-based single-input pinning con-
+                                                                                                                                                                        trol strategy, while also highlighting the inﬂuence of pinning-
+                                                      
+                                                                                                                                                                        node selection and observation information on synchroniza-
+                                                                                                                                        tion performance.
+                                                                                                 7 L P H  V
+Figure 13: Comparison of L1 synchronization error under                                                                                                                 5. Image Encryption Scheme and Statistical
+diﬀerent observation conﬁgurations for Node 3. The solid                                                                                                                   Security Analysis
+line denotes the mean over three independent runs, and the
+shaded region denotes the 95% conﬁdence interval obtained                                                                                                                   Astronomical observation systems generate large amounts
+by bootstrapping.                                                                                                                                                       of high-value image data, including celestial structures,
+                                                                                                                                                                        planetary surfaces, and remote-sensing information. In dis-
+                                                                                                                                                                        tributed observation scenarios such as Very Long Baseline
+                                                                                                                                                                     Interferometry, these images may need to be transmitted
+                                                                                                                                                                        and shared across diﬀerent observation sites, making them
+ /   ( U U R U   0 H D Q       & , 
+
+
+
+
+                                                                                                                                                                        vulnerable to eavesdropping, tampering, and unauthorized
+                                                                                                                                                                        access. Therefore, secure image protection is important for
+                                                                                                                                   2 E V H U Y D W L R Q  7 \ S H
+                                                                                                                                                       2 E V          astronomical and space-related data applications.
+                                                                                                                                                       2 E V              Astronomical images usually contain rich textures, com-
+                                                                                                                                                       2 E V  
+                                                                                                                                                                        plex intensity distributions, and strong spatial correlations
+                                                                                                                                                                     among adjacent pixels, making them suitable test objects
+                                                                                                                                                                        for image encryption algorithms. An eﬀective encryption
+                                                                                                                                                                        scheme should conceal the visual content of the original
+                                                                                                                                        image and reduce its statistical redundancy. Since chaotic
+                                                                                                 7 L P H  V                                                            systems are sensitive to initial conditions and can generate
+Figure 14: Comparison of L1 synchronization error under
+                                                                                                                                                                        pseudo-random trajectories, they have been widely used
+diﬀerent observation conﬁgurations for Node 2. The solid                                                                                                                for image encryption. In a drive–response synchronization
+line denotes the mean over three independent runs, and the                                                                                                              framework, synchronized chaotic trajectories can provide
+shaded region denotes the 95% conﬁdence interval obtained                                                                                                               consistent key streams for encryption and decryption.
+by bootstrapping.                                                                                                                                                           Motivated by this idea, this chapter applies the synchro-
+                                                                                                                                                                        nized trajectories generated by the PPO-controlled continuous-
+                                                                                                                                                                        time Hopﬁeld chaotic neural network to image encryption.
+Table 6                                                                                                                                                                 The proposed scheme combines synchronized Hopﬁeld
+Synchronization performance under diﬀerent observation set-                                                                                                             chaotic sequences, Logistic-map-based diﬀusion, and dy-
+tings.
+                                                                                                                                                                        namic DNA coding. The plain image is ﬁrst encrypted and
+                                                                                                                                                   Final L1             then decrypted to verify reversibility. The RGB histogram
+Observation Setting                                                                                                          MAE
+                                                                                                                                                    Error               and adjacent-pixel correlation are further analyzed to eval-
+Node 3 Full Observation                                                                                                    0.1193                   0.0081
+                                                                                                                                                                        uate the statistical security of the encrypted image. The
+                                                                                                                                                                        speciﬁc steps of encryption are as follows:
+Node 3 4D Observation ({𝑥1 , 𝑥3 , 𝑒1 , 𝑒3 })                                                                               0.1176                   0.0071
+Node 3 2D Observation ({𝑥3 , 𝑒3 })                                                                                         0.1484                   0.0398                 1. Let the input plain image be denoted as
+Node 2 Full Observation                                                                                                    0.2282                   0.0198
+Node 2 4D Observation ({𝑥1 , 𝑥2 , 𝑒1 , 𝑒2 })                                                                               2.1500                   2.1838                           𝐼 ∈ ℤ𝐻×𝑊
+                                                                                                                                                                                          256
+                                                                                                                                                                                              ×𝐶
+                                                                                                                                                                                                 ,                                (39)
+Node 2 2D Observation ({𝑥2 , 𝑒2 })                                                                                        10.0891                  11.6035
+                                                                                                                                                                              where 𝐻, 𝑊 , and 𝐶 denote the height, width, and
+                                                                                                                                                                              number of color channels, respectively. For an RGB
+    The additional results for Node 2 further show that the                                                                                                                   image, 𝐶 = 3, and the three channels are denoted by
+eﬀect of partial observability depends strongly on the se-
+lected pinning node. Although Node 2 still achieves accept-                                                                                                                          𝐼𝑅 , 𝐼𝐺 , 𝐼𝐵 .                               (40)
+able performance under full observation, its performance
+                                                                                                                                                                           2. The plain image 𝐼 is separated into three color-channel
+degrades signiﬁcantly when the observation dimension is
+                                                                                                                                                                              matrices 𝐼𝑅 , 𝐼𝐺 , and 𝐼𝐵 . Each channel is partitioned
+
+First Author et al.: Preprint submitted to Elsevier                                                                                                                                                                     Page 13 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+
+
+
+               (a) Original                                    (b) Encrypted                                    (c) Decrypted
+
+                           Figure 15: Visual comparison of the original, encrypted, and decrypted images.
+
+
+
+      into non-overlapping blocks of size 𝑝 × 𝑝. In this work,             Table 7
+      𝑝 = 8. The number of blocks is                                       DNA coding rules
+                  ⌈ ⌉⌈ ⌉                                                                  Rule     00    01     10     11
+                    𝐻     𝑊
+            𝑁𝑏 =               .                          (41)                             1       A     G      C      T
+                     𝑝     𝑝
+                                                                                           2       A     C      G      T
+      When 𝐻 or 𝑊 is not divisible by 𝑝, the boundary                                      3       T     G      C      A
+      blocks may have smaller spatial sizes in the implemen-                               4       T     C      G      A
+                                                                                           5       C     A      T      G
+      tation.
+                                                                                           6       C     G      T      A
+   3. A PPO-controlled continuous Hopﬁeld chaotic syn-                                     7       G     A      C      T
+      chronization system is used to generate the dynamic                                  8       G     T      A      C
+      key streams. Let the drive and response systems be
+      represented by
+      (                      )              (                      )          divided into four 2-bit binary groups, and each 2-
+𝑋(𝑡) = 𝑥1 (𝑡), 𝑥2 (𝑡), 𝑥3 (𝑡) ,      𝑌 (𝑡) = 𝑦1 (𝑡), 𝑦2 (𝑡), 𝑦3 (𝑡) .         bit group is mapped to one nucleotide base from
+                                                               (42)           {𝐴, 𝑇 , 𝐶, 𝐺}. To satisfy the Watson–Crick comple-
+                                                                              mentary principle, eight valid DNA coding rules are
+      Since the DNA coding process requires four chaotic                      used, as listed in Table 7.
+      sequence pairs, while the adopted Hopﬁeld system is                  6. A password- and image-dependent Logistic chaotic
+      three-dimensional, an additional nonlinear component                    mask is generated for pixel diﬀusion. Let 𝑃 denote
+      is constructed as                                                       the user password. The image-dependent value is com-
+                                                                              puted by summing all pixel values in the three color
+    𝑥4 (𝑡) = 𝑥1 (𝑡)𝑥2 (𝑡)+𝑥3 (𝑡),     𝑦4 (𝑡) = 𝑦1 (𝑡)𝑦2 (𝑡)+𝑦3 (𝑡).           channels:
+                                                               (43)                                       𝑊
+                                                                                                        𝐻 ∑
+                                                                                               ∑        ∑
+                                                                                     𝑤=                         𝐼𝑐 (𝑖, 𝑗).            (46)
+   4. After discarding the ﬁrst 1500 transient iterations,
+                                                                                            𝑐∈{𝑅,𝐺,𝐵} 𝑖=1 𝑗=1
+      four master sequences and four slave sequences are
+      collected:                                                               The password 𝑃 and 𝑤 are concatenated and hashed
+                                                                               using SHA-256. The hash value is normalized to
+        𝑆𝑚 = (𝑥1 , 𝑥2 , 𝑥3 , 𝑥4 ),    𝑆𝑠 = (𝑦1 , 𝑦2 , 𝑦3 , 𝑦4 ). (44)          obtain the initial value 𝑧0 :
+      The continuous chaotic values are quantized into inte-                                SHA256(𝑃 ‖𝑤)
+      ger indices from 1 to 8:                                                       𝑧0 =                .                            (47)
+                                                                                                2256
+               (             )
+       𝐾𝑖 = mod round(𝑆𝑖 ), 8 + 1,            𝐾𝑖 ∈ {1, 2, … , 8}.              Then the Logistic map is iterated as
+                                                               (45)                  𝑧𝑛+1 = 𝜃𝑧𝑛 (1 − 𝑧𝑛 ),           𝜃 = 3.9999.      (48)
+      These indices are used to dynamically select the DNA                     The generated chaotic sequence is quantized and re-
+      coding rules. A synchronization check is performed                       shaped into a mask matrix:
+      before encryption, and the generated key streams are
+                                                                                             (   (                   )       )
+      accepted only when the quantized master and slave                           𝑄 = reshape mod round(104 𝑧𝑛 ), 256 , 𝐻, 𝑊 .
+      sequences are identical.                                                                                             (49)
+   5. The DNA coding rules are adopted from the com-
+      monly used DNA coding strategy in chaos-based im-                    7. For each color channel, the image blocks are diﬀused
+      age encryption [56, 57]. Each 8-bit pixel value is                      by XORing them with the corresponding blocks of the
+
+First Author et al.: Preprint submitted to Elsevier                                                                          Page 14 of 18
+                                      DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+      Logistic mask:                                               Table 8
+                                                                   Correlation coeﬃcients of the original and encrypted images
+             𝐷𝑐(𝑘) = 𝐼𝑐(𝑘) ⊕ 𝑄(𝑘) ,      𝑐 ∈ {𝑅, 𝐺, 𝐵},    (50)
+                                                                    Image                            Horizontal   Vertical   Diagonal
+
+      where 𝑘 denotes the block index.                              Original image of node2 model      0.9914     0.9913     0.9865
+                                                                    Encrypted image of node2 model     0.0333     -0.0023    -0.0006
+   8. The diﬀused pixel values are converted into 8-bit             Original image of node3 model      0.9921     0.9917     0.9852
+      binary strings. For each block, the ﬁrst DNA transfor-        Encrypted image of node3 model     0.0381     -0.0018    -0.0012
+      mation round is controlled by 𝑥1 and 𝑥2 :                     Encrypted image of Ref. [58]      -0.0015     0.0023     0.0021
+                                                                    Encrypted image of Ref. [59]      -0.0123     -0.0068    -0.0368
+                       (          )
+            𝐵𝑐′ = 𝑅−1
+                    𝑥    𝑅𝑥1 (𝐵𝑐 ) ,                   (51)
+                       2
+                                                                   where
+      where 𝑅𝑥1 (⋅) denotes DNA encoding using the rule
+                                                                                             𝑁
+      indexed by 𝑥1 , and 𝑅−1   𝑥2 (⋅) denotes DNA decoding                             1 ∑
+                                                                           cov(𝑋, 𝑌 ) =      (𝑥 − 𝐸(𝑋))(𝑦𝑖 − 𝐸(𝑌 )),              (56)
+      using the rule indexed by 𝑥2 .                                                    𝑁 𝑖=1 𝑖
+   9. A second DNA transformation round is performed
+      using 𝑥3 and 𝑥4 :                                            and
+                        (              )                                                𝑁
+            𝐵𝑐′′ = 𝑅−1    𝑅    (𝐵  ′
+                                     )   .             (52)                       1 ∑
+                     𝑥     𝑥      𝑐                                        𝐷(𝑋) =      (𝑥 − 𝐸(𝑋))2 .                              (57)
+                                                                                  𝑁 𝑖=1 𝑖
+                        4    3
+
+
+      The resulting binary strings are converted back into
+      decimal pixel values, and the encrypted RGB channels         Here, 𝑋 and 𝑌 denote two adjacent-pixel sequences sampled
+      are merged to obtain the cipher image:                       in the horizontal, vertical, or diagonal direction. As reported
+                                                                   in Table 8, the original images have correlation coeﬃcients
+             𝐶 = merge(𝐶𝑅 , 𝐶𝐺 , 𝐶𝐵 ).                     (53)    close to 1 in all three directions, conﬁrming the strong
+                                                                   spatial redundancy of natural images. After encryption, the
+    The decryption process is the reverse of the encryption        coeﬃcients produced by both the node2 and node3 models
+process. With the same password, the same Logistic mask,           decrease to values close to 0. The scatter plots in Fig. 17 also
+and the synchronized slave chaotic sequences, the DNA              show that the encrypted pixels are broadly dispersed instead
+transformations and XOR diﬀusion can be inverted to re-            of being concentrated along the diagonal line. These results
+cover the original image.                                          indicate that the proposed encryption process eﬀectively
+    To illustrate the eﬀectiveness of the proposed encryption      suppresses adjacent-pixel correlation.
+method, we apply it to a color astronomical image. As shown            It should be noted that the node1 model is not in-
+in Fig. 15a(a) and Fig. 15b(b), the encrypted image exhibits       cluded because its synchronization performance is insuf-
+a noise-like appearance and has no obvious visual similarity       ﬁcient, causing the generated master–slave key streams
+to the original image, indicating that the visual information      to fail the sequence consistency check required for cor-
+is eﬀectively concealed. Fig. 15c(c) shows that the decrypted      rect encryption and decryption. Both node2 and node3
+image is visually consistent with the original image, which        are evaluated under the six-dimensional full-observation
+veriﬁes the reversibility of the proposed scheme when the          setting. Compared with the encrypted images reported in
+correct password and synchronized chaotic key streams are          Refs. [58, 59], the proposed method achieves comparable
+used.                                                              correlation suppression, demonstrating its eﬀectiveness in
+    After visual inspection, histogram and adjacent-pixel          reducing local statistical redundancy.
+correlation analyses are used to further evaluate the statis-
+tical properties of the cipher image. For each color channel
+𝑐 ∈ {𝑅, 𝐺, 𝐵}, the histogram is deﬁned as
+
+𝐻𝑐 (𝑘) = #{(𝑖, 𝑗) ∣ 𝐼𝑐 (𝑖, 𝑗) = 𝑘},      𝑘 = 0, 1, … , 255. (54)
+
+    As shown in Fig. 16, the histograms of the plain image
+are highly non-uniform, whereas those of the cipher image
+are much ﬂatter over the gray-level range. This indicates that
+the encryption process weakens the original pixel-intensity
+distribution and reduces histogram-based statistical leakage.
+    The adjacent-pixel correlation coeﬃcient is computed as
+
+              cov(𝑋, 𝑌 )
+      𝑟𝑥𝑦 = √     √      ,                                 (55)
+             𝐷(𝑋) 𝐷(𝑌 )
+
+
+First Author et al.: Preprint submitted to Elsevier                                                                    Page 15 of 18
+                                     DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+
+
+
+                      Figure 16: RGB histogram comparison between the plain image and the cipher image.
+
+
+
+
+Figure 17: Adjacent-pixel correlation analysis of the plain image and the cipher image in horizontal, vertical, and diagonal
+directions.
+
+
+
+6. Conclusion                                                    settings. Numerical results show that the PPO-implemented
+                                                                 DRL controller can maintain eﬀective synchronization in
+    This paper has investigated the single-input pinning         several non-ideal scenarios and exhibits better adaptability
+synchronization problem for two continuous-time Hopﬁeld          than the ﬁxed-gain linear feedback baseline, especially under
+chaotic neural networks and has developed a DRL-based            less favorable pinning channels. These results indicate that
+data-driven control framework implemented with PPO. In           DRL-based single-input pinning control is a feasible ap-
+the considered setting, only one scalar control input is
+                                                                 proach for synchronizing Hopﬁeld chaotic neural networks
+injected into a selected node of the response system. To
+                                                                 under constrained actuation and limited observation.
+guide the selection of the controlled node, a local pinning-         The main merits of the proposed method lie in its
+node analysis has been conducted by combining the max-           data-driven policy learning capability, single-input actu-
+imum conditional Lyapunov exponent, Riccati-based cost           ation structure, and adaptability under several non-ideal
+index, gain norm, and local control propagation index. The       conditions. Compared with the ﬁxed-gain linear feedback
+local node-selection analysis is generally consistent with
+                                                                 baseline, the PPO controller can learn a nonlinear control
+the closed-loop synchronization results, identifying Node
+                                                                 policy and maintain better synchronization performance
+3 as the preferred pinning node and Node 2 as a useful           in several challenging scenarios. However, the proposed
+challenging case for evaluating controller adaptability. The     method also has limitations. The present veriﬁcation is
+learned controller has been evaluated under nominal syn-         mainly based on numerical simulations for a representative
+chronization, parameter mismatch, global impulse distur-         continuous-time Hopﬁeld chaotic neural network, and a
+bance, Gaussian noise perturbation, and partial-observation
+
+First Author et al.: Preprint submitted to Elsevier                                                            Page 16 of 18
+                                          DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+rigorous global stability guarantee for the learned policy has                [15] M. G. Rosenblum, A. S. Pikovsky, J. Kurths, From phase to lag syn-
+not been established. In addition, the trained policy depends                      chronization in coupled chaotic oscillators, Physical Review Letters
+on the quality and coverage of the training environment.                           78 (22) (1997) 4193–4196.
+                                                                              [16] E. Ott, C. Grebogi, J. A. Yorke, Controlling chaos, Physical Review
+Future research will consider comparisons with other DRL                           Letters 64 (1990) 1196.
+algorithms, stability-certiﬁed learning control, larger-scale                 [17] S. Boccaletti, C. Grebogi, Y.-C. Lai, H. Mancini, D. Maza, The control
+chaotic neural networks, more systematic sensor–actuator                           of chaos: theory and applications, Physics Reports 329 (2000) 103.
+co-design, and experimental validation on a physical circuit                  [18] M. Yassen, Controlling chaos and synchronization for new chaotic
+or hardware platform.                                                              system using linear feedback control, Chaos, Solitons & Fractals
+                                                                                   26 (3) (2005) 913–920.
+                                                                              [19] Y. Wang, Z.-H. Guan, H. O. Wang, Feedback and adaptive control
+                                                                                   for the synchronization of chen system via a single variable, Physics
+Declaration of competing interest                                                  Letters A 312 (1) (2003) 34–40.
+    The authors declare that there is no conﬂict of interest                  [20] M. Feki, Sliding mode control and synchronization of chaotic systems
+regarding the publication of this paper.                                           with parametric uncertainties, Chaos, Solitons & Fractals 41 (3)
+                                                                                   (2009) 1390–1400.
+                                                                              [21] H. Su, L. Runzi, J. Fu, M. Huang, Fixed time stability of a class of
+                                                                                   chaotic systems with disturbances by using sliding mode control, ISA
+Data availability                                                                  Transactions 118 (2021) 75–82.
+    The data that support the ﬁndings of this study are                       [22] S. Mobayen, Chaos synchronization of uncertain chaotic systems us-
+available from the corresponding author upon reasonable                            ing composite nonlinear feedback based integral sliding mode control,
+                                                                                   ISA Transactions 77 (2018) 100–111.
+request.
+                                                                              [23] C. D. Li, X. F. Liao, X. Y. Zhang, Impulsive synchronization of
+                                                                                   chaotic systems, Chaos: An Interdisciplinary Journal of Nonlinear
+                                                                                   Science 15 (2005) 023104.
+References                                                                    [24] G. Chen, Pinning control and synchronization on complex dynamical
+ [1] S. H. Strogatz, Nonlinear Dynamics and Chaos: With Applications               networks, International Journal of Control, Automation and Systems
+     to Physics, Biology, Chemistry, and Engineering, 2nd Edition, CRC             12 (2) (2014) 221–230.
+     Press, 2018.                                                             [25] R. S. Sutton, A. G. Barto, Reinforcement Learning: An Introduction,
+ [2] S. Boccaletti, V. Latora, Y. Moreno, M. Chavez, D.-U. Hwang, Com-             2nd Edition, MIT Press, 2018.
+     plex networks: structure and dynamics, Physics Reports 424 (4–5)         [26] V. Mnih, K. Kavukcuoglu, D. Silver, A. A. Rusu, J. Veness, M. G.
+     (2006) 175–308.                                                               Bellemare, A. Graves, M. Riedmiller, A. K. Fidjeland, G. Ostrovski,
+ [3] E. M. Izhikevich, Dynamical Systems in Neuroscience: The Geometry             et al., Human-level control through deep reinforcement learning,
+     of Excitability and Bursting, MIT Press, 2007.                                nature 518 (7540) (2015) 529–533.
+ [4] L. M. Pecora, T. L. Carroll, Synchronization in chaotic systems,         [27] I. Carlucho, M. De Paula, G. G. Acosta, An adaptive deep reinforce-
+     Physical Review Letters 64 (8) (1990) 821–824.                                ment learning approach for MIMO PID control of mobile robots, ISA
+ [5] A. Koronovskii, O. Moskalenko, A. Hramov, On the use of chaotic               Transactions 102 (2020) 280–294.
+     synchronization for secure communication, Physics-Uspekhi 52             [28] M. A. Bucci, O. Semeraro, A. Allauzen, G. Wisniewski, L. Cordier,
+     (2010) 1213.                                                                  L. Mathelin, Control of chaotic systems by deep reinforcement learn-
+ [6] A. Argyris, D. Syvridis, L. Larger, V. Annovazzi-Lodi, P. Colet,              ing, Proceedings of the Royal Society A: Mathematical, Physical and
+     I. Fischer, J. Garcia-Ojalvo, C. R. Mirasso, L. Pesquera, K. A. Shore,        Engineering Sciences 475 (2231) (2019) 20190351.
+     Chaos-based communications at high bit rates using commercial ﬁbre-      [29] S. Vashishtha, S. Verma, Restoring chaos using deep reinforcement
+     optic links, Nature 438 (7066) (2005) 343–346.                                learning, Chaos: An Interdisciplinary Journal of Nonlinear Science
+ [7] G. D. Vanwiggeren, R. Roy, Communication with chaotic lasers,                 30 (2020) 031102.
+     Science 279 (5354) (1998) 1198–1200.                                     [30] Y. Y. Han, J. P. Ding, L. Du, Y. M. Lei, Control and anti-control of
+ [8] U. Zia, M. McCartney, B. Scotney, J. Martinez, M. AbuTair,                    chaos based on the moving largest lyapunov exponent using reinforce-
+     J. Memon, A. Sajjad, Survey on image encryption techniques using              ment learning, Physica D: Nonlinear Phenomena 428 (2021) 133068.
+     chaotic maps in spatial, transform and spatiotemporal domains, Inter-    [31] H. Cheng, H. Li, Q. Dai, J. Yang, A deep reinforcement learn-
+     national Journal of Information Security 21 (4) (2022) 917–935.               ing method to control chaos synchronization between two identical
+ [9] Y. Xu, H. Wang, Y. Li, B. Pei, Image encryption based on synchro-             chaotic systems, Chaos, Solitons & Fractals 174 (2023) 113809.
+     nization of fractional chaotic systems, Communications in Nonlinear      [32] H. Cheng, H. Li, J. Liang, Q. Dai, J. Yang, Generalized synchroniza-
+     Science and Numerical Simulation 19 (10) (2014) 3735–3744.                    tion between two distinct chaotic systems through deep reinforcement
+[10] G. Wen, X. Yu, W. Yu, J. Lu, Coordination and control of complex              learning, Chaos, Solitons & Fractals 199 (2025) 116727.
+     network systems with switching topologies: a survey, IEEE Trans-         [33] H.-T. Yau, P.-H. Kuo, P.-C. Luan, Y.-R. Tseng, Proximal policy
+     actions on Systems, Man, and Cybernetics: Systems 51 (10) (2021)              optimization-based controller for chaotic systems, International Jour-
+     6342–6357.                                                                    nal of Robust and Nonlinear Control 34 (2024) 586–601.
+[11] R. Olfati-Saber, J. A. Fax, R. M. Murray, Consensus and cooperation      [34] L. Xu, R. Ma, J. Wu, P. Rao, Proximal policy optimization approach
+     in networked multi-agent systems, Proceedings of the IEEE 95 (1)              to stabilize the chaotic food web system, Chaos, Solitons & Fractals
+     (2007) 215–233.                                                               192 (2025) 116033.
+[12] W. Lin, Y. He, Complete synchronization of the noise-perturbed           [35] S. Jin, J. Chen, J. Wu, X. Wang, X. Luan, J. Fu, G. Wen, A deep
+     Chua’s circuits, Chaos: An Interdisciplinary Journal of Nonlinear             reinforcement learning approach for synchronization between two
+     Science 15 (2) (2005) 023705.                                                 memristor chaotic systems and application for image encryption,
+[13] L. Kocarev, U. Parlitz, Generalized synchronization, predictability,          IEEE Transactions on Circuits and Systems I: Regular Papers 73 (2)
+     and equivalence of unidirectionally coupled dynamical systems, Phys-          (2026) 1380–1393.
+     ical Review Letters 76 (11) (1996) 1816–1819.                            [36] M. Weissenbacher, A. Borovykh, G. Rigas, Reinforcement learning
+[14] S. Guan, C. H. Lai, G. W. Wei, Phase synchronization between two              of chaotic systems control in partially observable environments, Flow,
+     essentially diﬀerent chaotic systems, Physical Review E 72 (1) (2005)         Turbulence and Combustion 115 (3) (2025) 1357–1378.
+     016205.
+
+
+
+First Author et al.: Preprint submitted to Elsevier                                                                                    Page 17 of 18
+                                          DRL-Based Pinning Synchronization of Hopﬁeld Networks
+
+[37] J. J. Hopﬁeld, Neurons with graded response have collective computa-
+     tional properties like those of two-state neurons., Proceedings of the
+     National Academy of Sciences 81 (10) (1984) 3088–3092.
+[38] J. Li, F. Liu, Z.-H. Guan, T. Li, A new chaotic hopﬁeld neural
+     network and its synthesis via parameter switchings, Neurocomputing
+     117 (2013) 33–39.
+[39] P. Zheng, W. Tang, J. Zhang, Some novel double-scroll chaotic at-
+     tractors in Hopﬁeld networks, Neurocomputing 73 (10) (2010) 2280–
+     2285.
+[40] B. Bao, H. Qian, J. Wang, Q. Xu, M. Chen, H. Wu, Y. Yu, Numerical
+     analyses and experimental validations of coexisting multiple attrac-
+     tors in Hopﬁeld neural network, Nonlinear Dynamics 90 (4) (2017)
+     2359–2369.
+[41] E. E. Mahmoud, L. S. Jahanzaib, P. Trikha, O. A. Almaghrabi,
+     Analysis and control of the fractional chaotic Hopﬁeld neural network,
+     Advances in Diﬀerence Equations 2021 (1) (2021) 126.
+[42] W. Zhang, J. Huang, P. Wei, Weak synchronization of chaotic neural
+     networks with parameter mismatch via periodically intermittent con-
+     trol, Applied Mathematical Modelling 35 (2) (2011) 612–620.
+[43] Z. Cao, C. Li, M.-F. Leung, The synchronisation problem of chaotic
+     neural networks based on saturation impulsive control and intermit-
+     tent control, Mathematics 12 (1) (2024) 151.
+[44] X. Wu, S. Liu, H. Wang, Y. Wang, Stability and pinning synchroniza-
+     tion of delayed memristive neural networks with fractional-order and
+     reaction–diﬀusion terms, ISA Transactions 136 (2023) 114–125.
+[45] B. Zhang, L. Liu, Chaos-based image encryption: Review, application,
+     and challenges, Mathematics 11 (11) (2023) 2585.
+[46] X.-Y. Wang, Z.-M. Li, A color image encryption algorithm based on
+     hopﬁeld chaotic neural network, Optics and Lasers in Engineering 115
+     (2019) 107–118.
+[47] K. M. Cuomo, A. V. Oppenheim, Circuit implementation of synchro-
+     nized chaos with applications to communications, Physical review
+     letters 71 (1) (1993) 65.
+[48] S. Li, G. Alvarez, Z. Li, W. A. Halang, Analog chaos-based secure
+     communications and cryptanalysis: a brief survey, arXiv preprint
+     arXiv:0710.5455 (2007).
+[49] S. Boccaletti, J. Kurths, G. Osipov, D. Valladares, C. Zhou, The
+     synchronization of chaotic systems, Physics Reports 366 (1-2) (2002)
+     1–101.
+[50] J.-J. E. Slotine, W. Li, Applied Nonlinear Control, Prentice Hall,
+     Englewood Cliﬀs, NJ, 1991.
+[51] L. M. Pecora, T. L. Carroll, Master stability functions for synchro-
+     nized coupled systems, Physical review letters 80 (10) (1998) 2109.
+[52] J. Willems, Least squares stationary optimal control and the algebraic
+     riccati equation, IEEE Transactions on Automatic Control 16 (6)
+     (1971) 621–634.
+[53] T. Kailath, Linear Systems, Vol. 156, Prentice-Hall Englewood Cliﬀs,
+     NJ, 1980.
+[54] J. Schulman, F. Wolski, P. Dhariwal, A. Radford, O. Klimov, Proximal
+     policy optimization algorithms (2017). arXiv:1707.06347.
+[55] J. Kobiolka, J. Habermann, M. E. Yamakou, Reduced-order adaptive
+     synchronization in a chaotic neural network with parameter mismatch:
+     A dynamical system versus machine learning approach, Nonlinear
+     Dynamics 113 (10) (2025) 10989–11008.
+[56] Q. Zhang, L. Guo, X. Wei, Image encryption using dna addition com-
+     bining with chaotic maps, Mathematical and Computer Modelling
+     52 (11) (2010) 2028–2035.
+[57] V. Patidar, G. Kaur, A novel conservative chaos driven dynamic
+     dna coding for image encryption, arXiv preprint arXiv:2207.05475
+     (2022).
+[58] L. Li, A novel chaotic map application in image encryption algorithm,
+     Expert Systems with Applications 252 (2024) 124316.
+[59] V. Verma, S. Kumar, Quantum image encryption algorithm based on
+     3d-bnm chaotic map, Nonlinear Dynamics 113 (4) (2025) 3829–3855.
+
+
+
+
+First Author et al.: Preprint submitted to Elsevier                                               Page 18 of 18
+

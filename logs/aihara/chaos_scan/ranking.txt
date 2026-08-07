@@ -1,0 +1,10 @@
+1. k=0.940, alpha=0.810, beta=0.120, bias=0.180, epsilon=0.050, lle=0.000248, peak_std=0.002818, dist_ratio=6.807e+00
+2. k=0.960, alpha=0.720, beta=0.160, bias=0.140, epsilon=0.050, lle=0.000226, peak_std=0.003238, dist_ratio=4.943e+00
+3. k=0.900, alpha=0.780, beta=0.140, bias=0.200, epsilon=0.050, lle=0.000224, peak_std=0.002723, dist_ratio=3.769e+00
+4. k=0.940, alpha=0.840, beta=0.160, bias=0.180, epsilon=0.050, lle=0.000211, peak_std=0.004229, dist_ratio=3.949e+00
+5. k=0.960, alpha=0.840, beta=0.160, bias=0.140, epsilon=0.050, lle=0.000210, peak_std=0.003888, dist_ratio=3.368e+00
+6. k=0.920, alpha=0.810, beta=0.160, bias=0.220, epsilon=0.050, lle=0.000201, peak_std=0.003158, dist_ratio=3.046e+00
+7. k=0.960, alpha=0.840, beta=0.140, bias=0.160, epsilon=0.080, lle=0.000196, peak_std=0.002150, dist_ratio=3.092e+00
+8. k=0.960, alpha=0.780, beta=0.160, bias=0.160, epsilon=0.050, lle=0.000191, peak_std=0.003696, dist_ratio=3.678e+00
+9. k=0.960, alpha=0.810, beta=0.160, bias=0.200, epsilon=0.050, lle=0.000190, peak_std=0.003042, dist_ratio=2.867e+00
+10. k=0.940, alpha=0.840, beta=0.080, bias=0.140, epsilon=0.050, lle=0.000185, peak_std=0.001395, dist_ratio=3.608e+00

@@ -1,0 +1,7 @@
+image_name,direction,plain,cipher
+test.jpg,Horizontal,0.9914,0.0333
+test.jpg,Vertical,0.9913,-0.0023
+test.jpg,Diagonal,0.9865,-0.0006
+test2.jpg,Horizontal,0.9921,0.0381
+test2.jpg,Vertical,0.9917,-0.0018
+test2.jpg,Diagonal,0.9852,-0.0012

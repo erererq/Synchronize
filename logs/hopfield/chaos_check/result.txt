@@ -1,0 +1,9 @@
+decay=0.350000
+weights=[[1.48, -1.62], [1.16, 0.18]]
+bias=[0.05, -0.02]
+steps=20000
+burn_in=2000
+largest_lyapunov_exponent=0.00001513
+x1_range=[-2.773838, 3.009752]
+x2_range=[-1.754382, 1.731737]
+final_separation=5.04440102e-06
