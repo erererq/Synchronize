@@ -198,14 +198,19 @@ def compute_metrics(
     error = result["error"]
     action = result["action"]
     l1 = np.linalg.norm(error, ord=1, axis=1)
+    steady_start = max(1, int(0.8 * len(l1)))
 
     metrics: dict[str, float] = {
         "mae": float(np.mean(np.abs(error))),
         "rmse": float(np.sqrt(np.mean(np.square(error)))),
         "mean_l1": float(np.mean(l1)),
+        "steady_l1": float(np.mean(l1[steady_start:])),
         "final_l1": float(l1[-1]),
         "mean_abs_u": float(np.mean(np.abs(action))),
         "energy_u": float(np.sum(np.square(action)) * step_time),
+        "saturation_fraction": float(
+            np.mean(np.isclose(np.abs(action[1:]), 4.0, atol=1e-6))
+        ),
     }
 
     if pulse_step is not None and pulse_step < len(l1):
@@ -268,9 +273,11 @@ def build_metric_row(
         "mae": metrics["mae"],
         "rmse": metrics["rmse"],
         "mean_l1": metrics["mean_l1"],
+        "steady_l1": metrics["steady_l1"],
         "final_l1": metrics["final_l1"],
         "mean_abs_u": metrics["mean_abs_u"],
         "energy_u": metrics["energy_u"],
+        "saturation_fraction": metrics["saturation_fraction"],
     }
     if "max_post_pulse" in metrics:
         row["max_post_pulse"] = metrics["max_post_pulse"]
@@ -311,9 +318,11 @@ def aggregate_records(records: list[dict[str, float | int | str]]) -> list[dict[
         "mae",
         "rmse",
         "mean_l1",
+        "steady_l1",
         "final_l1",
         "mean_abs_u",
         "energy_u",
+        "saturation_fraction",
         "max_post_pulse",
         "recovery_steps",
         "recovery_time",
@@ -337,6 +346,7 @@ def aggregate_records(records: list[dict[str, float | int | str]]) -> list[dict[
             values = [float(row[key]) for row in rows if key in row and not np.isnan(float(row[key]))]
             if values:
                 summary[f"{key}_mean"] = float(np.mean(values))
+                summary[f"{key}_std"] = float(np.std(values, ddof=1)) if len(values) > 1 else 0.0
         summary_rows.append(summary)
 
     return summary_rows

@@ -1,0 +1,49 @@
+Ref: Submission ID 33c0112b-4165-4ac1-adf7-8f02e9b94f49
+
+Dear Dr Wu,
+
+Your manuscript "Deep-Reinforcement-Learning-Based Optimal Pinning Synchronization of Hopfield Chaotic Neural Networks with an Application to Image Encryption" has now been assessed. If there are any reviewer comments on your manuscript, you can find them at the end of this email.
+
+Regrettably, your manuscript has been rejected for publication in Nonlinear Dynamics.
+
+Thank you for the opportunity to review your work. I'm sorry that we cannot be more positive on this occasion and hope you will not be deterred from submitting future work to Nonlinear Dynamics.
+
+Kind regards,
+Editor
+Nonlinear Dynamics
+
+Reviewer Comments:
+
+Reviewer 1
+This manuscript proposes a PPO-based single-input pinning synchronization framework for Hopfield chaotic neural networks and applies it to image encryption. However, the central novelty and motivation are not clearly established, the experimental comparisons are insufficient, and the most significant advantage observed for the challenging Node 2 is not adequately emphasized. In addition, the image-encryption application lacks a clear connection to the synchronization method and comprehensive comparative security evaluation.
+1.The Abstract covers the main components of the manuscript, but it does not clearly highlight the central novelty and the most important findings. It currently reads mainly as a list of methods and test scenarios, without explaining why the single-input single-node configuration is important or how the proposed framework differs from existing DRL-based synchronization studies. In particular, the most meaningful result—that PPO provides only limited improvement for the preferred Node 3 but shows a much clearer advantage for the more challenging Node 2—is expressed only vaguely as improved adaptability for “less favorable pinning channels.” This node-dependent advantage should be stated more explicitly and supported by representative quantitative results. The role of synchronization in ensuring key-stream consistency for image encryption should also be clarified.
+2.The Introduction should be reorganized to improve its logical flow. Although the single-input pinning structure is briefly introduced, the manuscript does not sufficiently explain why a single-input single-node control configuration is selected or what advantages it offers over multi-node or multi-input control structures. The reasons for selecting the continuous-time Hopfield chaotic neural network, the relationship between its network structure and pinning-node selection, and the way the claimed contributions arise from the identified research gaps also need to be clarified. In addition, the transition from chaotic synchronization to image encryption is abrupt, and the motivation and significance of introducing the image-encryption application are not clearly stated.
+3.The comparison in Section 4 is not sufficient. The PPO controller is compared only with a fixed-gain linear feedback controller whose gain is chosen empirically, so the current results do not clearly demonstrate the advantage of the proposed method. The authors should add several stronger and properly tuned control methods for comparison. Since the manuscript also claims that the single-input single-node structure reduces implementation complexity, its performance should be compared with multi-node or multi-input control structures to show what performance is gained or lost by using fewer control inputs.
+4.The partial-observation experiment is not placed appropriately in Section 4. Since this experiment mainly shows how the choice of pinning node affects the amount of observation information required, it would be more logical to place it immediately after the node-selection results rather than after the robustness experiments. The current arrangement also weakens the main advantage observed for Node 2: although PPO clearly outperforms linear feedback under the more challenging Node 2 setting, the final discussion shifts the focus to the poorer performance of Node 2 relative to Node 3. The authors should reorganize this part.
+5.The results obtained for Node 2 appear to reveal one of the main advantages of the proposed method. Compared with the relatively limited improvement observed for Node 3, PPO shows a much clearer advantage over linear feedback for the more challenging Node 2, particularly under parameter mismatch and impulse disturbance. This suggests that the main value of the proposed approach lies in its ability to handle less favorable pinning channels. However, this important finding is not sufficiently emphasized in the Abstract, Introduction, or discussion of the results. The authors should present the Node 2 results as a central contribution and explain more clearly why the proposed method is particularly effective under difficult pinning conditions.
+6.The role and advantage of the image-encryption application should be clarified. The manuscript does not sufficiently explain why the proposed PPO-based pinning synchronization is needed for image encryption or how synchronization quality affects key-stream consistency and decryption performance. In addition, the current comparison is limited to adjacent-pixel correlation with two chaos-map-based methods, which is not enough to demonstrate the advantage of the proposed synchronization-based scheme. The authors should strengthen the connection between synchronization and encryption, include comparisons with representative chaotic-synchronization-based encryption methods or different synchronization controllers under the same encryption framework, and provide more comprehensive security evaluations.
+
+Reviewer 2
+The paper addresses the question of pinning synchronisation of two chaotic systems, each consisting of three states (nodes). The proposed method is based on utilising several analytic indicators that allow ranking the nodes most likely to be suitable for pinning. Then, a PPO-based control method is implemented. Although the work is interesting, it lacks formal proofs guaranteeing the viability of the proposed algorithm. As the authors admit, the introduced local indicators simply provide guidance for pinning-node selection and do not guarantee closed-loop stability. Moreover, the PPO-scheme also provides no guarantees and its performance is only empirically examined in numerical simulations. A considerable part of the paper is devoted to numerical simulations and benchmarking of the method against parameter mismatches, impulsive disturbances and noisy perturbations, as well as partial observations. I would expect a formal stability/robustness analysis instead.
+
+Reviewer 3
+Manuscript Number: Nonlinear Dynamics
+Type of manuscript: Article
+Title:  Deep-Reinforcement-Learning-Based Optimal Pinning Synchronization of Hopfield Chaotic Neural Networks with an Application to Image Encryption
+Authors: Yan’an Huang, Ruru Ma, Weiye Wang1, Jie Wu, and Xiaoyan Sun
+Journal: Nonlinear Dynamics, Springer Nature
+
+In this study the authors, investigates the single-input pinning synchronization problem in a continuous-time Hopfield chaotic neural network and additionally evaluates its implementation in image encryption. A data-driven framework grounded in deep reinforcement learning (DRL) is developed, employing the proximal policy optimisation (PPO) algorithm to synthesise a constrained nonlinear control strategy. The proposed methodology merges local pinning-node analysis with reinforcement-learning-driven control, enabling concurrent evaluation of the node-selection criteria and the learned control strategy within a unified drive–response synchronization framework.
+
+Therefore, I recommend publication of the manuscript in the journal Nonlinear Dynamics, Springer Nature. However, I would like the authors to address some points that could improve the readability of the article:
+
+Minor points
+1. In Figures 5 to 7, the contribution of the results is difficult to discern clearly. The authors are advised to consider a two-dimensional representation, encoding the error (or Z-axis values) using a colour bar to improve visual clarity.
+
+2. To enhance comprehension, the order of Figure 1 and Figure 2 should be inverted. Because the theoretical formulation introduces the driving system prior to the response system, aligning the figures with this sequence will streamline the presentation.
+
+3. The role of the drive system within the information encryption scheme is not sufficiently clear. The authors should revise and expand the explanation of this process to clarify explicitly how the drive system is integrated into the encryption mechanism.
+
+4. The synchronization error reported in the manuscript, which is on the order of $10^{-2}$, is insufficient to guarantee reliable recovery of the encrypted information by the response system. The authors should address whether this residual error induces signal distortion or message degradation during decryption.
+
+5. The authors should evaluate the robustness of the encryption/decryption process against parameter sensitivity, for example by computing the Hamming distance between the recovered and original information.

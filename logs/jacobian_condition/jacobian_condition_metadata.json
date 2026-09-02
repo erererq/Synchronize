@@ -1,0 +1,89 @@
+{
+  "interpretation": "Sampled numerical assessment only; sampled pass does not prove the condition on the full continuous attractor tube.",
+  "formula": "lambda_max((J + J.T)/2) < 0",
+  "project_root": "E:\\project\\Synchronize",
+  "models_dir": "E:\\project\\Synchronize\\models\\hopfield",
+  "attractor_initial_state": [
+    0.0,
+    0.01,
+    0.0
+  ],
+  "attractor_samples": 500,
+  "directions_per_state": 8,
+  "transient_control_steps": 1200,
+  "sample_stride_control_steps": 2,
+  "radii": [
+    0.0,
+    0.01,
+    0.05,
+    0.1
+  ],
+  "random_seed": 20260822,
+  "state_weight_matrix": [
+    [
+      -1.399999976158142,
+      1.2000000476837158,
+      -7.0
+    ],
+    [
+      1.100000023841858,
+      0.0,
+      2.799999952316284
+    ],
+    [
+      0.800000011920929,
+      -2.0,
+      4.0
+    ]
+  ],
+  "action_scale": 4.0,
+  "observation_scale": 5.0,
+  "attractor_coordinate_min": [
+    -2.805934568216053,
+    -0.9485306862266019,
+    -1.0801929523433753
+  ],
+  "attractor_coordinate_max": [
+    2.9738298719410365,
+    0.8626052748337373,
+    0.9845391061864719
+  ],
+  "finite_difference_checks": [
+    {
+      "model": "ppo_continuous_hopfield_node2_final_seed_1024.zip",
+      "node": 2,
+      "training_seed": 1024,
+      "maximum_absolute_gradient_difference": 0.0015087127685546875
+    },
+    {
+      "model": "ppo_continuous_hopfield_node2_final_seed_123.zip",
+      "node": 2,
+      "training_seed": 123,
+      "maximum_absolute_gradient_difference": 0.0005550384521484375
+    },
+    {
+      "model": "ppo_continuous_hopfield_node2_final_seed_42.zip",
+      "node": 2,
+      "training_seed": 42,
+      "maximum_absolute_gradient_difference": 0.0007476806640625
+    },
+    {
+      "model": "ppo_continuous_hopfield_node3_final_seed_1024.zip",
+      "node": 3,
+      "training_seed": 1024,
+      "maximum_absolute_gradient_difference": 0.0004596710205078125
+    },
+    {
+      "model": "ppo_continuous_hopfield_node3_final_seed_123.zip",
+      "node": 3,
+      "training_seed": 123,
+      "maximum_absolute_gradient_difference": 0.0007531642913818359
+    },
+    {
+      "model": "ppo_continuous_hopfield_node3_final_seed_42.zip",
+      "node": 3,
+      "training_seed": 42,
+      "maximum_absolute_gradient_difference": 0.0006732940673828125
+    }
+  ]
+}
