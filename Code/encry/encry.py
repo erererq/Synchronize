@@ -463,7 +463,7 @@ def check_decryption_psnr(plain_path: str, decrypted_path: str) -> bool:
 # ==========================================
 
 def encrypt_and_decrypt(plain_path: str, cipher_path: str, decrypted_path: str,
-                        password: str = None, scheme: str = "scheme3") -> bool:
+                        password: str = None, scheme: str = "scheme1") -> bool:
     """
     单图完整流程：生成序列 → 同步检查 → 加密 → 解密 → 像素级验证。
 
@@ -472,7 +472,7 @@ def encrypt_and_decrypt(plain_path: str, cipher_path: str, decrypted_path: str,
         cipher_path: 密文图片保存路径。
         decrypted_path: 解密还原图片保存路径。
         password: 用户口令密码。
-        scheme: "scheme1" 或 "scheme3"，指定序列生成方案。
+        scheme: "scheme1" 或 "scheme3"，指定序列生成方案（默认: scheme1）。
     """
     if not all([plain_path, cipher_path, decrypted_path]):
         raise ValueError("File paths cannot be None.")
@@ -516,7 +516,7 @@ def encrypt_and_decrypt(plain_path: str, cipher_path: str, decrypted_path: str,
         return True
 
 
-def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: str, scheme: str = "scheme3"):
+def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: str, scheme: str = "scheme1"):
     """
     批量加解密：遍历 source_dir 下图片，增量处理（已存在则跳过）。
     """
@@ -574,8 +574,8 @@ def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: st
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="图像加密与解密主流程")
-    parser.add_argument("--scheme", type=str, default="scheme3", choices=["scheme1", "scheme3"],
-                        help="选择混沌序列生成方案: scheme1 或 scheme3 (default: scheme3)")
+    parser.add_argument("--scheme", type=str, default="scheme1", choices=["scheme1", "scheme3"],
+                        help="选择混沌序列生成方案: scheme1 或 scheme3 (default: scheme1)")
     parser.add_argument("--image", type=str, default=None,
                         help="指定要加解密的单张图像路径 (default: photo/plain_img/test1.jpg)")
     parser.add_argument("--batch", action="store_true",

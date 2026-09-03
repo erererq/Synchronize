@@ -39,7 +39,7 @@ from Code.encry.scheme3_seed_stream import generate_seed_scheme3
 
 # 全局配置开关
 ENABLE_SYNC_CHECK = True
-DEFAULT_SCHEME = "scheme3"
+DEFAULT_SCHEME = "scheme1"
 
 
 def generate_seed(
@@ -49,13 +49,13 @@ def generate_seed(
     scheme: str = DEFAULT_SCHEME
 ) -> tuple[tuple[np.ndarray, ...], tuple[np.ndarray, ...], tuple[np.ndarray, ...]]:
     """
-    统一序列生成入口，支持方案 1 与方案 3 自由切换。
+    统一序列生成入口，支持方案 1 与方案 3 自由切换（默认使用方案 1）。
 
     Args:
         height: 图像高度。
         width: 图像宽度。
         p: 图像分块大小。
-        scheme: "scheme1" 或 "scheme3"，默认 "scheme3"。
+        scheme: "scheme1" 或 "scheme3"，默认 "scheme1"。
 
     Returns:
         master_sequence: (x1, x2, x3, x4) uint8，值域 1~8。
