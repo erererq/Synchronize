@@ -577,7 +577,7 @@ if __name__ == "__main__":
     parser.add_argument("--scheme", type=str, default="scheme1", choices=["scheme1", "scheme3"],
                         help="选择混沌序列生成方案: scheme1 或 scheme3 (default: scheme1)")
     parser.add_argument("--image", type=str, default=None,
-                        help="指定要加解密的单张图像路径 (default: photo/plain_img/test1.jpg)")
+                        help="指定要加解密的单张图像路径 (default: photo/plain_img/test1_512.jpg)")
     parser.add_argument("--batch", action="store_true",
                         help="执行文件夹批量处理模式")
     args = parser.parse_args()
@@ -589,8 +589,14 @@ if __name__ == "__main__":
     if args.batch:
         process_images_in_folder(plain_folder, cipher_folder, decrypted_folder, scheme=args.scheme)
     else:
-        # 单图加解密
-        target_image = args.image or os.path.join(plain_folder, "test1.jpg")
+        # 单图加解密（默认优先使用 512x512 调试小图）
+        target_image = args.image
+        if not target_image:
+            candidate_512 = os.path.join(plain_folder, "test1_512.jpg")
+            if os.path.exists(candidate_512):
+                target_image = candidate_512
+            else:
+                target_image = os.path.join(plain_folder, "test1.jpg")
         if not os.path.exists(target_image):
             # 兼容寻找 plain_folder 下任意图片
             if os.path.exists(plain_folder):
