@@ -293,7 +293,7 @@ def encrypt(master_sequence: tuple, plain_img: np.ndarray, password: str = None)
         cipher_img: 密文图像。
         decry_key: 解密密钥 (img_word, initial_value)。
     """
-    x1, x2, x3, x4 = master_sequence
+    L1, L2, L3, L4, L5, L6 = master_sequence
 
     # ===== 阶段 1：Q 置乱 =====
     channels = cv2.split(plain_img)
@@ -329,15 +329,20 @@ def encrypt(master_sequence: tuple, plain_img: np.ndarray, password: str = None)
                             for block_I, block_Q in zip(blocks_I, blocks_Q)]
         diffused_channels.append(diffused_channel)
 
-    # ===== 阶段 2：DNA 双轮编解码 =====
+    # ===== 阶段 2：DNA 三轮不对称编解码 =====
     bin_channels = [convert_to_8bit_binary(ch) for ch in diffused_channels]
 
-    # 第 1 轮：x1 编码 → x2 解码
-    dna_channels = [binary_to_dna(bin_ch, x1, coding_rules) for bin_ch in bin_channels]
-    bin_channels = [dna_to_binary(dna_ch, x2, coding_rules) for dna_ch in dna_channels]
-    # 第 2 轮：x3 编码 → x4 解码
-    dna_channels = [binary_to_dna(bin_ch, x3, coding_rules) for bin_ch in bin_channels]
-    bin_channels = [dna_to_binary(dna_ch, x4, coding_rules) for dna_ch in dna_channels]
+    # 第 1 轮：L1 编码 → L2 解码
+    dna_channels = [binary_to_dna(bin_ch, L1, coding_rules) for bin_ch in bin_channels]
+    bin_channels = [dna_to_binary(dna_ch, L2, coding_rules) for dna_ch in dna_channels]
+
+    # 第 2 轮：L3 编码 → L4 解码
+    dna_channels = [binary_to_dna(bin_ch, L3, coding_rules) for bin_ch in bin_channels]
+    bin_channels = [dna_to_binary(dna_ch, L4, coding_rules) for dna_ch in dna_channels]
+
+    # 第 3 轮：L5 编码 → L6 解码
+    dna_channels = [binary_to_dna(bin_ch, L5, coding_rules) for bin_ch in bin_channels]
+    bin_channels = [dna_to_binary(dna_ch, L6, coding_rules) for dna_ch in dna_channels]
 
     # ===== 阶段 3：输出 =====
     channels_blocks = [convert_binary_to_decimal(bin_ch) for bin_ch in bin_channels]
@@ -388,18 +393,26 @@ def decrypt(slave_sequence: tuple, cipher_img: np.ndarray,
     Q = reshape_sequence_to_Q(logistic_sequence, height, width)
     blocks_Q = split_into_blocks(Q)
 
-    x5, x6, x7, x8 = slave_sequence
+    S1, S2, S3, S4, S5, S6 = slave_sequence
 
-    # DNA 逆序解码：x8 → x7 → x6 → x5
+    # DNA 逆序三轮解码：
+    # 逆第 3 轮（对应加密第 3 轮）：S6 编码 → S5 解码
+    # 逆第 2 轮（对应加密第 2 轮）：S4 编码 → S3 解码
+    # 逆第 1 轮（对应加密第 1 轮）：S2 编码 → S1 解码
     cipher_channel_blocks = [split_into_blocks(ch) for ch in cipher_channels]
     bin_channel_blocks = [convert_to_8bit_binary(ch) for ch in cipher_channel_blocks]
 
-    # 第 1 轮逆操作（对应加密第 2 轮）：x8 编码 → x7 解码
-    dna_channel_blocks = [binary_to_dna(bin_ch, x8, coding_rules) for bin_ch in bin_channel_blocks]
-    bin_channel_blocks = [dna_to_binary(dna_ch, x7, coding_rules) for dna_ch in dna_channel_blocks]
-    # 第 2 轮逆操作（对应加密第 1 轮）：x6 编码 → x5 解码
-    dna_channel_blocks = [binary_to_dna(bin_ch, x6, coding_rules) for bin_ch in bin_channel_blocks]
-    bin_channel_blocks = [dna_to_binary(dna_ch, x5, coding_rules) for dna_ch in dna_channel_blocks]
+    # 逆第 3 轮：S6 编码 → S5 解码
+    dna_channel_blocks = [binary_to_dna(bin_ch, S6, coding_rules) for bin_ch in bin_channel_blocks]
+    bin_channel_blocks = [dna_to_binary(dna_ch, S5, coding_rules) for dna_ch in dna_channel_blocks]
+
+    # 逆第 2 轮：S4 编码 → S3 解码
+    dna_channel_blocks = [binary_to_dna(bin_ch, S4, coding_rules) for bin_ch in bin_channel_blocks]
+    bin_channel_blocks = [dna_to_binary(dna_ch, S3, coding_rules) for dna_ch in dna_channel_blocks]
+
+    # 逆第 1 轮：S2 编码 → S1 解码
+    dna_channel_blocks = [binary_to_dna(bin_ch, S2, coding_rules) for bin_ch in bin_channel_blocks]
+    bin_channel_blocks = [dna_to_binary(dna_ch, S1, coding_rules) for dna_ch in dna_channel_blocks]
 
     # 十进制还原
     channels_blocks = [convert_binary_to_decimal(bin_ch) for bin_ch in bin_channel_blocks]

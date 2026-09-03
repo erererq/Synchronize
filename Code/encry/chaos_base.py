@@ -48,17 +48,8 @@ def get_sequence_pairs(env) -> list:
     if hasattr(env, "statex") and hasattr(env, "statey"):
         master_state = np.asarray(env.statex, dtype=np.float32).reshape(-1)
         slave_state = np.asarray(env.statey, dtype=np.float32).reshape(-1)
-        pair_count = min(len(master_state), len(slave_state))
-        pairs = [[master_state[idx], slave_state[idx]] for idx in range(pair_count)]
-
-        # 3D 系统：用非线性交叉项合成第 4 维
-        if pair_count == 3:
-            x4_master = master_state[0] * master_state[1] + master_state[2]
-            x4_slave = slave_state[0] * slave_state[1] + slave_state[2]
-            pairs.append([x4_master, x4_slave])
-
-        if len(pairs) >= 4:
-            return pairs[:4]
+        pairs = [[master_state[idx], slave_state[idx]] for idx in range(3)]
+        return pairs[:3]
 
     raise AttributeError(
         "Environment must expose get_current methods or statex/statey arrays with >= 3 dims."
@@ -73,27 +64,30 @@ def generate_raw(
     seed: int = None
 ) -> tuple[np.ndarray, ...]:
     """
-    运行 PPO 模型驱动 Hopfield 环境，采集原始连续混沌状态轨迹。
+    运行 PPO 模型驱动 Hopfield 环境，采集真实三维连续混沌状态轨迹。
+    为支撑后续 3 轮不对称 DNA 编解码 (需要 6 条序列)，实际演化 2 * num 步。
 
     Args:
-        num: 需要的有效序列点数。
+        num: 加密所需的块数 N (实际生成 2N 步轨迹以供奇偶抽取)。
         transient_steps: 瞬态丢弃步数（默认 1500）。
         model_path: 模型路径，默认使用 MODEL_DIR。
         pinning_node: 牵制控制节点（0, 1, 2），默认 2。
         seed: 环境随机种子。
 
     Returns:
-        8 个 ndarray：(raw_x1..raw_x4 为主系统，raw_x5..raw_x8 为从系统)。
+        6 个 ndarray，每个长度为 2 * num：
+        (raw_x1, raw_x2, raw_x3 为主系统；raw_y1, raw_y2, raw_y3 为从系统)。
     """
     resolved_model = model_path or str(PROJECT_ROOT / MODEL_DIR)
     env = ContinuousHopfieldEnv(pinning_node=pinning_node)
     model = PPO.load(resolved_model, device="cpu")
 
-    list_obs = [[] for _ in range(8)]
+    list_obs = [[] for _ in range(6)]
     reset_result = env.reset(seed=seed)
     obs = reset_result[0] if isinstance(reset_result, tuple) else reset_result
 
-    total_steps = num + transient_steps
+    target_steps = 2 * num
+    total_steps = target_steps + transient_steps
     for i in range(total_steps):
         action, _ = model.predict(obs, deterministic=True)
         step_result = env.step(action)
@@ -102,19 +96,18 @@ def generate_raw(
         else:
             obs, reward, dones, info = step_result
 
-        x1, x2, x3, x4 = get_sequence_pairs(env)
+        pair1, pair2, pair3 = get_sequence_pairs(env)
 
         if i >= transient_steps:
-            list_obs[0].append(x1[0])
-            list_obs[1].append(x2[0])
-            list_obs[2].append(x3[0])
-            list_obs[3].append(x4[0])
-            list_obs[4].append(x1[1])
-            list_obs[5].append(x2[1])
-            list_obs[6].append(x3[1])
-            list_obs[7].append(x4[1])
+            list_obs[0].append(pair1[0])
+            list_obs[1].append(pair2[0])
+            list_obs[2].append(pair3[0])
+            list_obs[3].append(pair1[1])
+            list_obs[4].append(pair2[1])
+            list_obs[5].append(pair3[1])
 
     return tuple(np.asarray(seq, dtype=np.float32) for seq in list_obs)
+
 
 
 def check_synchronization(master_sequence: tuple, slave_sequence: tuple) -> bool:

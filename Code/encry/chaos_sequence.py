@@ -88,22 +88,12 @@ def _save_results(master_seq, slave_seq, raw_arrays, output_dir: str, scheme: st
 
     # 1. 保存量化后序列为 .npz
     npz_path = os.path.join(output_dir, f"chaotic_sequences_{scheme}.npz")
-    np.savez(
-        npz_path,
-        master_x1=master_seq[0], master_x2=master_seq[1],
-        master_x3=master_seq[2], master_x4=master_seq[3],
-        slave_x5=slave_seq[0], slave_x6=slave_seq[1],
-        slave_x7=slave_seq[2], slave_x8=slave_seq[3],
-    )
-    # 同步维护一个默认名副本
+    save_dict = {f"master_L{i+1}": master_seq[i] for i in range(len(master_seq))}
+    save_dict.update({f"slave_S{i+1}": slave_seq[i] for i in range(len(slave_seq))})
+    np.savez(npz_path, **save_dict)
+
     default_npz_path = os.path.join(output_dir, "chaotic_sequences.npz")
-    np.savez(
-        default_npz_path,
-        master_x1=master_seq[0], master_x2=master_seq[1],
-        master_x3=master_seq[2], master_x4=master_seq[3],
-        slave_x5=slave_seq[0], slave_x6=slave_seq[1],
-        slave_x7=slave_seq[2], slave_x8=slave_seq[3],
-    )
+    np.savez(default_npz_path, **save_dict)
     print(f"[SAVED] Quantized sequences → {npz_path}")
 
     # 2. 保存原始浮点序列
@@ -118,23 +108,17 @@ def _save_results(master_seq, slave_seq, raw_arrays, output_dir: str, scheme: st
     try:
         import matplotlib.pyplot as plt
 
-        fig, axes = plt.subplots(4, 1, figsize=(14, 10), sharex=True)
-        fig.suptitle(f"Master vs Slave Chaotic Sequences ({scheme.upper()})", fontsize=14)
-
-        labels = [
-            ("x1 (master)", "x5 (slave)"),
-            ("x2 (master)", "x6 (slave)"),
-            ("x3 (master)", "x7 (slave)"),
-            ("x4 (master)", "x8 (slave)"),
-        ]
+        num_seqs = len(master_seq)
+        fig, axes = plt.subplots(num_seqs, 1, figsize=(14, 2.2 * num_seqs), sharex=True)
+        fig.suptitle(f"Master vs Slave Chaotic Sequences ({scheme.upper()}) [6-Sequence Architecture]", fontsize=14)
 
         for idx, ax in enumerate(axes):
             m = master_seq[idx]
             s = slave_seq[idx]
             n_points = min(len(m), 500)
 
-            ax.plot(m[:n_points], label=labels[idx][0], linewidth=0.8, alpha=0.8)
-            ax.plot(s[:n_points], label=labels[idx][1], linewidth=0.8, alpha=0.8, linestyle='--')
+            ax.plot(m[:n_points], label=f"Master L{idx+1}", linewidth=0.8, alpha=0.8)
+            ax.plot(s[:n_points], label=f"Slave S{idx+1}", linewidth=0.8, alpha=0.8, linestyle='--')
             ax.set_ylabel(f"Pair {idx+1}")
             ax.legend(loc="upper right", fontsize=8)
             ax.grid(True, alpha=0.3)
@@ -148,7 +132,7 @@ def _save_results(master_seq, slave_seq, raw_arrays, output_dir: str, scheme: st
         print(f"[SAVED] Comparison plot → {fig_path}")
 
         # 4. 误差图
-        fig2, axes2 = plt.subplots(4, 1, figsize=(14, 8), sharex=True)
+        fig2, axes2 = plt.subplots(num_seqs, 1, figsize=(14, 2 * num_seqs), sharex=True)
         fig2.suptitle(f"Synchronization Error (Master - Slave) [{scheme.upper()}]", fontsize=14)
 
         for idx, ax in enumerate(axes2):
@@ -191,7 +175,7 @@ def main():
         args.output_dir = os.path.join(str(PROJECT_ROOT), "experiments", "seq_gen")
 
     print("=" * 60)
-    print("混沌序列生成调度引擎")
+    print("混沌序列生成调度引擎 (6 序列 3 轮不对称编解码)")
     print(f"当前选定方案: {args.scheme}")
     print(f"图像尺寸: {args.height}x{args.width}, 分块: {args.block_size}")
     print(f"输出目录: {args.output_dir}")
@@ -209,15 +193,15 @@ def main():
 
     # 统计独立值数量，确保无常数坍缩
     print("\n[序列多样性检验]")
-    for i in range(4):
+    for i in range(len(master_seq)):
         u_count = len(np.unique(master_seq[i]))
-        print(f"  维度 x{i+1}: 独立值计数 = {u_count} (值域 1~8)")
-        assert u_count > 1, f"警告：维度 x{i+1} 发生了常数坍缩！"
+        print(f"  序列 L{i+1}: 独立值计数 = {u_count} (值域 1~8)")
+        assert u_count > 1, f"警告：序列 L{i+1} 发生了常数坍缩！"
 
     _save_results(master_seq, slave_seq, raw_arrays, args.output_dir, args.scheme)
 
     print("\n" + "=" * 60)
-    print(f"方案 {args.scheme} 序列生成与保存已成功完成！")
+    print(f"方案 {args.scheme} (6 序列架构) 序列生成与保存已成功完成！")
     print("=" * 60)
 
 

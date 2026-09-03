@@ -1,14 +1,15 @@
 """
-scheme1_direct_quant.py  —  方案 1：连续混沌轨迹自适应归一化 + 互补双网格量化（零真值泄漏）
+scheme1_direct_quant.py  —  方案 1：连续混沌轨迹自适应归一化 + 互补双网格量化（6 序列 3 轮编解码架构）
 
 职责：
-  1. 接收 Hopfield 混沌系统各维度连续状态轨迹 (raw_x1~raw_x8)
-  2. 执行各维度独立自适应归一化 (Session-level Min/Max Normalization)
-  3. 基于物理同步误差上限，应用各维自适应分辨率区间 K = [64, 64, 64, 32]
-  4. 采用 Floor/Round 互补双网格机制（δ = 0.25）消除跳变歧义：
+  1. 接收 Hopfield 混沌系统真实三维物理状态轨迹 (x1, x2, x3, 长度 2N)
+  2. 执行奇偶时间交错抽取，构建 6 条纯正物理序列 (L1~L6, S1~S6)
+  3. 执行各序列独立自适应归一化 (Session-level Min/Max Normalization)
+  4. 应用统一安全分辨率 K = (64, 64, 64, 64, 64, 64)，理论严格满足 Δz < 0.25
+  5. 采用 Floor/Round 互补双网格机制（δ = 0.25）消除跳变歧义：
      - 主端仅输出 1-bit 指示标记（Round vs Floor），绝不泄露任何量化真值
-     - 掩码通过 np.packbits 压缩为紧凑位图随密钥传递
-  5. 产出全维度严格覆盖 [1, 8] 且主从 100% 绝对一致的 DNA 规则序列
+     - 掩码通过 np.packbits 压缩为 6 通道紧凑位图随密钥传递
+  6. 产出 6 条全维度严格覆盖 [1, 8] 且主从 100% 绝对一致的 DNA 规则序列
 """
 
 import sys
@@ -33,8 +34,8 @@ from Code.encry.chaos_base import (
     DEFAULT_TRANSIENT_STEPS,
 )
 
-# 各维度自适应量化区间数（根据物理误差测绘最优确定，保障 Δz < 0.25）
-K_ADAPTIVE = (64, 64, 64, 32)
+# 6 条序列的量化区间数（全物理三维来源，精度均极高，全部统一安全采用 K=64）
+K_ADAPTIVE = (64, 64, 64, 64, 64, 64)
 
 # 互补网格最优保护带阈值
 DELTA_THRESHOLD = 0.25
@@ -100,7 +101,7 @@ def generate_seed_scheme1(
     transient_steps: int = DEFAULT_TRANSIENT_STEPS
 ) -> tuple[tuple[np.ndarray, ...], tuple[np.ndarray, ...], tuple[np.ndarray, ...], dict]:
     """
-    方案 1 序列生成主入口。
+    方案 1 序列生成主入口（6 序列 3 轮编解码架构）。
 
     Args:
         height: 图像高度。
@@ -109,16 +110,28 @@ def generate_seed_scheme1(
         transient_steps: 瞬态丢弃步数。
 
     Returns:
-        master_sequence: (x1, x2, x3, x4) uint8，值域 1~8。
-        slave_sequence:  (x5, x6, x7, x8) uint8，值域 1~8（严格逐点 100% 恒等）。
-        raw:             原始连续浮点轨迹。
+        master_sequence: (L1, L2, L3, L4, L5, L6) uint8，值域 1~8。
+        slave_sequence:  (S1, S2, S3, S4, S5, S6) uint8，值域 1~8（严格逐点 100% 恒等）。
+        raw:             原始连续浮点轨迹 (x1..x3, y1..y3)。
         helper_info:     包含会话极值 bounds 与 1-bit 紧凑掩码 packed_masks。
     """
     num = ((height + p - 1) // p) * ((width + p - 1) // p)
     raw = generate_raw(num, transient_steps=transient_steps)
 
-    master_raw = raw[:4]
-    slave_raw = raw[4:]
+    master_raw = raw[:3]  # x1, x2, x3, 长度 2 * num
+    slave_raw = raw[3:]   # y1, y2, y3, 长度 2 * num
+
+    # 奇偶时间抽取，构建 6 条物理序列
+    # L1, L2, L3: 奇数时刻点 (0, 2, 4...)
+    # L4, L5, L6: 偶数时刻点 (1, 3, 5...)
+    master_sliced = [
+        master_raw[0][0::2], master_raw[1][0::2], master_raw[2][0::2],
+        master_raw[0][1::2], master_raw[1][1::2], master_raw[2][1::2],
+    ]
+    slave_sliced = [
+        slave_raw[0][0::2], slave_raw[1][0::2], slave_raw[2][0::2],
+        slave_raw[0][1::2], slave_raw[1][1::2], slave_raw[2][1::2],
+    ]
 
     master_list = []
     slave_list = []
@@ -126,9 +139,9 @@ def generate_seed_scheme1(
     packed_masks_list = []
     marked_ratios = []
 
-    for dim in range(4):
-        m_r = master_raw[dim]
-        s_r = slave_raw[dim]
+    for dim in range(6):
+        m_r = master_sliced[dim]
+        s_r = slave_sliced[dim]
         K = K_ADAPTIVE[dim]
 
         # 1. 主端确定当前会话的物理极值（加微小裕度防端点除零）
@@ -170,40 +183,43 @@ def generate_seed_scheme1(
 # ==========================================
 
 def main():
-    parser = argparse.ArgumentParser(description="方案 1：互补双网格自适应量化验证")
+    parser = argparse.ArgumentParser(description="方案 1：6 序列 3 轮编解码架构独立测试")
     parser.add_argument("--height", type=int, default=256)
     parser.add_argument("--width", type=int, default=256)
     parser.add_argument("--block-size", type=int, default=DEFAULT_BLOCK_SIZE)
     args = parser.parse_args()
 
     print("=" * 70)
-    print("方案 1：连续混沌轨迹自适应归一化 + 互补双网格量化 (零真值泄漏)")
+    print("方案 1：连续混沌轨迹自适应归一化 + 互补双网格量化 (6 序列架构)")
     print(f"图像尺寸: {args.height}x{args.width}, 块大小: {args.block_size}")
     print(f"自适应分辨率 K: {K_ADAPTIVE}, 保护带阈值 δ: {DELTA_THRESHOLD}")
     print("=" * 70)
 
     master_seq, slave_seq, raw, helper_info = generate_seed_scheme1(args.height, args.width, args.block_size)
 
-    synced = check_synchronization(master_seq, slave_seq)
-    print(f"\n[同步判定] check_synchronization: {'[PASS] (100% 逐点恒等零误差)' if synced else '[FAIL]'}")
+    assert len(master_seq) == 6, f"预期 6 条序列，实际为 {len(master_seq)}"
+    assert len(slave_seq) == 6, f"预期 6 条从序列，实际为 {len(slave_seq)}"
 
+    synced = check_synchronization(master_seq, slave_seq)
+    print(f"\n[同步判定] check_synchronization: {'[PASS] (6 序列 100% 逐点恒等零误差)' if synced else '[FAIL]'}")
+
+    seq_names = ["L1 (x1_odd)", "L2 (x2_odd)", "L3 (x3_odd)", "L4 (x1_even)", "L5 (x2_even)", "L6 (x3_even)"]
     print("\n[序列多样性与规则全覆盖检验]")
-    for i in range(4):
+    for i in range(6):
         m = master_seq[i]
         unique_vals, counts = np.unique(m, return_counts=True)
         ratio_pct = helper_info["marked_ratios"][i] * 100
         min_v, max_v = helper_info["bounds"][i]
-        print(f"  维度 X{i+1} (K={K_ADAPTIVE[i]}): 物理范围=[{min_v:.3f}, {max_v:.3f}], 1-bit标记率={ratio_pct:.1f}%")
+        print(f"  序列 {seq_names[i]} (K={K_ADAPTIVE[i]}): 物理范围=[{min_v:.3f}, {max_v:.3f}], 1-bit标记率={ratio_pct:.1f}%")
         print(f"             独立规则数={len(unique_vals)}, 取值={unique_vals}")
-        print(f"             分布计数={dict(zip(unique_vals, counts))}")
-        assert len(unique_vals) == 8, f"维度 X{i+1} 未完全覆盖 8 种规则！"
+        assert len(unique_vals) == 8, f"序列 {seq_names[i]} 未完全覆盖 8 种规则！"
 
     print(f"\n[辅助数据开销与安全特性]")
     print(f"  紧凑位图总字节数: {helper_info['mask_bytes_total']} 字节 (~{helper_info['mask_bytes_total']/1024:.2f} KB)")
     print(f"  是否泄露任何真值/偏移量: 否 (Zero Value Leakage)")
 
     print("\n" + "=" * 70)
-    print("方案 1 升级重构独立测试全部通过！")
+    print("方案 1 (6 序列 3 轮架构) 独立测试全部通过！")
     print("=" * 70)
 
 

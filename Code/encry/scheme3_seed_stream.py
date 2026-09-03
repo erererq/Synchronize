@@ -85,22 +85,23 @@ def extract_guardband_seed(raw_trajs: tuple[np.ndarray, ...], sample_indices: li
     return np.array(seed_values, dtype=np.int32), chosen_steps
 
 
-def expand_seed_to_streams(seed_vec: np.ndarray, target_length: int, num_streams: int = 4, num_rules: int = 8) -> tuple[np.ndarray, ...]:
+def expand_seed_to_streams(seed_vec: np.ndarray, target_length: int, num_streams: int = 6, num_rules: int = 8) -> tuple[np.ndarray, ...]:
     """
-    使用提取的离散物理种子驱动高性能混沌伪随机发生器（PRNG），扩展为图像所需的 DNA 规则序列。
+    使用提取的离散物理种子驱动高性能混沌伪随机发生器（PRNG），扩展为图像所需的 6 条 DNA 规则序列。
 
     扩展动力学：使用混沌动力学极强、无弱混沌窗口的 Logistic-Sine 耦合映射 (LSCM):
         x_{k+1} = ( r * x_k * (1 - x_k) + (4 - r) * sin(pi * x_k) / 4 ) mod 1.0
     """
     seed_bytes = seed_vec.tobytes()
-    hash_digest = hashlib.sha256(seed_bytes).hexdigest()
+    # 使用 SHA-512 生成 128 位十六进制散列，为 6 条流分别提供充裕且独立的扰动初值
+    hash_digest = hashlib.sha512(seed_bytes).hexdigest()
 
     streams = []
     for s_idx in range(num_streams):
         sub_hex = hash_digest[s_idx * 16 : (s_idx + 1) * 16]
         int_val = int(sub_hex, 16)
         x = 0.05 + (int_val % (10**9)) / (10**9) * 0.90
-        r = 3.99 + (s_idx * 0.002)
+        r = 3.99 + (s_idx * 0.0015)
 
         for _ in range(100):
             x = (r * x * (1.0 - x) + (4.0 - r) * np.sin(np.pi * x) / 4.0) % 1.0
@@ -125,15 +126,15 @@ def generate_seed_scheme3(
     transient_steps: int = DEFAULT_TRANSIENT_STEPS
 ) -> tuple[tuple[np.ndarray, ...], tuple[np.ndarray, ...], tuple[np.ndarray, ...], dict]:
     """
-    方案 3 序列生成主入口。
+    方案 3 序列生成主入口（6 序列 3 轮编解码架构）。
     仅需采样 1024 步物理稳态用于种子提取，随后快速确定性扩展为所需尺寸序列。
     """
     num = ((height + p - 1) // p) * ((width + p - 1) // p)
     # 种子提取仅需固定 1024 步稳态轨迹，无需冗余模拟全图步数
-    raw = generate_raw(1024, transient_steps=transient_steps)
+    raw = generate_raw(512, transient_steps=transient_steps)
 
-    master_raw = raw[:4]
-    slave_raw = raw[4:]
+    master_raw = raw[:3]
+    slave_raw = raw[3:]
 
     # 1. 保护带稳态种子提取（Master 确定安全采样步，Slave 在相同安全步采样）
     seed_master, chosen_steps = extract_guardband_seed(master_raw, sample_indices=None, grid_delta=GRID_DELTA, guard=GUARD_BAND)
@@ -143,9 +144,9 @@ def generate_seed_scheme3(
     if not seed_match:
         raise RuntimeError("方案 3 物理种子提取发生分歧，主从两端种子不一致！")
 
-    # 2. 确定性混沌流展开
-    master_sequence = expand_seed_to_streams(seed_master, target_length=num, num_streams=4)
-    slave_sequence = expand_seed_to_streams(seed_slave, target_length=num, num_streams=4)
+    # 2. 确定性混沌流展开为 6 条 DNA 规则序列
+    master_sequence = expand_seed_to_streams(seed_master, target_length=num, num_streams=6)
+    slave_sequence = expand_seed_to_streams(seed_slave, target_length=num, num_streams=6)
 
     seed_info = {
         "seed_length": len(seed_master),
@@ -154,9 +155,11 @@ def generate_seed_scheme3(
         "seed_exact_match": bool(seed_match),
         "sample_steps": chosen_steps,
         "expansion_length": num,
+        "num_streams": 6,
     }
 
     return master_sequence, slave_sequence, raw, seed_info
+
 
 
 # ==========================================
@@ -186,15 +189,14 @@ def main():
     print(f"\n[流扩展同步判定] check_synchronization: {'[PASS] (100% 逐元素恒等)' if synced else '[FAIL]'}")
 
     print("\n[统计特性检查（检验均匀分布与非平庸性）]")
-    for i in range(4):
+    for i in range(len(master_seq)):
         m = master_seq[i]
         unique_vals, counts = np.unique(m, return_counts=True)
-        print(f"  维度 x{i+1}: 独立取值数={len(unique_vals)}, 取值={unique_vals}")
-        print(f"             分布计数={dict(zip(unique_vals, counts))}")
-        assert len(unique_vals) == 8, f"维度 x{i+1} 未完全覆盖 8 种规则！"
+        print(f"  流 Stream {i+1}: 独立取值数={len(unique_vals)}, 取值={unique_vals}")
+        assert len(unique_vals) == 8, f"流 Stream {i+1} 未完全覆盖 8 种规则！"
 
     print("\n" + "=" * 60)
-    print("方案 3 独立测试全部通过！")
+    print("方案 3 (6 序列 3 轮架构) 独立测试全部通过！")
     print("=" * 60)
 
 
