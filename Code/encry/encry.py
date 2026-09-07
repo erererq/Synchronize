@@ -56,16 +56,33 @@ p = DEFAULT_BLOCK_SIZE
 # 用户密码
 MY_PASSWORD = "password987"
 
-# 8 种 DNA 碱基编码规则（2bit → 碱基的双射）
+# 24 种 DNA 碱基编码规则（S_4 对称群全排列，2bit → 碱基的双射）
+# 规则 1~8 保持经典 Watson-Crick 互补配对；规则 9~24 拓展其余全部 16 种置换，彻底打破互补不变子空间缺陷
 coding_rules = {
-    1: {'00': 'A', '11': 'T', '10': 'C', '01': 'G'},
-    2: {'00': 'A', '11': 'T', '01': 'C', '10': 'G'},
-    3: {'11': 'A', '00': 'T', '10': 'C', '01': 'G'},
-    4: {'11': 'A', '00': 'T', '01': 'C', '10': 'G'},
-    5: {'01': 'A', '10': 'T', '00': 'C', '11': 'G'},
-    6: {'01': 'A', '10': 'T', '11': 'C', '00': 'G'},
-    7: {'10': 'A', '01': 'T', '00': 'C', '11': 'G'},
-    8: {'10': 'A', '01': 'T', '11': 'C', '00': 'G'}
+    1: {'00': 'A', '01': 'G', '10': 'C', '11': 'T'},  # Watson-Crick 互补
+    2: {'00': 'A', '01': 'C', '10': 'G', '11': 'T'},  # Watson-Crick 互补
+    3: {'00': 'T', '01': 'G', '10': 'C', '11': 'A'},  # Watson-Crick 互补
+    4: {'00': 'T', '01': 'C', '10': 'G', '11': 'A'},  # Watson-Crick 互补
+    5: {'00': 'C', '01': 'A', '10': 'T', '11': 'G'},  # Watson-Crick 互补
+    6: {'00': 'G', '01': 'A', '10': 'T', '11': 'C'},  # Watson-Crick 互补
+    7: {'00': 'C', '01': 'T', '10': 'A', '11': 'G'},  # Watson-Crick 互补
+    8: {'00': 'G', '01': 'T', '10': 'A', '11': 'C'},  # Watson-Crick 互补
+    9: {'00': 'A', '01': 'C', '10': 'T', '11': 'G'},  # S_4 拓展全排列
+    10: {'00': 'A', '01': 'G', '10': 'T', '11': 'C'},  # S_4 拓展全排列
+    11: {'00': 'A', '01': 'T', '10': 'C', '11': 'G'},  # S_4 拓展全排列
+    12: {'00': 'A', '01': 'T', '10': 'G', '11': 'C'},  # S_4 拓展全排列
+    13: {'00': 'C', '01': 'A', '10': 'G', '11': 'T'},  # S_4 拓展全排列
+    14: {'00': 'C', '01': 'G', '10': 'A', '11': 'T'},  # S_4 拓展全排列
+    15: {'00': 'C', '01': 'G', '10': 'T', '11': 'A'},  # S_4 拓展全排列
+    16: {'00': 'C', '01': 'T', '10': 'G', '11': 'A'},  # S_4 拓展全排列
+    17: {'00': 'G', '01': 'A', '10': 'C', '11': 'T'},  # S_4 拓展全排列
+    18: {'00': 'G', '01': 'C', '10': 'A', '11': 'T'},  # S_4 拓展全排列
+    19: {'00': 'G', '01': 'C', '10': 'T', '11': 'A'},  # S_4 拓展全排列
+    20: {'00': 'G', '01': 'T', '10': 'C', '11': 'A'},  # S_4 拓展全排列
+    21: {'00': 'T', '01': 'A', '10': 'C', '11': 'G'},  # S_4 拓展全排列
+    22: {'00': 'T', '01': 'A', '10': 'G', '11': 'C'},  # S_4 拓展全排列
+    23: {'00': 'T', '01': 'C', '10': 'A', '11': 'G'},  # S_4 拓展全排列
+    24: {'00': 'T', '01': 'G', '10': 'A', '11': 'C'},  # S_4 拓展全排列
 }
 
 
@@ -73,19 +90,19 @@ coding_rules = {
 # 密钥派生
 # ==========================================
 
-def string_to_initial_value(password: str) -> float:
+def string_to_initial_value(password: str, offset: float = 0.0) -> float:
     """
     将用户输入的字符串密码转换为 (0, 1) 之间的浮点数，用作混沌系统的初值。
     """
     hash_obj = hashlib.sha256(password.encode('utf-8'))
     hex_dig = hash_obj.hexdigest()
     int_val = int(hex_dig, 16)
-    float_val = int_val / (2 ** 256)
+    float_val = int_val / (2 ** 256) + offset
 
-    # 避免正好是 0 或 1
-    if float_val == 0:
+    # 避免正好是 0 或 1 或超出 (0, 1) 区间
+    if float_val <= 0:
         float_val = 0.123456789
-    if float_val == 1:
+    if float_val >= 1:
         float_val = 0.987654321
 
     return float_val
@@ -280,24 +297,37 @@ def save_image(multi_channel_img: np.ndarray, path: str):
 # 加密
 # ==========================================
 
-def encrypt(master_sequence: tuple, plain_img: np.ndarray, password: str = None) -> tuple:
+def encrypt(master_sequence: tuple = None, plain_img: np.ndarray = None, password: str = None, offset: float = 0.0, **kwargs) -> tuple:
     """
-    三阶段加密：Q 置乱 (XOR) → DNA 双轮编解码 → 输出密文。
+    三阶段加密：Q 置乱 (XOR) → DNA 三轮编解码 → 输出密文。
 
     Args:
-        master_sequence: (x1, x2, x3, x4) — 量化后的混沌主序列。
+        master_sequence: (L1..L6) 量化后的混沌主序列。若为 None 则内部自动生成。
         plain_img: 明文图像 (BGR)。
         password: 用户密码，用于派生 Logistic Map 初值。
+        offset: Logistic Map 初值微扰量（用于敏感性测试）。
 
     Returns:
         cipher_img: 密文图像。
         decry_key: 解密密钥 (img_word, initial_value)。
     """
+    # 兼容处理：若第 1 个参数传入的是 plain_img (ndarray)，而第 2 个参数为 None 或序列
+    if isinstance(master_sequence, np.ndarray) and plain_img is None:
+        plain_img = master_sequence
+        master_sequence = kwargs.get('master_sequence', None)
+
+    if plain_img is None:
+        raise ValueError("plain_img cannot be None.")
+
+    height, width = plain_img.shape[:2]
+
+    if master_sequence is None:
+        master_sequence, _, _ = generate_seed(height, width, p)
+
     L1, L2, L3, L4, L5, L6 = master_sequence
 
     # ===== 阶段 1：Q 置乱 =====
     channels = cv2.split(plain_img)
-    height, width = plain_img.shape[:2]
 
     # 生成 Logistic Map 初值（密码 + 图像像素和混合）
     i1 = np.sum(channels[0])
@@ -312,7 +342,7 @@ def encrypt(master_sequence: tuple, plain_img: np.ndarray, password: str = None)
     else:
         raise ValueError("Password must be a string or None.")
 
-    initial_value = string_to_initial_value(raw_seed_str)
+    initial_value = string_to_initial_value(raw_seed_str, offset=offset)
     theta = 3.9999
     num_iterations = height * width
 
@@ -359,15 +389,16 @@ def encrypt(master_sequence: tuple, plain_img: np.ndarray, password: str = None)
 # ==========================================
 
 def decrypt(slave_sequence: tuple, cipher_img: np.ndarray,
-            decry_key: tuple, password: str = None) -> tuple:
+            decry_key: tuple, password: str = None, offset: float = 0.0) -> tuple:
     """
     解密算法：加密的严格逆过程。
 
     Args:
-        slave_sequence: (x5, x6, x7, x8) — 量化后的混沌从序列。
+        slave_sequence: (S1..S6) — 量化后的混沌从序列。
         cipher_img: 密文图像。
         decry_key: 解密密钥。
         password: 用户密码。
+        offset: 初值微扰量（用于敏感性测试）。
 
     Returns:
         (is_success, decrypted_img): 解密结果。
@@ -382,7 +413,7 @@ def decrypt(slave_sequence: tuple, cipher_img: np.ndarray,
     else:
         raise ValueError("Password must be a string or None.")
 
-    initial_value_of_Q = string_to_initial_value(raw_seed_str)
+    initial_value_of_Q = string_to_initial_value(raw_seed_str, offset=offset)
 
     cipher_channels = cv2.split(cipher_img)
     height, width = cipher_img.shape[:2]
@@ -463,16 +494,19 @@ def check_decryption_psnr(plain_path: str, decrypted_path: str) -> bool:
 # ==========================================
 
 def encrypt_and_decrypt(plain_path: str, cipher_path: str, decrypted_path: str,
-                        password: str = None, scheme: str = "scheme1") -> bool:
+                        password: str = None, master_sequence: tuple = None,
+                        slave_sequence: tuple = None, offset: float = 0.0, **kwargs) -> bool:
     """
-    单图完整流程：生成序列 → 同步检查 → 加密 → 解密 → 像素级验证。
+    单图完整流程：生成序列 (方案 1) → 同步检查 → 加密 → 解密 → 像素级验证。
 
     Args:
         plain_path: 明文图片路径。
         cipher_path: 密文图片保存路径。
         decrypted_path: 解密还原图片保存路径。
         password: 用户口令密码。
-        scheme: "scheme1" 或 "scheme3"，指定序列生成方案（默认: scheme1）。
+        master_sequence: 外部传入的主序列（可选）。
+        slave_sequence: 外部传入的从序列（可选）。
+        offset: 初值微扰量（可选）。
     """
     if not all([plain_path, cipher_path, decrypted_path]):
         raise ValueError("File paths cannot be None.")
@@ -482,28 +516,29 @@ def encrypt_and_decrypt(plain_path: str, cipher_path: str, decrypted_path: str,
         raise FileNotFoundError(f"Unable to load image at {plain_path}")
     height, width = plain_img.shape[:2]
 
-    if ENABLE_SYNC_CHECK:
-        cnt = 0
-        attempt_num = 5
-        while True:
-            cnt += 1
-            print(f"Generating chaotic sequences [{scheme}], attempt {cnt}...")
-            master_sequence, slave_sequence, _ = generate_seed(height, width, p, scheme=scheme)
-            if check_synchronization(master_sequence, slave_sequence):
-                print(f"Chaotic sequences [{scheme}] passed the synchronization check.")
-                break
-            elif cnt >= attempt_num:
-                print(f"Error: Unable to generate valid chaotic sequences after {attempt_num} attempts.")
-                return False
-    else:
-        master_sequence, slave_sequence, _ = generate_seed(height, width, p, scheme=scheme)
+    if master_sequence is None or slave_sequence is None:
+        if ENABLE_SYNC_CHECK:
+            cnt = 0
+            attempt_num = 5
+            while True:
+                cnt += 1
+                print(f"Generating chaotic sequences [scheme1], attempt {cnt}...")
+                master_sequence, slave_sequence, _ = generate_seed(height, width, p)
+                if check_synchronization(master_sequence, slave_sequence):
+                    print("Chaotic sequences [scheme1] passed the synchronization check.")
+                    break
+                elif cnt >= attempt_num:
+                    print(f"Error: Unable to generate valid chaotic sequences after {attempt_num} attempts.")
+                    return False
+        else:
+            master_sequence, slave_sequence, _ = generate_seed(height, width, p)
 
     # 加密
-    cipher_img, decry_key = encrypt(master_sequence, plain_img, password)
+    cipher_img, decry_key = encrypt(master_sequence, plain_img, password, offset=offset)
     save_image(cipher_img, cipher_path)
 
     # 解密
-    is_success, decry_img = decrypt(slave_sequence, cipher_img, decry_key, password)
+    is_success, decry_img = decrypt(slave_sequence, cipher_img, decry_key, password, offset=offset)
     print("Decryption attempt completed.")
     save_image(decry_img, decrypted_path)
 
@@ -512,11 +547,11 @@ def encrypt_and_decrypt(plain_path: str, cipher_path: str, decrypted_path: str,
         print("Warning: Decryption verification failed: Pixel values do not match exactly.")
         return False
     else:
-        print(f"Verification succeed [{scheme}]: Pixel values match exactly (100% loss-free).")
+        print("Verification succeed [scheme1]: Pixel values match exactly (100% loss-free).")
         return True
 
 
-def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: str, scheme: str = "scheme1"):
+def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: str):
     """
     批量加解密：遍历 source_dir 下图片，增量处理（已存在则跳过）。
     """
@@ -533,7 +568,7 @@ def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: st
     count_processed = 0
     count_skipped = 0
 
-    print(f"Starting batch processing in: {source_dir} using {scheme}\n" + "-" * 40)
+    print(f"Starting batch processing in: {source_dir}\n" + "-" * 40)
 
     for file_name in files:
         if file_name.lower().endswith(('.tiff', '.png', '.jpg', '.bmp')):
@@ -558,7 +593,7 @@ def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: st
 
             print(f"[ACTION] Processing new image: {file_name}")
             try:
-                encrypt_and_decrypt(plain_path, cipher_path, decrypted_path, password=MY_PASSWORD, scheme=scheme)
+                encrypt_and_decrypt(plain_path, cipher_path, decrypted_path, password=MY_PASSWORD)
                 count_processed += 1
             except Exception as e:
                 print(f"[ERROR] Failed to process {file_name}. Reason: {str(e)}")
@@ -573,9 +608,7 @@ def process_images_in_folder(source_dir: str, cipher_dir: str, decrypted_dir: st
 # ==========================================
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="图像加密与解密主流程")
-    parser.add_argument("--scheme", type=str, default="scheme1", choices=["scheme1", "scheme3"],
-                        help="选择混沌序列生成方案: scheme1 或 scheme3 (default: scheme1)")
+    parser = argparse.ArgumentParser(description="图像加密与解密主流程 (方案 1 纯 3D 动力学 24 DNA 规则)")
     parser.add_argument("--image", type=str, default=None,
                         help="指定要加解密的单张图像路径 (default: photo/plain_img/test1_512.jpg)")
     parser.add_argument("--batch", action="store_true",
@@ -587,7 +620,7 @@ if __name__ == "__main__":
     decrypted_folder = DECRYPTED_DIR
 
     if args.batch:
-        process_images_in_folder(plain_folder, cipher_folder, decrypted_folder, scheme=args.scheme)
+        process_images_in_folder(plain_folder, cipher_folder, decrypted_folder)
     else:
         # 单图加解密（默认优先使用 512x512 调试小图）
         target_image = args.image
@@ -606,10 +639,10 @@ if __name__ == "__main__":
 
         if os.path.exists(target_image):
             base_name = os.path.splitext(os.path.basename(target_image))[0]
-            cipher_path = os.path.join(cipher_folder, f"{base_name}_{args.scheme}.png")
-            decrypted_path = os.path.join(decrypted_folder, f"{base_name}_{args.scheme}.png")
+            cipher_path = os.path.join(cipher_folder, f"{base_name}_scheme1.png")
+            decrypted_path = os.path.join(decrypted_folder, f"{base_name}_scheme1.png")
 
-            print(f"=== 运行图像加解密 (方案: {args.scheme}) ===")
+            print("=== 运行图像加解密 (方案 1) ===")
             print(f"明文图片: {target_image}")
             print(f"密文输出: {cipher_path}")
             print(f"解密输出: {decrypted_path}")
@@ -618,8 +651,7 @@ if __name__ == "__main__":
                 plain_path=target_image,
                 cipher_path=cipher_path,
                 decrypted_path=decrypted_path,
-                password=MY_PASSWORD,
-                scheme=args.scheme
+                password=MY_PASSWORD
             )
         else:
             print(f"Error: Target image '{target_image}' not found.")

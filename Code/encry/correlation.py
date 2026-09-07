@@ -171,7 +171,9 @@ def main():
     for f in plain_files:
         stem = Path(f).stem
         if stem in cipher_map:
-            target_files.append((f,cipher_map[stem]))
+            target_files.append((f, cipher_map[stem]))
+        elif f"{stem}_scheme1" in cipher_map:
+            target_files.append((f, cipher_map[f"{stem}_scheme1"]))
             
     print(f"Total plain images: {len(plain_files)}")
     print(f"Found cipher images: {len(target_files)} (Skipping {len(plain_files) - len(target_files)} unprocessed images)")
