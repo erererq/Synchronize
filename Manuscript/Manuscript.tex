@@ -1121,27 +1121,31 @@ Subsequently, for the remaining channels, the sequential diffusion is strictly e
 Through this circular structure, any minute pixel perturbation in a single channel will be propagated to all channels during the subsequent diffusion and looping process, thereby effectively resisting differential attacks.
 
 \item 
-Let $R_i \ (i=1,2,\dots,8)$ represent a set of encoding rules presents in Table~\ref{tab:dna_rules} between numerical values and DNA sequences, with $R_i^{-1}$ denoting the corresponding decoding process. For the state variable sequences $x_1, x_2, x_3, x_4$ outputted by the chaotic system, a quantization function $F_{\text{quantize}}$ based on dead-zone characteristics is applied. This function quantizes the floating-point numbers into integers according to a maximum error bound $\epsilon$:
+Let $R_i \ (i=1,2,\dots,24)$ represent the set of all $4! = 24$ bijective encoding rules between 2-bit binary symbols and DNA bases, as listed in Table~\ref{tab:dna_rules}, with $R_i^{-1}$ denoting the corresponding inverse decoding process. Unlike traditional DNA encryption schemes that restrict the rule set to the 8 Watson-Crick complementary mappings (which preserve complementary partitions and restrict the induced permutations on $\{00, 01, 10, 11\}$ to an order-8 subgroup isomorphic to $D_4$), the proposed scheme fully utilizes all 24 permutations of the symmetric group $S_4$. This eliminates algebraic invariant subspace vulnerabilities under asymmetric encoding--decoding rounds and expands the rule search space threefold. For the state variable sequences outputted by the chaotic system, the quantization function maps the continuous trajectories into rule index sequences:
 \begin{equation}
-	s_i = F_{\text{quantize}}(x_i, \epsilon), \quad i \in \{1, 2, 3, 4\}
+	s_i = F_{\text{quantize}}(x_i), \quad s_i \in \{1, 2, \dots, 24\}
 \end{equation}
 
 \begin{table}[htbp]
 		\centering
-		\caption{DNA coding rules}
+		\caption{Full $S_4$ symmetric DNA coding rules (24 permutations).}
 		\label{tab:dna_rules}
-		\begin{tabular}{c|cccc}
+		\begin{tabular}{c|cccc||c|cccc}
 				\hline
-				Rule & 00 & 01 & 10 & 11 \\
+				Rule & 00 & 01 & 10 & 11 & Rule & 00 & 01 & 10 & 11 \\
 				\hline
-				1 & A & G & C & T \\
-				2 & A & C & G & T \\
-				3 & T & G & C & A \\
-				4 & T & C & G & A \\
-				5 & C & A & T & G \\
-				6 & C & G & T & A \\
-				7 & G & A & C & T \\
-				8 & G & T & A & C \\
+				 1 & A & G & C & T & 13 & C & A & G & T \\
+				 2 & A & C & G & T & 14 & C & G & A & T \\
+				 3 & T & G & C & A & 15 & C & G & T & A \\
+				 4 & T & C & G & A & 16 & C & T & G & A \\
+				 5 & C & A & T & G & 17 & G & A & C & T \\
+				 6 & G & A & T & C & 18 & G & C & A & T \\
+				 7 & C & T & A & G & 19 & G & C & T & A \\
+				 8 & G & T & A & C & 20 & G & T & C & A \\
+				 9 & A & C & T & G & 21 & T & A & C & G \\
+				10 & A & G & T & C & 22 & T & A & G & C \\
+				11 & A & T & C & G & 23 & T & C & A & G \\
+				12 & A & T & G & C & 24 & T & G & A & C \\
 				\hline
 		\end{tabular}
 \end{table}

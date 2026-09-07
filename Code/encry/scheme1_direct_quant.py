@@ -9,7 +9,7 @@ scheme1_direct_quant.py  —  方案 1：连续混沌轨迹自适应归一化 + 
   5. 采用 Floor/Round 互补双网格机制（δ = 0.25）消除跳变歧义：
      - 主端仅输出 1-bit 指示标记（Round vs Floor），绝不泄露任何量化真值
      - 掩码通过 np.packbits 压缩为 6 通道紧凑位图随密钥传递
-  6. 产出 6 条全维度严格覆盖 [1, 8] 且主从 100% 绝对一致的 DNA 规则序列
+  6. 产出 6 条全维度严格覆盖 [1, 24] 且主从 100% 绝对一致的 DNA 规则序列（遍历 S_4 对称群）
 """
 
 import sys
@@ -34,8 +34,8 @@ from Code.encry.chaos_base import (
     DEFAULT_TRANSIENT_STEPS,
 )
 
-# 6 条序列的量化区间数（全物理三维来源，精度均极高，全部统一安全采用 K=64）
-K_ADAPTIVE = (64, 64, 64, 64, 64, 64)
+# 6 条序列的量化区间数（统一采用 K=48 为 24 种规则的 2 个完整周期，彻底消除模偏差且严格满足 Δz < 0.25）
+K_ADAPTIVE = (48, 48, 48, 48, 48, 48)
 
 # 互补网格最优保护带阈值
 DELTA_THRESHOLD = 0.25
@@ -46,7 +46,7 @@ def quantize_master(traj: np.ndarray, min_val: float, max_val: float, K: int, de
     加密端（Master）：自适应归一化 + 互补双网格量化 + 1-bit 标记提取。
 
     Returns:
-        rules: DNA 规则序列 uint8，值域 1~8。
+        rules: DNA 规则序列 uint8，值域 1~24。
         packed_mask: 紧凑位图 uint8 数组（承载每个点是否为 Round 的 1-bit 指示标记）。
     """
     span = max_val - min_val
@@ -61,9 +61,9 @@ def quantize_master(traj: np.ndarray, min_val: float, max_val: float, K: int, de
     dist_to_int = np.abs(z - np.round(z))
     marked = (dist_to_int <= delta)  # True 表示使用 Round，False 表示使用 Floor
 
-    # 3. 双网格量化与模 8 映射
+    # 3. 双网格量化与模 24 映射（覆盖 24 种 S_4 全排列规则）
     q = np.where(marked, np.round(z), np.floor(z)).astype(np.int32)
-    rules = (np.mod(q, 8) + 1).astype(np.uint8)
+    rules = (np.mod(q, 24) + 1).astype(np.uint8)
 
     # 4. 压缩为紧凑位图
     packed_mask = np.packbits(marked)
@@ -87,9 +87,9 @@ def quantize_slave(traj: np.ndarray, min_val: float, max_val: float, K: int, pac
     u = np.clip((traj - min_val) / span, 0.0, 1.0 - 1e-7)
     z = u * K
 
-    # 3. 遵照 1-bit 标记分别采用 Round 或 Floor
+    # 3. 遵照 1-bit 标记分别采用 Round 或 Floor，执行模 24 映射
     q = np.where(marked, np.round(z), np.floor(z)).astype(np.int32)
-    rules = (np.mod(q, 8) + 1).astype(np.uint8)
+    rules = (np.mod(q, 24) + 1).astype(np.uint8)
 
     return rules
 
@@ -110,8 +110,8 @@ def generate_seed_scheme1(
         transient_steps: 瞬态丢弃步数。
 
     Returns:
-        master_sequence: (L1, L2, L3, L4, L5, L6) uint8，值域 1~8。
-        slave_sequence:  (S1, S2, S3, S4, S5, S6) uint8，值域 1~8（严格逐点 100% 恒等）。
+        master_sequence: (L1, L2, L3, L4, L5, L6) uint8，值域 1~24。
+        slave_sequence:  (S1, S2, S3, S4, S5, S6) uint8，值域 1~24（严格逐点 100% 恒等）。
         raw:             原始连续浮点轨迹 (x1..x3, y1..y3)。
         helper_info:     包含会话极值 bounds 与 1-bit 紧凑掩码 packed_masks。
     """
@@ -212,7 +212,7 @@ def main():
         min_v, max_v = helper_info["bounds"][i]
         print(f"  序列 {seq_names[i]} (K={K_ADAPTIVE[i]}): 物理范围=[{min_v:.3f}, {max_v:.3f}], 1-bit标记率={ratio_pct:.1f}%")
         print(f"             独立规则数={len(unique_vals)}, 取值={unique_vals}")
-        assert len(unique_vals) == 8, f"序列 {seq_names[i]} 未完全覆盖 8 种规则！"
+        assert len(unique_vals) == 24, f"序列 {seq_names[i]} 未完全覆盖 24 种规则！(实际覆盖 {len(unique_vals)} 种)"
 
     print(f"\n[辅助数据开销与安全特性]")
     print(f"  紧凑位图总字节数: {helper_info['mask_bytes_total']} 字节 (~{helper_info['mask_bytes_total']/1024:.2f} KB)")

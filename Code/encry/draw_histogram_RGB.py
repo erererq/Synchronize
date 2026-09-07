@@ -132,12 +132,17 @@ def batch_plot_histograms(plain_dir, cipher_dir, hist_dir, log_scale=True):
         if ext.lower() not in valid_exts:
             continue
         
-        if name not in cipher_map:
+        cipher_name = None
+        if name in cipher_map:
+            cipher_name = cipher_map[name]
+        elif f"{name}_scheme1" in cipher_map:
+            cipher_name = cipher_map[f"{name}_scheme1"]
+        else:
             print(f"Warning: 找不到对应的密文图像 {filename}，跳过。")
             continue
 
         p_path = os.path.join(plain_dir, filename)
-        c_path = os.path.join(cipher_dir, cipher_map[name])
+        c_path = os.path.join(cipher_dir, cipher_name)
         
         # 结果文件名
         h_path = os.path.join(hist_dir, f"{name}_hist.png")

@@ -1,0 +1,7 @@
+Scheme / Reference,Entropy (bit),NPCR (%),UACI (%),Corr (H),Corr (V),Corr (D),Key Space
+"Proposed (PPO Node 3, Scheme 1)",7.9993,99.600,33.347,0.0511,-0.0003,-0.0044,2^{465}
+Jin et al. (2025) [TCAS-I],N/A,N/A,N/A,0.0056,0.0017,0.0024,10^{95}
+Wang et al. (2021) [TCAS-I],N/A,N/A,N/A,-0.0088,0.0047,0.0053,N/A
+Li et al. (2024) [ESWA],N/A,N/A,N/A,-0.0015,0.0023,0.0021,N/A
+Verma et al. (2025) [NOND],N/A,N/A,N/A,-0.0123,-0.0068,-0.0368,N/A
+Hao et al. (2023) [Signal Process.],N/A,N/A,N/A,-0.0042,-0.0028,0.0027,N/A

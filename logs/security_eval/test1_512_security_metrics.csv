@@ -1,0 +1,43 @@
+Metric,Value
+image_name,test1_512.jpg
+image_shape,512x512
+lossless_recovery,True
+plain_entropy_mean,7.414014108457651
+cipher_entropy_r,7.99936780875233
+cipher_entropy_g,7.9992516119885435
+cipher_entropy_b,7.999312701314311
+cipher_entropy_mean,7.999310707351728
+plain_corr_h,0.9884131989126994
+plain_corr_v,0.9872023422930817
+plain_corr_d,0.9771599976883281
+cipher_corr_h,0.051146510298068625
+cipher_corr_v,-0.00026223149623145017
+cipher_corr_d,-0.004425747395522256
+npcr_r,99.60014343261719
+npcr_g,99.60014343261719
+npcr_b,99.60014343261719
+npcr_mean,99.60014343261719
+uaci_r,33.34619035907821
+uaci_g,33.373872794357005
+uaci_b,33.319848154105394
+uaci_mean,33.34663710251353
+encrypt_npcr,99.5849609375
+encrypt_hamming_pct,49.944305419921875
+decrypt_correct_mae,0.0
+decrypt_correct_psnr,inf
+decrypt_wrong_mae,75.90405400594075
+decrypt_wrong_psnr,8.824566553833247
+decrypt_wrong_hd,49.99370574951172
+key_space_bits,465
+key_space_str,2^{465}
+robustness_gaussian_sigma_5,"PSNR=19.66dB, MAE=12.71"
+robustness_gaussian_sigma_10,"PSNR=16.83dB, MAE=20.70"
+robustness_gaussian_sigma_20,"PSNR=14.22dB, MAE=31.48"
+robustness_gaussian_sigma_40,"PSNR=11.84dB, MAE=45.62"
+robustness_salt_pepper_ratio_0.01,"PSNR=28.78dB, MAE=0.76"
+robustness_salt_pepper_ratio_0.05,"PSNR=21.86dB, MAE=3.74"
+robustness_salt_pepper_ratio_0.1,"PSNR=18.99dB, MAE=7.28"
+robustness_salt_pepper_ratio_0.2,"PSNR=16.13dB, MAE=13.95"
+robustness_occlusion_area_ratio_0.0625,"PSNR=21.54dB, MAE=4.45"
+robustness_occlusion_area_ratio_0.125,"PSNR=18.27dB, MAE=9.14"
+robustness_occlusion_area_ratio_0.25,"PSNR=14.99dB, MAE=18.74"
