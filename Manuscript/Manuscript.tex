@@ -117,11 +117,10 @@ With a single bounded actuator, chaotic synchronization depends not only on wher
 \end{abstract}
 
 \begin{keywords}
-Chaotic synchronization \sep
-Pinning control \sep
-Proximal policy optimization \sep
-Partial observation \sep
-Hopfield neural network
+Image encryption \sep
+Synchronization \sep
+Deep reinforcement learning \sep
+Neural network
 \end{keywords}
 \maketitle
 
@@ -465,11 +464,11 @@ where
 \end{equation}
 Here $\widetilde a_t$ is the unclipped Gaussian sample stored for the policy update, whereas $a_t=\operatorname{clip}(\widetilde a_t,-1,1)$ is applied to the environment. The ratio $\rho_t(\theta)$ compares the new and old action likelihoods, $\epsilon$ is the PPO clipping hyperparameter, and $\hat A_t$ is obtained using generalized advantage estimation (GAE). Optimization aims to reduce the discounted synchronization-error cost; attainment of its global minimum is not asserted.
 
-\begin{figure}[pos=t,width=\linewidth]
-	\centering
-	\includegraphics[width=0.75\linewidth,keepaspectratio]{figures/ppo_process.pdf}
-	\caption{General training process of the PPO-based DRL framework.}
-	\label{fig:ppo_framework2}
+\begin{figure}[pos=!t,width=\linewidth]
+\centering
+\includegraphics[width=0.92\linewidth,height=0.72\textheight,keepaspectratio]{figures/ppo_process.pdf}
+\caption{General training process of the PPO-based DRL framework.}
+\label{fig:ppo_framework2}
 \end{figure}
 
 As shown in Fig.~\ref{fig:ppo_framework2}, PPO follows an interaction--update training process. The agent first interacts with the environment using the current policy and stores the collected states, actions, rewards, and value estimates in a trajectory buffer. The advantage function is then estimated, typically using GAE, and the policy network is updated by maximizing a clipped surrogate objective. Meanwhile, the value network is trained by minimizing the mean squared error between the predicted and target state values. The clipped surrogate discourages some large likelihood-ratio changes during optimization. It does not impose a hard bound on the change in the deployed feedback law or certify closed-loop stability.
@@ -814,12 +813,17 @@ To avoid relying only on a single error curve for qualitative judgment, MAE, RMS
 	\end{tabular}
 \end{table}
 
-To show component-level behavior, Fig.~\ref{fig:node_error_comparison} presents two-dimensional heat maps from the archived multi-initial-condition trajectories. Within each panel, rows represent test trajectories, time is horizontal, and color encodes signed synchronization error. Node 3 generally has a shorter transient than Node 2, whereas large fluctuations persist for Node 1. These qualitative observations agree with the performance ordering in Table~\ref{tab:pinning_node_metrics}; they are not additional independent training replications.
+To show component-level behavior, Fig.~\ref{fig:node_error_comparison} restores the original three-dimensional error surfaces for multiple initial conditions. Surface height represents the signed error component, with time and test index on the other axes. The displayed trajectories illustrate decay toward low error at Nodes 3 and 2 and persistent fluctuations at Node 1. They provide a qualitative illustration, not additional independent training replications; quantitative comparisons use Table~\ref{tab:pinning_node_metrics}. Test index is categorical, so the surfaces between trajectories are a visual interpolation rather than a physical state dimension.
 
 \begin{figure}[pos=htbp,width=\linewidth]
 	\centering
-	\includegraphics[width=0.86\linewidth]{figures/node_error_heatmap_comparison.png}
-	\caption{Two-dimensional heat maps of synchronization-error components under different random initial conditions. Rows correspond to Nodes 3, 2, and 1, columns correspond to $e_1$, $e_2$, and $e_3$, and a common color scale is used throughout.}
+\begin{tabular}{@{}ccc@{}}
+Node 3 & Node 2 & Node 1\\
+\includegraphics[width=0.31\linewidth]{figures/node3_error.png} &
+\includegraphics[width=0.31\linewidth]{figures/node2_error.png} &
+\includegraphics[width=0.31\linewidth]{figures/node1_error.png}
+\end{tabular}
+\caption{Original three-dimensional synchronization-error surfaces for multiple initial conditions. Columns correspond to actuation at Nodes 3, 2, and 1; within each column, panels show $e_1$, $e_2$, and $e_3$ from top to bottom. Height and color represent signed error. The original axis and color ranges are retained and differ between panels; colors alone should not be used for quantitative comparisons across nodes.}
 	\label{fig:node_error_comparison}
 \end{figure}
 
@@ -1061,25 +1065,12 @@ Motivated by this idea, this chapter applies the synchronized trajectories gener
 %	\label{fig:encrypt_process}
 %\end{figure}
 
-\begin{center}
-\begin{minipage}{\linewidth}
+\begin{figure}[pos=!t,width=\linewidth]
 \centering
-\fbox{\begin{minipage}{0.88\linewidth}
-\centering\small
-Password + decimal pixel sum\\
-$\downarrow$ SHA-256 / floating-point seed\\
-Logistic sequence $\longrightarrow$ byte mask $Q$\\[3pt]
-Three-channel image $\longrightarrow$ ordered blocks\\
-$\downarrow$ channelwise XOR with $Q$\\
-Two rounds of block-indexed DNA substitution\\
-$\uparrow$ four preprocessed drive streams\\
-$\downarrow$ restore original block positions\\
-Cipher image
-\end{minipage}}
-\captionof{figure}{Implemented image-transform pipeline. Response-side reconstruction reverses the DNA substitutions and XOR masking; no cross-channel diffusion is implemented.}
+\includegraphics[width=0.75\linewidth,height=0.70\textheight,keepaspectratio]{figures/encrypt_process.pdf}
+\caption{Overview of the image-encryption workflow. The image-derived value denoted by $H(P)$ in the schematic is combined with the password and mapped through SHA-256 to the Logistic initial value, as specified in the text. Chaotic sequences determine the discrete DNA rules after preprocessing. This overview omits the round-level operations and receiver-side reconstruction; channelwise XOR masking is not cross-channel diffusion.}
 \label{fig:encrypt_process}
-\end{minipage}
-\end{center}
+\end{figure}
 
 \begin{enumerate}
 \item \textit{Channel separation and spatial blocks.}

@@ -100,6 +100,13 @@ M.~Weissenbacher, A.~Borovykh, G.~Rigas, Reinforcement learning of chaotic
   systems control in partially observable environments, Flow, Turbulence and
   Combustion 115~(3) (2025) 1357--1378.
 
+\bibitem{ozan2025data}
+D.~E. Ozan, A.~N{\'o}voa, G.~Rigas, L.~Magri, Data-assimilated model-informed
+  reinforcement learning, Proceedings of the Royal Society A 481~(2327) (2025)
+  20250476.
+\newblock \href {https://doi.org/10.1098/rspa.2025.0476}
+  {\path{doi:10.1098/rspa.2025.0476}}.
+
 \bibitem{tooranjipour2018critic}
 P.~Tooranjipour, R.~Vatankhah, Adaptive critic-based quaternion neuro-fuzzy
   controller design with application to chaos control, Applied Soft Computing

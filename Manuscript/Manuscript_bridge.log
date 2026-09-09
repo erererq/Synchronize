@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  9 SEP 2026 15:02
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  9 SEP 2026 21:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -888,19 +888,19 @@ Package caption Info: End \AtBeginDocument code.
 \openout4 = `Manuscript_bridge.abs'.
 
 LaTeX Font Info:    Trying to load font information for LS1+stixscr on input li
-ne 126.
+ne 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls1stixscr.fd
 File: ls1stixscr.fd 2015/04/17 v1.1.2-latex STIX script LS1 font definitions
 )
 LaTeX Font Info:    Trying to load font information for LS2+stixex on input lin
-e 126.
+e 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls2stixex.fd
 File: ls2stixex.fd 2015/04/17 v1.1.2-latex STIX extentions LS2 font definitions
 
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 126
+LaTeX Font Info:    Trying to load font information for U+msa on input line 125
 .
 
 (e:/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -909,7 +909,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (e:/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 126
+LaTeX Font Info:    Trying to load font information for U+msb on input line 125
 .
 
 (e:/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -919,49 +919,49 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Trying to load font information for LS1+stixfrak on input l
-ine 126.
+ine 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls1stixfrak.fd
 File: ls1stixfrak.fd 2015/04/17 v1.1.2-latex STIX fraktur LS1 font definitions
 )
 LaTeX Font Info:    Trying to load font information for LS1+stixbb on input lin
-e 126.
+e 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls1stixbb.fd
 File: ls1stixbb.fd 2015/04/17 v1.1.2-latex STIX blackboard LS1 font definitions
 
 )
 LaTeX Font Info:    Trying to load font information for LS2+stixcal on input li
-ne 126.
+ne 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls2stixcal.fd
 File: ls2stixcal.fd 2015/04/17 v1.1.2-latex STIX calligraphic LS2 font definiti
 ons
 )
 LaTeX Font Info:    Trying to load font information for LS1+stixsf on input lin
-e 126.
+e 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls1stixsf.fd
 File: ls1stixsf.fd 2015/04/17 v1.1.2-latex STIX sans-serif LS1 font definitions
 
 )
 LaTeX Font Info:    Trying to load font information for LS2+stixtt on input lin
-e 126.
+e 125.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ls2stixtt.fd
 File: ls2stixtt.fd 2015/04/17 v1.1.2-latex STIX typewriter LS2 font definitions
 
 )
-Overfull \hbox (117.0831pt too wide) detected at line 126
+Overfull \hbox (117.0831pt too wide) detected at line 125
 []
  []
 
 (./Manuscript_bridge.abs)
 
-Package hyperref Warning: Ignoring empty anchor on input line 126.
+Package hyperref Warning: Ignoring empty anchor on input line 125.
 
 
-Package hyperref Warning: Ignoring empty anchor on input line 126.
+Package hyperref Warning: Ignoring empty anchor on input line 125.
 
 File: thumbnails/cas-email.jpeg Graphic file (type bmp)
 <thumbnails/cas-email.jpeg>
@@ -970,15 +970,15 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Package hyperref Warning: Ignoring empty anchor on input line 126.
+Package hyperref Warning: Ignoring empty anchor on input line 125.
 
 
-Package hyperref Warning: Ignoring empty anchor on input line 126.
+Package hyperref Warning: Ignoring empty anchor on input line 125.
 
 
 
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 1
-36.
+35.
 (e:/texlive/2025/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -990,7 +990,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 ]
 LaTeX Font Info:    Trying to load font information for TS1+stix on input line 
-149.
+148.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ts1stix.fd
 File: ts1stix.fd 2015/04/17 v1.1.2-latex STIX TS1 font definitions
@@ -1004,7 +1004,7 @@ File: figures/hopfield_chaos_trajectory.png Graphic file (type bmp)
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 192.
+(caption)                particular \caption on input line 191.
 See the caption package documentation for explanation.
 
 
@@ -1027,14 +1027,14 @@ File: figures/ppo_process.pdf Graphic file (type pdf)
 [9]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 571.
+(caption)                particular \caption on input line 570.
 See the caption package documentation for explanation.
 
 
 
 [10]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 599.
+put line 598.
 
 
 [11]
@@ -1044,13 +1044,15 @@ put line 599.
 [13]
 File: figures/node_selection_audited.pdf Graphic file (type pdf)
 <use figures/node_selection_audited.pdf>
-File: figures/node_error_heatmap_comparison.png Graphic file (type bmp)
-<figures/node_error_heatmap_comparison.png>
 
 
 [14]
-
-[15]
+File: figures/node3_error.png Graphic file (type bmp)
+<figures/node3_error.png>
+File: figures/node2_error.png Graphic file (type bmp)
+<figures/node2_error.png>
+File: figures/node1_error.png Graphic file (type bmp)
+<figures/node1_error.png>
 File: figures/observation_comparison_audited.pdf Graphic file (type pdf)
 <use figures/observation_comparison_audited.pdf>
 
@@ -1058,20 +1060,22 @@ File: figures/observation_comparison_audited.pdf Graphic file (type pdf)
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 (./comparison_observation_identity.tex
+
+[15]
+
+[16]
 File: figures/paired_observation_complete.png Graphic file (type bmp)
 <figures/paired_observation_complete.png>
-)
+) (./comparison_configuration_selection.tex
 
-[16] (./comparison_configuration_selection.tex
+[17]
 
-[17] (./configuration_extensions.tex
+[18] (./configuration_extensions.tex)) (./comparison_multi_input.tex
 
-[18])) (./comparison_multi_input.tex (./generated/multi_input_table.tex)
+[19] (./generated/multi_input_table.tex)
 File: figures/multi_input_matched_budget.pdf Graphic file (type pdf)
 <use figures/multi_input_matched_budget.pdf>
 )
-
-[19]
 
 [20]
 File: figures/mismatch_methods.pdf Graphic file (type pdf)
@@ -1083,6 +1087,10 @@ File: figures/pulse_methods.pdf Graphic file (type pdf)
 <use figures/pulse_methods.pdf>
 
 
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+
 [22]
 File: figures/noise_methods.pdf Graphic file (type pdf)
 <use figures/noise_methods.pdf>
@@ -1090,11 +1098,11 @@ File: figures/noise_methods.pdf Graphic file (type pdf)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-(./comparison_lqr_sensitivity.tex
+(./comparison_lqr_sensitivity.tex (./generated/lqr_weight_table.tex)
 
-[23] (./generated/lqr_weight_table.tex)) (./comparison_sac.tex
+[23])
 
-[24] (./generated/sac_table.tex)
+[24] (./comparison_sac.tex (./generated/sac_table.tex)
 File: figures/ppo_sac_matched_budget.pdf Graphic file (type pdf)
 <use figures/ppo_sac_matched_budget.pdf>
 )
@@ -1111,14 +1119,11 @@ File: figures/decrypted_image.png Graphic file (type bmp)
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1050.
+(caption)                particular \caption on input line 1054.
 See the caption package documentation for explanation.
 
-
-Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1079.
-See the caption package documentation for explanation.
-
+File: figures/encrypt_process.pdf Graphic file (type pdf)
+<use figures/encrypt_process.pdf>
 
 
 [27]
@@ -1129,25 +1134,27 @@ File: figures/test_hist.png Graphic file (type bmp)
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1167.
+(caption)                particular \caption on input line 1158.
 See the caption package documentation for explanation.
 
+
+
+[29]
 File: figures/test_correlation.png Graphic file (type bmp)
 <figures/test_correlation.png>
 
+
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1178.
+(caption)                particular \caption on input line 1169.
 See the caption package documentation for explanation.
 
 
 
-[29] (./sync_application_bridge.tex
+[30] (./sync_application_bridge.tex
 
-[30]
+[31])
 
-[31]) (./Manuscript_bridge.bbl
-
-[32]
+[32] (./Manuscript_bridge.bbl
 
 [33])
 
@@ -1160,12 +1167,12 @@ Package rerunfilecheck Info: File `Manuscript_bridge.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 22453 strings out of 473832
- 370729 string characters out of 5733159
- 799859 words of memory out of 5000000
- 45137 multiletter control sequences out of 15000+600000
+ 22478 strings out of 473832
+ 371300 string characters out of 5733159
+ 798859 words of memory out of 5000000
+ 45159 multiletter control sequences out of 15000+600000
  682585 words of font info for 190 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 87i,16n,93p,1850b,656s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 87i,16n,93p,1850b,634s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Manuscript_bridge.pdf (34 pages).
