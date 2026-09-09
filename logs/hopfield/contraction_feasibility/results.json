@@ -1,0 +1,557 @@
+{
+  "scope": "One fit and one held-out nominal trajectory per policy, 700 steps, discard 100; frozen metric, overlapping windows. No tube verification, bias bound, disturbances or invariance.",
+  "results": [
+    {
+      "node": 2,
+      "training_seed": 42,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "euclidean",
+      "mean_jacobian_spectral_radius": 0.9575475751718797,
+      "metric_condition_number": 1.0,
+      "windows": {
+        "1": {
+          "max_gain": 3.370424737391616,
+          "fraction_below_one": 0.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 3.4401806366392256,
+          "fraction_below_one": 0.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 2.3180405649874904,
+          "fraction_below_one": 0.1844331641285956,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 2.5441871698163347,
+          "fraction_below_one": 0.7039586919104991,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 1.1213012712132195,
+          "fraction_below_one": 0.9857397504456328,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.10067509374919771,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.002405666289856686,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 2,
+      "training_seed": 42,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "mean_jacobian_lyapunov",
+      "mean_jacobian_spectral_radius": 0.9575475751718797,
+      "metric_condition_number": 15.414263593062122,
+      "windows": {
+        "1": {
+          "max_gain": 1.0210547229078368,
+          "fraction_below_one": 0.5466666666666666,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 1.0768462167624961,
+          "fraction_below_one": 0.9681208053691275,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 1.113103787822718,
+          "fraction_below_one": 0.9763113367174281,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 1.0014340771647847,
+          "fraction_below_one": 0.9965576592082617,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.4576620538366896,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.05677838556866269,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.001401303525337673,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 2,
+      "training_seed": 123,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "euclidean",
+      "mean_jacobian_spectral_radius": 0.9436444090736862,
+      "metric_condition_number": 1.0,
+      "windows": {
+        "1": {
+          "max_gain": 2.1328160099440856,
+          "fraction_below_one": 0.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 2.5138922610096555,
+          "fraction_below_one": 0.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 2.913119162053243,
+          "fraction_below_one": 0.021996615905245348,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 2.879156405360152,
+          "fraction_below_one": 0.6454388984509466,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 1.2412352187052536,
+          "fraction_below_one": 0.9803921568627451,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.07077865260257207,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.0007174910087375807,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 2,
+      "training_seed": 123,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "mean_jacobian_lyapunov",
+      "mean_jacobian_spectral_radius": 0.9436444090736862,
+      "metric_condition_number": 59.40007114485955,
+      "windows": {
+        "1": {
+          "max_gain": 1.0397570780965588,
+          "fraction_below_one": 0.48333333333333334,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 1.0968551652921283,
+          "fraction_below_one": 0.9496644295302014,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 1.1366031895351512,
+          "fraction_below_one": 0.9763113367174281,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 1.02658931270903,
+          "fraction_below_one": 0.9913941480206541,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.4623259124432061,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.03884644197349451,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.00057772155663592,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 2,
+      "training_seed": 1024,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "euclidean",
+      "mean_jacobian_spectral_radius": 0.937136207068615,
+      "metric_condition_number": 1.0,
+      "windows": {
+        "1": {
+          "max_gain": 2.985122270586405,
+          "fraction_below_one": 0.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 2.5448126809278686,
+          "fraction_below_one": 0.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 2.642112749371222,
+          "fraction_below_one": 0.03553299492385787,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 2.1059169794896375,
+          "fraction_below_one": 0.846815834767642,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.5328410099241998,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.036965455530434704,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.00022244682294693803,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 2,
+      "training_seed": 1024,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "mean_jacobian_lyapunov",
+      "mean_jacobian_spectral_radius": 0.937136207068615,
+      "metric_condition_number": 36.186839142571614,
+      "windows": {
+        "1": {
+          "max_gain": 1.0345806173644536,
+          "fraction_below_one": 0.5516666666666666,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 1.0208804131448554,
+          "fraction_below_one": 0.9865771812080537,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.9862721776269375,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.7706351952151362,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.30093433184305785,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.024031582614794114,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.00011750437897157295,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 3,
+      "training_seed": 42,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "euclidean",
+      "mean_jacobian_spectral_radius": 0.9706962940079985,
+      "metric_condition_number": 1.0,
+      "windows": {
+        "1": {
+          "max_gain": 1.2056891990791614,
+          "fraction_below_one": 0.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 0.9186766189101916,
+          "fraction_below_one": 1.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.8200712515962282,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.6461455290570104,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.39887927521390076,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.13837641909574933,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.012451249712319474,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 3,
+      "training_seed": 42,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "mean_jacobian_lyapunov",
+      "mean_jacobian_spectral_radius": 0.9706962940079985,
+      "metric_condition_number": 16.837273361105677,
+      "windows": {
+        "1": {
+          "max_gain": 0.9815350508619834,
+          "fraction_below_one": 1.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 0.8977049180183142,
+          "fraction_below_one": 1.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.8002818780526892,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.631156695687592,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.39033539883211865,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.1354579965410191,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.012241357551301216,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 3,
+      "training_seed": 123,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "euclidean",
+      "mean_jacobian_spectral_radius": 0.9707837446792089,
+      "metric_condition_number": 1.0,
+      "windows": {
+        "1": {
+          "max_gain": 1.4579544943992147,
+          "fraction_below_one": 0.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 0.9137483920488523,
+          "fraction_below_one": 1.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.8160551467283287,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.6473871268583844,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.4046403179821972,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.1422330235203556,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.012758371156720693,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 3,
+      "training_seed": 123,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "mean_jacobian_lyapunov",
+      "mean_jacobian_spectral_radius": 0.9707837446792089,
+      "metric_condition_number": 15.006046969620394,
+      "windows": {
+        "1": {
+          "max_gain": 0.9814504295993665,
+          "fraction_below_one": 1.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 0.8974037505494028,
+          "fraction_below_one": 1.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.8018540552913977,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.63649687101654,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.3985116378182261,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.1400145213464143,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.012588813375455928,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 3,
+      "training_seed": 1024,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "euclidean",
+      "mean_jacobian_spectral_radius": 0.9720166500994467,
+      "metric_condition_number": 1.0,
+      "windows": {
+        "1": {
+          "max_gain": 1.2030291934556343,
+          "fraction_below_one": 0.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 0.9542248562143171,
+          "fraction_below_one": 1.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.8847385110975202,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.7528606729574421,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.5320766407957389,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.21701489163055598,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.01936686982110275,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    },
+    {
+      "node": 3,
+      "training_seed": 1024,
+      "fit_initial_seed": 1,
+      "test_initial_seed": 11,
+      "metric": "mean_jacobian_lyapunov",
+      "mean_jacobian_spectral_radius": 0.9720166500994467,
+      "metric_condition_number": 19.748208530729343,
+      "windows": {
+        "1": {
+          "max_gain": 0.9854309006634706,
+          "fraction_below_one": 1.0,
+          "count": 600
+        },
+        "5": {
+          "max_gain": 0.9269283764624289,
+          "fraction_below_one": 1.0,
+          "count": 596
+        },
+        "10": {
+          "max_gain": 0.8558840490672451,
+          "fraction_below_one": 1.0,
+          "count": 591
+        },
+        "20": {
+          "max_gain": 0.7275367013684929,
+          "fraction_below_one": 1.0,
+          "count": 581
+        },
+        "40": {
+          "max_gain": 0.5087828237462101,
+          "fraction_below_one": 1.0,
+          "count": 561
+        },
+        "80": {
+          "max_gain": 0.20600003716467308,
+          "fraction_below_one": 1.0,
+          "count": 521
+        },
+        "160": {
+          "max_gain": 0.01748799820880593,
+          "fraction_below_one": 1.0,
+          "count": 441
+        }
+      }
+    }
+  ]
+}

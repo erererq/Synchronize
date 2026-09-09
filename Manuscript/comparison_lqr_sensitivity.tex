@@ -1,0 +1,10 @@
+\subsubsection{Sensitivity to LQR control weighting}
+\label{subsec:lqr_weight_sensitivity}
+
+The preceding LQR curves use the reference design $Q=I_3$, $R=1$. To check whether the error comparisons depend on that choice, a separate sensitivity test fixes $Q=I_3$ and considers $R\in\{0.01,0.1,1,10,100\}$. For each node, $R$ is selected using ten validation initial conditions and the same nominal, $\eta=1$, and impulse normalized-MAE score used for SMC. All five candidate scores are retained in the reproducibility records. Both nodes select $R=0.01$, which is then frozen before evaluating 20 held-out test initial conditions. This error-oriented validation does not penalize measured energy and has access to non-ideal validation scenarios, unlike nominal-only PPO training. The selected value is at the lower edge of this limited grid; it is not claimed to be globally optimal. The historical $R=1$ results and fixed gain $k=8$ are unchanged.
+
+\input{generated/lqr_weight_table.tex}
+
+Table~\ref{tab:lqr_weight_sensitivity} shows that the original LQR weighting materially affects the comparison. At Node 2, $R=0.01$ lowers MAE below PPO in all four tested settings. Under mismatch, its MAE and energy are 0.1486 and 14.60, compared with PPO's 0.1703 and 11.85. After the impulse, its mean post-pulse error is 1.5536 versus PPO's 2.0800, with energy 31.23 versus 17.51. Under noise, it improves both MAE (0.2427 versus 0.2669) and energy (90.27 versus 135.57). Thus, PPO's error advantages over the reference $R=1$ design must not be generalized to tuned LQR.
+
+At Node 3, the selected LQR has lower mean error and energy than PPO in the nominal, mismatch, and noise tests. PPO has a slightly lower mean post-impulse error (1.2969 versus 1.3169), but higher energy (18.09 versus 13.71); this small difference is not interpreted as statistical superiority. The result reinforces the error--effort interpretation and the importance of controller weighting, rather than establishing an inherent robustness advantage of learning-based control.

@@ -1,0 +1,5 @@
+﻿method,num_seeds,continuous_mae_mean,direct_key_word_disagreement_mean,legacy_key_word_disagreement_mean,recovered_image_mae_mean,exact_recovery_rate
+PPO,5,0.0401069569344448,0.0390625,0.05,18.33095703125,0.8
+Fixed,5,2.4886179693381565,0.7328125,0.75,111.78616536458333,0.0
+LQR,5,0.09958727513209549,0.08515625,0.2,32.14033203125,0.6
+SMC,5,0.10987341333420772,0.10625,0.15,13.809375,0.8

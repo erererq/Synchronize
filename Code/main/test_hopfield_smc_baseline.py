@@ -98,7 +98,9 @@ def run_episode(
     pulse_vector: tuple[float, float, float] = (0.0, 0.0, 0.0),
     reaching_gain: float = 1.0,
     boundary_width: float = 0.1,
+    linear_gain: float = 8.0,
     model: PPO | None = None,
+    noise_std: float = 0.0,
 ) -> dict[str, float]:
     env = ContinuousHopfieldEnv(
         pinning_node=node - 1,
@@ -106,6 +108,7 @@ def run_episode(
         pulse_step=pulse_step,
         pulse_width=1,
         pulse_vector=pulse_vector,
+        process_noise_std=noise_std,
     )
     observation, _ = env.reset(seed=seed)
     surface = sliding_surface(node)
@@ -125,6 +128,10 @@ def run_episode(
             action = np.array([np.clip(force / env.scale, -1.0, 1.0)], dtype=np.float32)
         elif method == "SMC":
             force = smc_force(env, surface, reaching_gain, boundary_width)
+            action = np.array([np.clip(force / env.scale, -1.0, 1.0)], dtype=np.float32)
+        elif method == "Linear":
+            error = (env.statey - env.statex).astype(np.float64)
+            force = -linear_gain * float(error[node - 1])
             action = np.array([np.clip(force / env.scale, -1.0, 1.0)], dtype=np.float32)
         else:
             raise ValueError(f"Unknown method: {method}")

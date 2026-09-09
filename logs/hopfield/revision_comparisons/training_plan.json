@@ -1,0 +1,82 @@
+{
+  "budget": 401408,
+  "seeds": [
+    42,
+    123,
+    1024
+  ],
+  "jobs": [
+    [
+      "SAC",
+      "2",
+      42
+    ],
+    [
+      "PPO",
+      "1-2",
+      123
+    ],
+    [
+      "SAC",
+      "3",
+      42
+    ],
+    [
+      "PPO",
+      "1-3",
+      123
+    ],
+    [
+      "SAC",
+      "2",
+      123
+    ],
+    [
+      "PPO",
+      "2-3",
+      123
+    ],
+    [
+      "SAC",
+      "3",
+      123
+    ],
+    [
+      "PPO",
+      "1-2-3",
+      123
+    ],
+    [
+      "SAC",
+      "2",
+      1024
+    ],
+    [
+      "PPO",
+      "1-2",
+      1024
+    ],
+    [
+      "SAC",
+      "3",
+      1024
+    ],
+    [
+      "PPO",
+      "1-3",
+      1024
+    ],
+    [
+      "PPO",
+      "2-3",
+      1024
+    ],
+    [
+      "PPO",
+      "1-2-3",
+      1024
+    ]
+  ],
+  "checkpoint_selection": "final only; retain every seed and configuration",
+  "reused": "single-input PPO seeds 42,123,1024 and multi-input PPO seed 42"
+}
