@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  9 SEP 2026 21:52
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  10 SEP 2026 15:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1013,14 +1013,9 @@ Package hyperref Warning: Ignoring empty anchor on input line 126.
 
 
 
-Underfull \hbox (badness 1675) in paragraph at lines 137--138
-\T1/stix/m/n/10 is there-fore not the con-tri-bu-tion claimed here. Re-lated
- []
-
-
 
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 1
-38.
+37.
 (e:/texlive/2025/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -1032,9 +1027,12 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 
 ]
+Underfull \hbox (badness 1675) in paragraph at lines 137--138
+\T1/stix/m/n/10 is there-fore not the con-tri-bu-tion claimed here. Re-lated
+ []
+
 LaTeX Font Info:    Trying to load font information for TS1+stix on input line 
 149.
-
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ts1stix.fd
 File: ts1stix.fd 2015/04/17 v1.1.2-latex STIX TS1 font definitions
 )
@@ -1100,6 +1098,11 @@ File: figures/ppo_process.pdf Graphic file (type pdf)
 
 
 
+Underfull \hbox (badness 1092) in paragraph at lines 495--496
+\T1/stix/m/n/10 the closed-loop control-step Ja-co-bian char-ac-ter-izes post-
+ []
+
+
 
 [6]
 
@@ -1151,52 +1154,54 @@ File: figures/node2_error.png Graphic file (type bmp)
 File: figures/node1_error.png Graphic file (type bmp)
 <figures/node1_error.png>
 
-
-
-Underfull \hbox (badness 1769) in paragraph at lines 845--846
+Underfull \hbox (badness 1769) in paragraph at lines 844--845
 []\T1/stix/m/n/10 For Node 3, the full-observation pol-icy has ac-cess
  []
+
+
 
 File: figures/observation_comparison_audited.pdf Graphic file (type pdf)
 <use figures/observation_comparison_audited.pdf>
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Underfull \hbox (badness 1270) in paragraph at lines 889--890
+Underfull \hbox (badness 1270) in paragraph at lines 888--889
 \T1/stix/m/n/10 The fol-low-ing matched-dimension com-par-i-son ex-am-ines
  []
 
 (./comparison_observation_identity.tex
 
 [11]
-
 File: figures/paired_observation_complete.png Graphic file (type bmp)
 <figures/paired_observation_complete.png>
-
-
-[12]) (./comparison_configuration_selection.tex
-
-
-
-[13] (./configuration_extensions.tex
-
-
-Underfull \hbox (badness 1939) in paragraph at lines 5--6
- []\T1/stix/m/it/11 Response-parameter mis-match.[] \T1/stix/m/n/10 The orig-i-
-nal se-lected
- []
-
-)) (./comparison_multi_input_ASC.tex
-
-[14] (./generated/multi_input_table_ASC.tex)
-File: figures/multi_input_matched_budget.pdf Graphic file (type pdf)
-<use figures/multi_input_matched_budget.pdf>
 )
 
+(./comparison_sac_observation.tex
+
+[12] (./generated/sac_observation_table.tex)
+
+)
+Underfull \hbox (badness 1033) in paragraph at lines 7--893
+\T1/stix/m/n/10 2 sub-sti-tu-tion re-duces SAC en-ergy from 40.73 to 7.17,
+ []
+
+(./comparison_configuration_selection.tex
+
+[13]
+
+(./configuration_extensions.tex
+
+[14])) (./comparison_multi_input_ASC.tex (./generated/multi_input_table_ASC.tex
+)
+File: figures/multi_input_matched_budget.pdf Graphic file (type pdf)
+<use figures/multi_input_matched_budget.pdf>
 
 
-[15]
+) (./comparison_lqr_sensitivity_ASC.tex
+
+[15] (./generated/lqr_weight_table_ASC.tex)
+
+)
+
+[16]
 File: figures/mismatch_methods.pdf Graphic file (type pdf)
 <use figures/mismatch_methods.pdf>
 
@@ -1205,20 +1210,16 @@ File: figures/pulse_methods.pdf Graphic file (type pdf)
 <use figures/pulse_methods.pdf>
 
 
-[16]
+[17]
 File: figures/noise_methods.pdf Graphic file (type pdf)
 <use figures/noise_methods.pdf>
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-(./comparison_lqr_sensitivity_ASC.tex
+(./comparison_sac_ASC.tex
 
 
-
-[17] (./generated/lqr_weight_table_ASC.tex)
-
-) (./comparison_sac_ASC.tex
 
 [18] (./generated/sac_table_ASC.tex
 
@@ -1238,10 +1239,10 @@ File: figures/cipher_image.png Graphic file (type bmp)
 <figures/cipher_image.png>
 File: figures/decrypted_image.png Graphic file (type bmp)
 <figures/decrypted_image.png>
+
+
 File: figures/encrypt_process.pdf Graphic file (type pdf)
 <use figures/encrypt_process.pdf>
-
-
 
 
 [21]
@@ -1256,17 +1257,17 @@ File: figures/test_correlation.png Graphic file (type bmp)
 
 
 
-Underfull \hbox (badness 1152) in paragraph at lines 1219--1220
+Underfull \hbox (badness 1152) in paragraph at lines 1218--1219
 []\T1/stix/m/n/10 It should be noted that the node1 model is not in-
  []
 
 
-Underfull \hbox (badness 1460) in paragraph at lines 1219--1220
+Underfull \hbox (badness 1460) in paragraph at lines 1218--1219
 \T1/stix/m/n/10 fi-cient, caus-ing the gen-er-ated master--slave key streams
  []
 
 
-Underfull \hbox (badness 1210) in paragraph at lines 1219--1220
+Underfull \hbox (badness 1210) in paragraph at lines 1218--1219
 \T1/stix/m/n/10 rect en-cryp-tion and de-cryp-tion. Both node2 and node3
  []
 
@@ -1275,6 +1276,8 @@ Underfull \hbox (badness 1210) in paragraph at lines 1219--1220
 [23]
 
 
+
+[24]
 Underfull \hbox (badness 1127) in paragraph at lines 34--35
 []\T1/stix/m/n/10 Substituting [] into [] gives $[] \LS1/stix/m/n/10 = \LS1/sti
 x/m/it/10 k[] \LS1/stix/m/n/10 +
@@ -1282,15 +1285,7 @@ x/m/it/10 k[] \LS1/stix/m/n/10 +
 
 
 
-[24])
-
-
-Underfull \hbox (badness 1281) in paragraph at lines 1231--1232
-\T1/stix/m/n/10 pri-or-ity, and their orig-i-nal ac-cu-racy re-quire-ments ceas
-e
- []
-
-
+)
 
 [25] (./Manuscript_ASC.bbl
 Underfull \hbox (badness 3396) in paragraph at lines 17--19
@@ -1323,12 +1318,12 @@ Package rerunfilecheck Info: File `Manuscript_ASC.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 22864 strings out of 473832
- 378350 string characters out of 5733159
- 816923 words of memory out of 5000000
- 45521 multiletter control sequences out of 15000+600000
- 682580 words of font info for 190 fonts, out of 8000000 for 9000
+ 22867 strings out of 473832
+ 378513 string characters out of 5733159
+ 810923 words of memory out of 5000000
+ 45519 multiletter control sequences out of 15000+600000
+ 679821 words of font info for 189 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 87i,16n,131p,1854b,650s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 87i,16n,131p,1989b,672s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Manuscript_ASC.pdf (27 pages).
