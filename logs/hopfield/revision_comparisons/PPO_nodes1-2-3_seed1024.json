@@ -1,0 +1,14 @@
+{
+  "algorithm": "PPO",
+  "nodes": [
+    1,
+    2,
+    3
+  ],
+  "seed": 1024,
+  "budget": 401408,
+  "status": "complete",
+  "steps": 401408,
+  "elapsed_seconds": 423.56033277511597,
+  "sha256": "6bd008c4a5af3136d7164e97e5192c871ac7d3b2340916967796560f37dcc94b"
+}

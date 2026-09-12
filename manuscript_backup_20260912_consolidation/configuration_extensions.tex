@@ -1,0 +1,26 @@
+To check the dependence of this selection example on the resource preference, a post-hoc analysis reuses only the original eight-candidate validation data, varying the minimum per-run pass fraction over 80\%, 90\%, and 100\%, and comparing dimension-first with energy-first ranking. Changing the pass-fraction requirement does not change any choice at the tested error tolerances. The ranking preference matters when only Node 2 is allowed at $\varepsilon=0.10$: dimension-first selects $\mathcal O_{23}$, whereas energy-first selects full observations. All other choices are unchanged. This provides a post-hoc assessment of preference sensitivity using the validation data. The subsequently completed paired subsets are not retroactively inserted into the original candidate set or its frozen choices.
+
+We then examine whether the nominal choices retain their requested accuracy when response parameters change. The original selected Node 2/$\mathcal O_{23}$ and Node 3/$\mathcal O_{13}$ policies are frozen and evaluated at their respective tolerances 0.10 and 0.05. For 40 new common initial conditions, response weights are set to $W_r=W\odot(1+\eta U)$, where each entry of $U$ is sampled uniformly from $[-1,1]$ and $\eta\in\{0,0.01,0.03,0.05\}$. The drive system is unchanged. Each initial condition uses the same mismatch direction across amplitudes and policies; an independent random stream preserves identical initial states. Zero weights remain zero. No retraining or configuration reselection is performed.
+
+\begin{table*}[pos=!t,width=\textwidth]
+\centering
+\caption{Frozen selected configurations under response-weight mismatch. Pass fractions are the minimum across three training runs, each evaluated on the same 40 new initial conditions. Mean tail error $z$ and energy $E_u$ average runs and initial conditions. Pass fractions track each configuration against its own previously fixed tolerance.}
+\label{tab:configuration_transfer}
+\small
+\begin{tabular}{cccccc}
+\toprule
+Configuration & $\varepsilon$ & $\eta$ & Minimum pass & Mean $z$ & Mean $E_u$\\
+\midrule
+$2/\mathcal O_{23}$ & 0.10 & 0\% & 100.0\% & 0.0266 & 10.08\\
+$2/\mathcal O_{23}$ & 0.10 & 1\% & 97.5\% & 0.0402 & 10.11\\
+$2/\mathcal O_{23}$ & 0.10 & 3\% & 57.5\% & 0.0942 & 10.20\\
+$2/\mathcal O_{23}$ & 0.10 & 5\% & 35.0\% & 0.1571 & 10.39\\
+$3/\mathcal O_{13}$ & 0.05 & 0\% & 100.0\% & 0.0084 & 5.84\\
+$3/\mathcal O_{13}$ & 0.05 & 1\% & 97.5\% & 0.0181 & 5.85\\
+$3/\mathcal O_{13}$ & 0.05 & 3\% & 75.0\% & 0.0455 & 5.91\\
+$3/\mathcal O_{13}$ & 0.05 & 5\% & 42.5\% & 0.0743 & 6.01\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:configuration_transfer} shows that both configurations retain a minimum pass fraction of 97.5\% at 1\% relative mismatch, but fall below the original 90\% requirement at 3\% and 5\%. No state-protection boundary is reached in these 960 trajectories. The drop in pass fraction identifies the sensitivity of the frozen configurations to larger response-weight deviations and motivates incorporating the intended parameter range into configuration validation.

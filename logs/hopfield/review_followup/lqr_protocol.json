@@ -1,0 +1,72 @@
+{
+  "Q": "I3",
+  "R": [
+    0.01,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "validation_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "test_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119
+  ],
+  "validation_scenarios": [
+    [
+      "nominal",
+      0.0,
+      null,
+      0.0,
+      0.1
+    ],
+    [
+      "mismatch",
+      1.0,
+      null,
+      0.0,
+      0.15
+    ],
+    [
+      "pulse",
+      0.0,
+      200,
+      0.0,
+      0.45
+    ]
+  ],
+  "objective": "mean of nominal MAE/.1, eta=1 MAE/.15, pulse MAE/.45",
+  "tie_break": "candidate order",
+  "action_limit": 4,
+  "steps": 400,
+  "dt_control": 0.05
+}

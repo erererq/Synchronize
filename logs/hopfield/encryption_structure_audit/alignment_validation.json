@@ -1,0 +1,177 @@
+{
+  "rule_rows": {
+    "1": [
+      "A",
+      "G",
+      "C",
+      "T"
+    ],
+    "2": [
+      "A",
+      "C",
+      "G",
+      "T"
+    ],
+    "3": [
+      "T",
+      "G",
+      "C",
+      "A"
+    ],
+    "4": [
+      "T",
+      "C",
+      "G",
+      "A"
+    ],
+    "5": [
+      "C",
+      "A",
+      "T",
+      "G"
+    ],
+    "6": [
+      "G",
+      "A",
+      "T",
+      "C"
+    ],
+    "7": [
+      "C",
+      "T",
+      "A",
+      "G"
+    ],
+    "8": [
+      "G",
+      "T",
+      "A",
+      "C"
+    ]
+  },
+  "exhaustive_four_rule_compositions": 4096,
+  "bytes_per_composition": 256,
+  "full_pipeline_cases": [
+    {
+      "height": 8,
+      "width": 8,
+      "case": 0,
+      "exact_recovery": true
+    },
+    {
+      "height": 8,
+      "width": 8,
+      "case": 1,
+      "exact_recovery": true
+    },
+    {
+      "height": 8,
+      "width": 8,
+      "case": 2,
+      "exact_recovery": true
+    },
+    {
+      "height": 8,
+      "width": 8,
+      "case": 3,
+      "exact_recovery": true
+    },
+    {
+      "height": 16,
+      "width": 16,
+      "case": 0,
+      "exact_recovery": true
+    },
+    {
+      "height": 16,
+      "width": 16,
+      "case": 1,
+      "exact_recovery": true
+    },
+    {
+      "height": 16,
+      "width": 16,
+      "case": 2,
+      "exact_recovery": true
+    },
+    {
+      "height": 16,
+      "width": 16,
+      "case": 3,
+      "exact_recovery": true
+    },
+    {
+      "height": 17,
+      "width": 25,
+      "case": 0,
+      "exact_recovery": true
+    },
+    {
+      "height": 17,
+      "width": 25,
+      "case": 1,
+      "exact_recovery": true
+    },
+    {
+      "height": 17,
+      "width": 25,
+      "case": 2,
+      "exact_recovery": true
+    },
+    {
+      "height": 17,
+      "width": 25,
+      "case": 3,
+      "exact_recovery": true
+    },
+    {
+      "height": 32,
+      "width": 32,
+      "case": 0,
+      "exact_recovery": true
+    },
+    {
+      "height": 32,
+      "width": 32,
+      "case": 1,
+      "exact_recovery": true
+    },
+    {
+      "height": 32,
+      "width": 32,
+      "case": 2,
+      "exact_recovery": true
+    },
+    {
+      "height": 32,
+      "width": 32,
+      "case": 3,
+      "exact_recovery": true
+    },
+    {
+      "height": 64,
+      "width": 64,
+      "case": 0,
+      "exact_recovery": true
+    },
+    {
+      "height": 64,
+      "width": 64,
+      "case": 1,
+      "exact_recovery": true
+    },
+    {
+      "height": 64,
+      "width": 64,
+      "case": 2,
+      "exact_recovery": true
+    },
+    {
+      "height": 64,
+      "width": 64,
+      "case": 3,
+      "exact_recovery": true
+    }
+  ],
+  "scope": "Fixed matching rule streams; no PPO loading, quantizer reliability or security certification."
+}

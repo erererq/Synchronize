@@ -1,0 +1,4 @@
+SAC 3 1024 nominal 0.0 0.0
+SAC 3 1024 mismatch 2.0 0.0
+SAC 3 1024 pulse 0.0 0.0
+SAC 3 1024 noise 0.0 0.05

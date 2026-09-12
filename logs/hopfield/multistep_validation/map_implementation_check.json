@@ -1,0 +1,32 @@
+[
+  {
+    "node": 2,
+    "model_seed": 42,
+    "max_one_step_difference": 6.007915240857642e-07
+  },
+  {
+    "node": 2,
+    "model_seed": 123,
+    "max_one_step_difference": 4.770421848654394e-07
+  },
+  {
+    "node": 2,
+    "model_seed": 1024,
+    "max_one_step_difference": 5.609850024512752e-07
+  },
+  {
+    "node": 3,
+    "model_seed": 42,
+    "max_one_step_difference": 4.423049970725401e-07
+  },
+  {
+    "node": 3,
+    "model_seed": 123,
+    "max_one_step_difference": 4.837717817451903e-07
+  },
+  {
+    "node": 3,
+    "model_seed": 1024,
+    "max_one_step_difference": 4.6990927726753284e-07
+  }
+]

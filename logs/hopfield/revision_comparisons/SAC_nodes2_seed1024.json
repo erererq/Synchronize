@@ -1,0 +1,12 @@
+{
+  "algorithm": "SAC",
+  "nodes": [
+    2
+  ],
+  "seed": 1024,
+  "budget": 401408,
+  "status": "complete",
+  "steps": 401408,
+  "elapsed_seconds": 3845.0834300518036,
+  "sha256": "98fb92f28f6281c63a22122ffe00ef7503cb6ce2720c6494e7d9f94080e3b6fb"
+}

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  26 AUG 2026 20:07
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  12 SEP 2026 08:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -992,7 +992,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 ]
 LaTeX Font Info:    Trying to load font information for TS1+stix on input line 
-145.
+148.
 
 (e:/texlive/2025/texmf-dist/tex/latex/stix/ts1stix.fd
 File: ts1stix.fd 2015/04/17 v1.1.2-latex STIX TS1 font definitions
@@ -1006,7 +1006,7 @@ File: figures/hopfield_chaos_trajectory.png Graphic file (type bmp)
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 193.
+(caption)                particular \caption on input line 191.
 See the caption package documentation for explanation.
 
 
@@ -1018,80 +1018,99 @@ See the caption package documentation for explanation.
 [5]
 
 [6]
+
+[7]
 File: figures/ppo_process.pdf Graphic file (type pdf)
 <use figures/ppo_process.pdf>
 
-
-[7]
 
 [8]
 
 [9]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 569.
+(caption)                particular \caption on input line 570.
 See the caption package documentation for explanation.
 
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 593.
 
 
 [10]
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 598.
+
 
 [11]
 
 [12]
-File: figures/compare_different_nodes.pdf Graphic file (type pdf)
-<use figures/compare_different_nodes.pdf>
-File: figures/node_error_heatmap_comparison.png Graphic file (type bmp)
-<figures/node_error_heatmap_comparison.png>
-
 
 [13]
-File: figures/node3_comparison_plot.pdf Graphic file (type pdf)
-<use figures/node3_comparison_plot.pdf>
-File: figures/node2_comparison_plot.pdf Graphic file (type pdf)
-<use figures/node2_comparison_plot.pdf>
-
-
-Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 816.
-See the caption package documentation for explanation.
-
+File: figures/node_selection_audited.pdf Graphic file (type pdf)
+<use figures/node_selection_audited.pdf>
+File: figures/node3_error.png Graphic file (type bmp)
+<figures/node3_error.png>
+File: figures/node2_error.png Graphic file (type bmp)
+<figures/node2_error.png>
+File: figures/node1_error.png Graphic file (type bmp)
+<figures/node1_error.png>
 
 
 [14]
 
 [15]
-File: figures/node3_mismatch_mae.pdf Graphic file (type pdf)
-<use figures/node3_mismatch_mae.pdf>
-File: figures/node2_mismatch_mae.pdf Graphic file (type pdf)
-<use figures/node2_mismatch_mae.pdf>
+File: figures/observation_comparison_audited.pdf Graphic file (type pdf)
+<use figures/observation_comparison_audited.pdf>
 
 
-Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 917.
-See the caption package documentation for explanation.
+LaTeX Warning: `h' float specifier changed to `ht'.
 
+File: figures/paired_observation_complete.png Graphic file (type bmp)
+<figures/paired_observation_complete.png>
 
 
 [16]
-File: figures/pulse_response.png Graphic file (type bmp)
-<figures/pulse_response.png>
-
 
 [17]
-File: figures/noise_mae_trend.png Graphic file (type bmp)
-<figures/noise_mae_trend.png>
-File: figures/ppo_vs_linear_high_noise.png Graphic file (type bmp)
-<figures/ppo_vs_linear_high_noise.png>
+
+[18]
+
+[19]
+File: figures/multi_input_matched_budget.pdf Graphic file (type pdf)
+<use figures/multi_input_matched_budget.pdf>
+
+
+[20]
+
+[21]
+File: figures/mismatch_methods.pdf Graphic file (type pdf)
+<use figures/mismatch_methods.pdf>
+File: figures/pulse_methods.pdf Graphic file (type pdf)
+<use figures/pulse_methods.pdf>
+
+
+[22]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+File: figures/noise_methods.pdf Graphic file (type pdf)
+<use figures/noise_methods.pdf>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
-[18]
+[23]
+File: figures/ppo_sac_matched_budget.pdf Graphic file (type pdf)
+<use figures/ppo_sac_matched_budget.pdf>
+
+
+[24]
+
+[25]
+
+[26]
 File: figures/original_image.jpg Graphic file (type bmp)
 <figures/original_image.jpg>
 File: figures/cipher_image.png Graphic file (type bmp)
@@ -1101,49 +1120,46 @@ File: figures/decrypted_image.png Graphic file (type bmp)
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1035.
+(caption)                particular \caption on input line 1272.
 See the caption package documentation for explanation.
 
 File: figures/encrypt_process.pdf Graphic file (type pdf)
 <use figures/encrypt_process.pdf>
 
-Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1052.
-See the caption package documentation for explanation.
 
+[27]
 
-
-[19]
-
-[20]
-
-[21]
+[28]
 File: figures/test_hist.png Graphic file (type bmp)
 <figures/test_hist.png>
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1172.
+(caption)                particular \caption on input line 1376.
 See the caption package documentation for explanation.
 
+
+
+[29]
 File: figures/test_correlation.png Graphic file (type bmp)
 <figures/test_correlation.png>
 
+
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 1183.
+(caption)                particular \caption on input line 1387.
 See the caption package documentation for explanation.
 
 
 
-[22]
+[30]
 
-[23] (./Manuscript.bbl
+[31]
 
-[24]
+[32] (./Manuscript.bbl
 
-[25])
+[33])
 
-[26] (./Manuscript.aux)
+[34] (./Manuscript.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -1152,12 +1168,12 @@ Package rerunfilecheck Info: File `Manuscript.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 22399 strings out of 473832
- 368499 string characters out of 5733159
- 800838 words of memory out of 5000000
- 45114 multiletter control sequences out of 15000+600000
- 679820 words of font info for 189 fonts, out of 8000000 for 9000
+ 22407 strings out of 473832
+ 368919 string characters out of 5733159
+ 798838 words of memory out of 5000000
+ 45121 multiletter control sequences out of 15000+600000
+ 679826 words of font info for 189 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 87i,19n,93p,1716b,732s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 87i,16n,93p,1985b,634s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on Manuscript.pdf (26 pages).
+Output written on Manuscript.pdf (34 pages).

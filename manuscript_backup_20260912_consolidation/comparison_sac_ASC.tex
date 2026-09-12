@@ -1,0 +1,17 @@
+
+To assess the dependence of the results on the learning algorithm, SAC~\cite{haarnoja2018soft} is evaluated on the same single-input Node 2 and Node 3 tasks. Both algorithms use the six-dimensional observation $(\mathbf x,\mathbf e)/5$, reward $-0.1\|\mathbf e\|_1$, actuator bound $|u|\leq4$, nominal training dynamics, and final checkpoints at a nominal budget of $4\times10^5$ environment transitions. Three independent training runs and 20 common test initial conditions per seed are used. All checkpoints are retained, and evaluation uses deterministic actions without online learning. The compared test settings are nominal dynamics, mismatch $\eta=2$, the drive-state impulse at $t=10$, and response process noise with $\sigma=0.05$.
+
+Both implementations use two hidden layers of width 64, a learning rate of $3\times10^{-4}$, batch size 128, and discount factor 0.99. PPO uses Tanh hidden activations, four environments with 512 steps per rollout, ten optimization epochs, clip range 0.2, GAE parameter 0.95, and entropy coefficient 0.001. SAC uses ReLU hidden activations, one environment, a replay buffer of $10^5$ transitions, 5,000 initial exploration steps, one gradient update per subsequent transition, target-update coefficient $\tau=0.005$, and automatic entropy adjustment with target entropy $-1$. These settings are fixed across nodes and seeds. The budget matches environment interactions; gradient-update counts and training times follow each algorithm\'s update schedule. The comparison uses these fixed hyperparameter settings.
+
+\input{generated/sac_table_ASC.tex}
+
+\begin{figure*}[pos=!t,width=\textwidth]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ppo_sac_matched_budget.pdf}
+  \caption{PPO--SAC comparison at matched environment-transition budgets. Bars show the mean of three training-seed means and error bars show their sample standard deviation. Each seed is evaluated on 20 common initial conditions. The upper panels use full-horizon MAE for every scenario; the separate post-impulse metric is given in Table~\ref{tab:sac_comparison}.}
+  \label{fig:sac_comparison}
+\end{figure*}
+
+Table~\ref{tab:sac_comparison} and Fig.~\ref{fig:sac_comparison} show a scenario-dependent comparison. For Node 2, PPO has lower nominal MAE (0.0930 versus 0.1173), but SAC has lower MAE under mismatch $\eta=2$ (0.1513 versus 0.1703) and also lower energy (9.31 versus 11.85). Following the impulse, SAC has lower mean $E_{\mathrm{post}}$ (1.9226 versus 2.0800), but greater variation across training-seed means (SD 0.5913 versus 0.1451) and higher mean energy (25.20 versus 17.51). At $\sigma=0.05$, the mean MAEs are close (0.2632 for SAC and 0.2669 for PPO), while SAC uses less energy.
+
+For Node 3, SAC has slightly lower mean MAE in the nominal, mismatch, and noise tests and lower mean energy in all four settings. PPO achieves lower post-impulse error (1.2969 versus 1.3987), at higher energy. The comparison reveals complementary strengths of the two learning algorithms across operating conditions. PPO is a viable implementation of the constrained pinning framework, while algorithm choice depends on the operating condition and the relative importance of error, variability, and control effort. Means and standard deviations across the three training runs summarize both performance and training variability.

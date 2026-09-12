@@ -1,0 +1,39 @@
+{
+  "status": "recovery_failed",
+  "node": 2,
+  "seed": 100,
+  "burn_in": 0,
+  "block_size": 8,
+  "sample_count": 1,
+  "model": "E:\\project\\Synchronize\\tmp\\encryption_test_bf54c1ba975c4503bf94884b3baa4ed0\\node2.zip",
+  "model_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "image_sha256": "8b4a544837a1a0280fa8a7c82865c27a1064b3cc6281fda0753566b9bb104a87",
+  "deterministic": true,
+  "attempts": 1,
+  "quantization": "direct",
+  "filter_passes": 0,
+  "scope": "Functional experiment, not authentication or security certification.",
+  "all_rules_equal": true,
+  "rule_mismatch_rate": 0.0,
+  "master_unique_per_stream": [
+    1,
+    1,
+    1,
+    1
+  ],
+  "slave_unique_per_stream": [
+    1,
+    1,
+    1,
+    1
+  ],
+  "master_identity_block_fraction": 1.0,
+  "exact_recovery": false,
+  "changed_component_rate": 0.9947916666666666,
+  "bit_error_rate": 0.4583333333333333,
+  "fixed_rule_exact_recovery": false,
+  "warnings": [
+    "Diagnostic prototype: discrete agreement and DNA cancellation remain unresolved.",
+    "At least one rule stream is constant; recovery is not evidence of synchronization necessity."
+  ]
+}

@@ -1,0 +1,39 @@
+To illustrate how measured performance can inform a resource-constrained choice, an offline screening example uses a prespecified eight-candidate pool, fixed before the paired-subset completion. A candidate $c$ specifies the actuated node and its observation subset. The pool comprises Nodes 2 and 3, each with local two-dimensional observations, the original four-dimensional subset ($\mathcal O_{12}$ at Node 2 and $\mathcal O_{13}$ at Node 3), $\mathcal O_{23}$, and full six-dimensional observations. Each candidate retains all three training runs; configuration selection therefore accounts for variability across the retained runs. The allowed actuator set may be $\{2,3\}$, $\{2\}$, or $\{3\}$. The subsequently evaluated Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$ configurations are outside this frozen pool; the complete paired-subset comparison and this limited selection example answer different questions.
+
+For a trajectory, let $z$ be the sample mean of $\|\mathbf e(t)\|_1$ over the final interval $16\leq t\leq20$. A trajectory passes when $z\leq\varepsilon$ and no state-protection boundary is reached. For training run $r$, its validation pass fraction is
+\begin{equation}
+ \widehat p_{c,r}(\varepsilon)
+ =\frac{1}{n_v}\sum_{\ell=1}^{n_v}
+ \mathbf 1\{z_{c,r,\ell}\leq\varepsilon,\ g_{c,r,\ell}=0\},
+ \label{eq:configuration_pass}
+\end{equation}
+where $g$ counts state-protection boundary hits. A candidate is feasible only if $\min_r\widehat p_{c,r}\geq0.90$. Among feasible candidates with allowed actuation, the rule first minimizes observation dimension and then validation mean applied energy $E_u$. Remaining ties are resolved by a fixed candidate ordering. If none is feasible, no configuration is selected. This lexicographic preference prioritizes feedback dimension as the structural resource measure.
+
+The rule uses 20 new common validation initial conditions and 40 separate common test initial conditions drawn from the original initial-state distribution. The illustrative tolerances $\varepsilon\in\{0.01,0.05,0.10\}$ were informed by the preceding experiments and fixed before this validation. They serve as illustrative design targets for the screening example. Choices were recorded before evaluating the selected configurations on the test set, with no test-based reselection. Dynamics, nominal parameters, action bounds, and frozen policies were unchanged.
+
+\begin{table*}[pos=!t,width=\textwidth]
+\centering
+\caption{Validation-selected configurations and independent-initial-condition tests. Test pass fractions are the minimum across three training runs, each evaluated on the same 40 test initial conditions. Error and energy average initial conditions and runs. A dash denotes no selection and hence no corresponding test; grouped tolerances have identical outcomes.}
+\label{tab:configuration_selection}
+\small
+\begin{tabular}{cccccc}
+\toprule
+Allowed nodes & $\varepsilon$ & Selected node / observations & Test pass & Test $z$ & Test $E_u$\\
+\midrule
+$\{2,3\}$ & 0.01 & -- & -- & -- & --\\
+$\{2,3\}$ & 0.05, 0.10 & $3\,/\,\mathcal O_{13}$ & 100\% & 0.0086 & 5.03\\
+$\{2\}$ & 0.01, 0.05 & -- & -- & -- & --\\
+$\{2\}$ & 0.10 & $2\,/\,\mathcal O_{23}$ & 100\% & 0.0282 & 8.11\\
+$\{3\}$ & 0.01 & -- & -- & -- & --\\
+$\{3\}$ & 0.05, 0.10 & $3\,/\,\mathcal O_{13}$ & 100\% & 0.0086 & 5.03\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:configuration_selection} translates the observation comparison into conditional design choices. With either node available, the original four-dimensional Node 3 configuration is selected at tolerances 0.05 and 0.10. When actuation is restricted to Node 2, the alternative four-dimensional subset is selected at 0.10. Both selected configurations pass every test trajectory at their respective selected tolerances. No candidate in the prespecified pool meets the validation criterion at 0.01. No state-protection boundary is reached in the 480 validation or 240 test trajectories.
+
+The per-run criterion prevents aggregate averages from masking inconsistent training outcomes. At tolerance 0.05, the alternative Node 2 subset has validation pass fractions of 100\%, 75\%, and 100\%; it is rejected despite an aggregate fraction above 90\%. The local two-dimensional Node 3 policies likewise yield 100\%, 0\%, and 100\% at both 0.05 and 0.10. The resource priority affects the choice: at Node 2, the selected four-dimensional configuration has validation mean energy 11.76 versus 10.93 for six dimensions. The preference must therefore reflect the intended resource priority.
+
+The selection procedure links nominal accuracy to resource preference within the fixed candidate pool, with validation on held-out initial conditions. Pass fractions describe the tested policies and sampled initial conditions; population-level reliability and transfer to newly trained policies require further validation. The tail-mean criterion measures average late-stage accuracy, whereas pointwise error limits and application-specific recovery requirements call for their own acceptance criteria. Shared initial conditions provide paired comparisons across policies.
+
+\input{configuration_extensions.tex}
