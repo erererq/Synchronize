@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  12 SEP 2026 10:59
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.7)  12 SEP 2026 16:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1270,7 +1270,7 @@ i 52
 
 
 
-Underfull \hbox (badness 1342) in paragraph at lines 111--114
+Underfull \hbox (badness 1342) in paragraph at lines 109--112
 []\T1/stix/m/n/8 P. Tooran-jipour, R. Vatankhah, Adap-tive critic-based quater-
 nion
  []
@@ -1294,10 +1294,10 @@ Package rerunfilecheck Info: File `Manuscript_ASC.out' has not changed.
 Here is how much of TeX's memory you used:
  22792 strings out of 473832
  375961 string characters out of 5733159
- 813923 words of memory out of 5000000
+ 812923 words of memory out of 5000000
  45481 multiletter control sequences out of 15000+600000
  679821 words of font info for 189 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 87i,16n,131p,1649b,650s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 87i,16n,131p,1649b,672s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Manuscript_ASC.pdf (28 pages).
