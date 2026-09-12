@@ -1,6 +1,0 @@
-default_k=0.92
-default_alpha=0.78
-default_beta=0.12
-default_bias=0.18
-default_epsilon=0.08
-default_lle=0.000045
