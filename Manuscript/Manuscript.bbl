@@ -35,6 +35,16 @@ A.~Argyris, D.~Syvridis, L.~Larger, V.~Annovazzi-Lodi, P.~Colet, I.~Fischer,
 G.~D. Vanwiggeren, R.~Roy, Communication with chaotic lasers, Science
   279~(5354) (1998) 1198--1200.
 
+\bibitem{wen2021coordination}
+G.~Wen, X.~Yu, W.~Yu, J.~Lu, Coordination and control of complex network
+  systems with switching topologies: a survey, IEEE Transactions on Systems,
+  Man, and Cybernetics: Systems 51~(10) (2021) 6342--6357.
+
+\bibitem{olfati2007consensus}
+R.~Olfati-Saber, J.~A. Fax, R.~M. Murray, Consensus and cooperation in
+  networked multi-agent systems, Proceedings of the IEEE 95~(1) (2007)
+  215--233.
+
 \bibitem{zia2022survey}
 U.~Zia, M.~McCartney, B.~Scotney, J.~Martinez, M.~AbuTair, J.~Memon, A.~Sajjad,
   Survey on image encryption techniques using chaotic maps in spatial,
@@ -45,16 +55,6 @@ U.~Zia, M.~McCartney, B.~Scotney, J.~Martinez, M.~AbuTair, J.~Memon, A.~Sajjad,
 Y.~Xu, H.~Wang, Y.~Li, B.~Pei, Image encryption based on synchronization of
   fractional chaotic systems, Communications in Nonlinear Science and Numerical
   Simulation 19~(10) (2014) 3735--3744.
-
-\bibitem{wen2021coordination}
-G.~Wen, X.~Yu, W.~Yu, J.~Lu, Coordination and control of complex network
-  systems with switching topologies: a survey, IEEE Transactions on Systems,
-  Man, and Cybernetics: Systems 51~(10) (2021) 6342--6357.
-
-\bibitem{olfati2007consensus}
-R.~Olfati-Saber, J.~A. Fax, R.~M. Murray, Consensus and cooperation in
-  networked multi-agent systems, Proceedings of the IEEE 95~(1) (2007)
-  215--233.
 
 \bibitem{lin2005complete}
 W.~Lin, Y.~He, Complete synchronization of the noise-perturbed {{Chua}}'s
@@ -69,11 +69,6 @@ L.~Kocarev, U.~Parlitz, Generalized synchronization, predictability, and
 \bibitem{guan2005phase}
 S.~Guan, C.~H. Lai, G.~W. Wei, Phase synchronization between two essentially
   different chaotic systems, Physical Review E 72~(1) (2005) 016205.
-
-\bibitem{rosenblum1997phase}
-M.~G. Rosenblum, A.~S. Pikovsky, J.~Kurths, From phase to lag synchronization
-  in coupled chaotic oscillators, Physical Review Letters 78~(22) (1997)
-  4193--4196.
 
 \bibitem{ott1990controlling}
 E.~Ott, C.~Grebogi, J.~A. Yorke, Controlling chaos, Physical Review Letters 64
@@ -116,6 +111,43 @@ C.~D. Li, X.~F. Liao, X.~Y. Zhang, Impulsive synchronization of chaotic
 G.~Chen, Pinning control and synchronization on complex dynamical networks,
   International Journal of Control, Automation and Systems 12~(2) (2014)
   221--230.
+
+\bibitem{thompson2017interferometry}
+A.~R. Thompson, J.~M. Moran, G.~W. Swenson, Interferometry and synthesis in
+  radio astronomy, Springer, 2017.
+
+\bibitem{hopfield1984neurons}
+J.~J. Hopfield, Neurons with graded response have collective computational
+  properties like those of two-state neurons., Proceedings of the National
+  Academy of Sciences 81~(10) (1984) 3088--3092.
+
+\bibitem{LI2013a}
+J.~Li, F.~Liu, Z.-H. Guan, T.~Li, A new chaotic hopfield neural network and its
+  synthesis via parameter switchings, Neurocomputing 117 (2013) 33--39.
+
+\bibitem{zheng2010double}
+P.~Zheng, W.~Tang, J.~Zhang, Some novel double-scroll chaotic attractors in
+  {{Hopfield}} networks, Neurocomputing 73~(10) (2010) 2280--2285.
+
+\bibitem{bao2017numerical}
+B.~Bao, H.~Qian, J.~Wang, Q.~Xu, M.~Chen, H.~Wu, Y.~Yu, Numerical analyses and
+  experimental validations of coexisting multiple attractors in {{Hopfield}}
+  neural network, Nonlinear Dynamics 90~(4) (2017) 2359--2369.
+
+\bibitem{mahmoud2021analysis}
+E.~E. Mahmoud, L.~S. Jahanzaib, P.~Trikha, O.~A. Almaghrabi, Analysis and
+  control of the fractional chaotic {{Hopfield}} neural network, Advances in
+  Difference Equations 2021~(1) (2021) 126.
+
+\bibitem{zhang2011weak}
+W.~Zhang, J.~Huang, P.~Wei, Weak synchronization of chaotic neural networks
+  with parameter mismatch via periodically intermittent control, Applied
+  Mathematical Modelling 35~(2) (2011) 612--620.
+
+\bibitem{cao2024synchronisation}
+Z.~Cao, C.~Li, M.-F. Leung, The synchronisation problem of chaotic neural
+  networks based on saturation impulsive control and intermittent control,
+  Mathematics 12~(1) (2024) 151.
 
 \bibitem{sutton2018reinforcement}
 R.~S. Sutton, A.~G. Barto, Reinforcement Learning: An Introduction, 2nd
@@ -177,76 +209,6 @@ M.~Weissenbacher, A.~Borovykh, G.~Rigas, Reinforcement learning of chaotic
   systems control in partially observable environments, Flow, Turbulence and
   Combustion 115~(3) (2025) 1357--1378.
 
-\bibitem{hopfield1984neurons}
-J.~J. Hopfield, Neurons with graded response have collective computational
-  properties like those of two-state neurons., Proceedings of the National
-  Academy of Sciences 81~(10) (1984) 3088--3092.
-
-\bibitem{LI2013a}
-J.~Li, F.~Liu, Z.-H. Guan, T.~Li, A new chaotic hopfield neural network and its
-  synthesis via parameter switchings, Neurocomputing 117 (2013) 33--39.
-
-\bibitem{zheng2010double}
-P.~Zheng, W.~Tang, J.~Zhang, Some novel double-scroll chaotic attractors in
-  {{Hopfield}} networks, Neurocomputing 73~(10) (2010) 2280--2285.
-
-\bibitem{bao2017numerical}
-B.~Bao, H.~Qian, J.~Wang, Q.~Xu, M.~Chen, H.~Wu, Y.~Yu, Numerical analyses and
-  experimental validations of coexisting multiple attractors in {{Hopfield}}
-  neural network, Nonlinear Dynamics 90~(4) (2017) 2359--2369.
-
-\bibitem{mahmoud2021analysis}
-E.~E. Mahmoud, L.~S. Jahanzaib, P.~Trikha, O.~A. Almaghrabi, Analysis and
-  control of the fractional chaotic {{Hopfield}} neural network, Advances in
-  Difference Equations 2021~(1) (2021) 126.
-
-\bibitem{zhang2011weak}
-W.~Zhang, J.~Huang, P.~Wei, Weak synchronization of chaotic neural networks
-  with parameter mismatch via periodically intermittent control, Applied
-  Mathematical Modelling 35~(2) (2011) 612--620.
-
-\bibitem{cao2024synchronisation}
-Z.~Cao, C.~Li, M.-F. Leung, The synchronisation problem of chaotic neural
-  networks based on saturation impulsive control and intermittent control,
-  Mathematics 12~(1) (2024) 151.
-
-\bibitem{wu2023stability}
-X.~Wu, S.~Liu, H.~Wang, Y.~Wang, Stability and pinning synchronization of
-  delayed memristive neural networks with fractional-order and
-  reaction--diffusion terms, ISA Transactions 136 (2023) 114--125.
-
-\bibitem{dong2026event}
-Z.~Dong, J.~Shen, C.~Lian, S.~Wang, Event-triggered global synchronization
-  control of discrete-time delayed neural networks with applications in image
-  encryption, Journal of the Franklin Institute (2026) 108524.
-
-\bibitem{luo2025memory}
-C.~Luo, H.~Bao, J.~Cao, Memory-based event-triggered synchronization of dynamic
-  memristor delayed cellular neural networks for image encryption, Journal of
-  the Franklin Institute 362~(4) (2025) 107552.
-
-\bibitem{liu2024synchronization}
-P.~Liu, J.~Yong, J.~Zhao, J.~Sun, Synchronization of coupled inertial neural
-  networks via continuous and event-triggered pinning controls, Journal of the
-  Franklin Institute 361~(9) (2024) 106869.
-
-\bibitem{zhang2023chaos}
-B.~Zhang, L.~Liu, Chaos-based image encryption: Review, application, and
-  challenges, Mathematics 11~(11) (2023) 2585.
-
-\bibitem{wang2019color}
-X.-Y. Wang, Z.-M. Li, A color image encryption algorithm based on hopfield
-  chaotic neural network, Optics and Lasers in Engineering 115 (2019) 107--118.
-
-\bibitem{cuomo1993circuit}
-K.~M. Cuomo, A.~V. Oppenheim, Circuit implementation of synchronized chaos with
-  applications to communications, Physical review letters 71~(1) (1993) 65.
-
-\bibitem{li2007analog}
-S.~Li, G.~Alvarez, Z.~Li, W.~A. Halang, Analog chaos-based secure
-  communications and cryptanalysis: a brief survey, arXiv preprint
-  arXiv:0710.5455 (2007).
-
 \bibitem{boccaletti2002synchronization}
 S.~Boccaletti, J.~Kurths, G.~Osipov, D.~Valladares, C.~Zhou, The
   synchronization of chaotic systems, Physics Reports 366~(1-2) (2002) 1--101.
@@ -276,10 +238,6 @@ J.~Kobiolka, J.~Habermann, M.~E. Yamakou, Reduced-order adaptive
   synchronization in a chaotic neural network with parameter mismatch: A
   dynamical system versus machine learning approach, Nonlinear Dynamics
   113~(10) (2025) 10989--11008.
-
-\bibitem{thompson2017interferometry}
-A.~R. Thompson, J.~M. Moran, G.~W. Swenson, Interferometry and synthesis in
-  radio astronomy, Springer, 2017.
 
 \bibitem{li2024novel}
 L.~Li, A novel chaotic map application in image encryption algorithm, Expert

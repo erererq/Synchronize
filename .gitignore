@@ -87,4 +87,10 @@ AGENTS.MD
 Code/encry/*.md
 Code/encry/**/*.md
 
+# ==========================================
+# 论文插图目录本身及其所有下属内容
+# ==========================================
+Manuscript/figures/
+Manuscript/figures/**
+
 

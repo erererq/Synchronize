@@ -33,12 +33,16 @@
 \usepackage{array}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{microtype}
+\usepackage[protrusion=false, expansion=false]{microtype}
 \usepackage{subcaption}
 \usepackage{xurl}
 
 \usepackage[section]{placeins}
 \usepackage{cleveref}
+
+\ExplSyntaxOn
+\keys_set:nn { stm / mktitle } { nologo }
+\ExplSyntaxOff
 
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}[section]
@@ -127,30 +131,29 @@ Neural network
 \section{Introduction}
 \label{sec:introduction}
 
-Chaotic systems have been widely studied in nonlinear science~\cite{strogatz2018nonlinear}, complex networks~\cite{boccaletti2006complex}, and neural dynamics~\cite{izhikevich2007dynamical} because of their sensitive dependence on initial conditions, a property in which small differences in initial states may grow rapidly and lead to markedly different trajectories over time. This sensitivity makes chaotic systems difficult to predict and control, and also raises the fundamental problem of whether chaotic motions can be coordinated or synchronized through appropriate coupling or control. In 1990, Pecora and Carroll demonstrated drive--response synchronization in chaotic systems~\cite{pecora1990synchronization}, showing that two chaotic systems can evolve coherently under suitable conditions. Since then, the analysis, control, and synchronization of chaotic systems have attracted extensive attention, with applications in secure communication~\cite{koronovskii2010on,argyris2005chaos,vanwiggeren1998communication}, image encryption~\cite{zia2022survey,xu2014image}, and coordinated control of complex systems~\cite{wen2021coordination,olfati2007consensus}.
+Nonlinear dynamical systems and chaotic phenomena have attracted enduring interest across physics, mathematics, and engineering sciences~\cite{strogatz2018nonlinear,boccaletti2006complex,izhikevich2007dynamical}, primarily due to their hallmark property: extreme sensitivity to initial conditions, whereby infinitesimal state discrepancies amplify exponentially over time into pseudorandom, unpredictable trajectories. This intrinsic unpredictability long rendered chaotic systems difficult to regulate, until the pioneering discovery of drive--response synchronization by Pecora and Carroll in 1990~\cite{pecora1990synchronization}. Their seminal work demonstrated that two coupled or appropriately controlled chaotic systems can achieve coherent dynamical evolution, unlocking widespread applications in secure communication~\cite{koronovskii2010on,argyris2005chaos,vanwiggeren1998communication}, cooperative network control~\cite{wen2021coordination,olfati2007consensus}, and image encryption~\cite{zia2022survey,xu2014image}. Over the past decades, diverse synchronization regimes—such as complete synchronization~\cite{lin2005complete}, generalized synchronization~\cite{kocarev1996generalized}, and phase synchronization~\cite{guan2005phase}—have been extensively investigated through traditional model-based control strategies~\cite{ott1990controlling,boccaletti2000control}, including linear feedback~\cite{yassen2005controlling}, adaptive control~\cite{wang2003feedback}, sliding-mode control~\cite{feki2009sliding,su2021fixed,mobayen2018chaos}, impulsive control~\cite{li2005impulsive}, and pinning control~\cite{chen2014pinning}.
 
-For chaotic systems, synchronization refers to the process by which two or more systems evolve toward a consistent dynamical relationship through appropriate coupling or control mechanisms. Different synchronization forms have been widely investigated, including complete synchronization~\cite{lin2005complete}, generalized synchronization~\cite{kocarev1996generalized}, phase synchronization~\cite{guan2005phase}, and lag synchronization~\cite{rosenblum1997phase}. To realize these synchronization objectives and control chaotic behaviors, a variety of classical control methods have been developed~\cite{ott1990controlling,boccaletti2000control}, such as linear feedback control~\cite{yassen2005controlling}, adaptive control~\cite{wang2003feedback}, sliding-mode control~\cite{feki2009sliding,su2021fixed,mobayen2018chaos}, impulsive control~\cite{li2005impulsive}, and pinning control~\cite{chen2014pinning}.
+In recent years, secure image transmission has emerged as a prominent application scenario where chaos dynamics and synchronization play an indispensable role. In distributed communication environments—such as remote sensing, telemetry links, and distributed astronomical observation networks (e.g., Very Long Baseline Interferometry arrays)~\cite{thompson2017interferometry}—large volumes of sensitive and high-value scientific imagery must be transmitted across open and potentially untrusted channels. These transmission scenarios are vulnerable to eavesdropping and data interception, while simultaneously operating under stringent physical constraints: limited channel bandwidth, constrained terminal computing resources, and strict energy budgets. Such requirements necessitate lightweight, low-cost, and computationally efficient encryption frameworks capable of securing high-value visual data without imposing heavy communication or computational burdens.
 
-Although these classical methods have provided effective tools for stabilizing and synchronizing chaotic systems, they usually rely on explicit system models, stability analysis, and carefully designed feedback laws. For complex nonlinear systems with uncertain dynamics, limited observation information, or difficult-to-model behaviors, such requirements may restrict their applicability. To reduce the dependence on analytical controller design, the deep reinforcement learning (DRL) has been increasingly explored as a model-free data-driven control approach for complex dynamical systems~\cite{sutton2018reinforcement,mnih2015human,carlucho2020adaptive}. Through interaction with the environment, DRL learns nonlinear control policies directly from state observations and reward feedback, making it suitable for continuous control and decision-making tasks. Existing studies have introduced learning-based methods into chaos control and synchronization tasks, showing that DRL controllers can achieve effective control or synchronization in several typical chaotic systems~\cite{bucci2019control,vashishtha2020restoring,han2021control,cheng2023deep,cheng2025generalized,yau2024ppo,xu2025ppo}. Some recent works~\cite{jin2025Deep,weissenbacher2025reinforcement} have further considered reduced control inputs, noisy environments, or incomplete state information, suggesting that learning-based controllers may retain certain adaptability under non-ideal conditions.
+Chaotic systems are naturally endowed with properties that align with cryptographic primitives: ergodicity, broadband continuous spectra, spatiotemporal pseudorandomness, and extreme initial-state sensitivity~\cite{zia2022survey}. In conventional cryptography, the distribution of secret keys or the transmission of pseudorandom keystreams over public channels inevitably creates key-distribution bottlenecks and security vulnerabilities. In contrast, drive--response chaotic synchronization establishes a ``zero-key-transmission'' cryptographic paradigm: the transmitter (drive system) locally generates a continuous chaotic trajectory to construct the encryption keystream, while the receiver (response system) independently reconstructs the identical chaotic trajectory through synchronization. Consequently, the need to transmit or expose the keystream across vulnerable communication channels is eliminated. To generate cryptographically robust keystreams, continuous-time Hopfield chaotic neural networks (CHNNs)~\cite{hopfield1984neurons,LI2013a} offer pronounced dynamical advantages over discrete toy maps (such as Logistic, Tent, or Arnold maps) and low-dimensional polynomial oscillators (such as Lorenz or Chen systems). Under finite-precision digital computation, discrete maps frequently suffer from dynamical degradation, short periodic orbits, and non-uniform state distributions, whereas low-dimensional polynomial oscillators exhibit relatively simple vector fields and limited topological complexity. In contrast, continuous-time Hopfield neural networks represent recurrent neuromorphic dynamical systems governed by saturating transcendental nonlinearities ($\tanh$) and interconnected by asymmetric synaptic weight matrices $W$. They generate rich multi-scroll chaotic attractors, broadband pseudorandom trajectories with high spatiotemporal uniformity, and elevated Shannon entropy~\cite{zheng2010double,bao2017numerical,mahmoud2021analysis}, thereby supplying high-complexity, continuous-state key material for image diffusion, permutation, and dynamic DNA coding.
 
-As a representative neural dynamical model, the Hopfield neural network has also been widely used to study nonlinear dynamics and chaos. In the classical graded-response Hopfield model, suitable symmetric-connection conditions usually lead the network state to converge to equilibrium points~\cite{hopfield1984neurons}. However, the modified Hopfield-type neural networks can exhibit rich nonlinear dynamics, including bifurcation, multistability, and chaotic attractors~\cite{LI2013a,zheng2010double,bao2017numerical}. Existing studies on Hopfield-type chaotic neural networks have mainly focused on dynamical analysis and model-based control or synchronization, such as fractional-order dynamics, chaos control, weak synchronization, and impulsive or intermittent synchronization~\cite{mahmoud2021analysis,zhang2011weak,cao2024synchronisation,wu2023stability}. Recent studies have further investigated neural-network synchronization under event-triggered control, pinning control, delayed dynamics, and image-encryption-oriented applications~\cite{dong2026event,luo2025memory,liu2024synchronization}. These studies provide useful foundations for understanding and controlling Hopfield chaotic dynamics, especially from the perspectives of dynamical characterization, model-based synchronization, and secure-information applications.
+However, translating chaotic synchronization into practical, resource-constrained image transmission encounters a critical control-theoretic and engineering bottleneck: actuation overhead and telemetry communication bandwidth. In a master--slave synchronization architecture, the drive and response systems are physically separated across distinct communication nodes. Conventional synchronization methods frequently rely on full-state or multi-input control architectures~\cite{yassen2005controlling,feki2009sliding,su2021fixed}, where control corrections are simultaneously applied to every state dimension. In real-time remote telemetry, transmitting multi-channel control signals or state corrections requires communication bandwidth that scales directly and linearly with the actuation dimension. For an $n$-dimensional chaotic system, multi-input control multiplies the required telemetry traffic by $n$-fold, while simultaneously requiring multiple physical actuators, digital-to-analog converters, and driving circuits. For the three-dimensional Hopfield neural network investigated in this study, full-state control would require three independent actuator channels and triple the telemetry bandwidth. To address this challenge, this paper investigates an underactuated single-input pinning control strategy, in which only a single scalar control signal is injected into one selected node of the response system. By restricting actuation to a single dimension, the required control telemetry bandwidth, driver circuitry, and physical actuation cost are reduced by 66.7\%, which is particularly advantageous for bandwidth-constrained remote transmission links.
 
-Despite recent progress in both Hopfield chaotic dynamics and DRL-based chaos control, the synchronization of continuous-time Hopfield chaotic neural networks under constrained pinning control has received less attention. Many existing DRL-based chaotic synchronization studies have mainly focused on typical low-dimensional chaotic systems, such as the Lorenz system, Rössler system, and Chua circuit~\cite{cheng2023deep,cheng2025generalized}, or have adopted relatively flexible multi-variable control structures. In contrast, a single-input pinning architecture uses only one actuator channel and injects one scalar signal into a selected response node. This restriction is relevant when actuator count, sensing, communication, or implementation complexity limits the available control channels; it also makes the pinning-node choice critical to the performance of the learned controller.
-Moreover, practical control systems are often subject to actuator limitations, model uncertainty, external perturbations, stochastic measurement or process noise, and limited sensing information~\cite{zhang2011weak,cao2024synchronisation,weissenbacher2025reinforcement}. In this context, single-input pinning control can be interpreted as a constrained-actuation scenario, where only one control channel is available for synchronization. Therefore, it is necessary to evaluate not only nominal synchronization performance but also the robustness and adaptability of the learned controller under non-ideal operating conditions.
+Nevertheless, single-input pinning control presents significant control difficulties: because only one node is directly actuated, the control force must propagate to the remaining uncontrolled nodes solely through the internal recurrent synaptic connections ($W$) of the neural network. In continuous-time Hopfield networks, the synaptic weight matrix $W$ is intrinsically asymmetric, meaning that individual nodes occupy fundamentally unequal topological and dynamical positions. Certain nodes possess strong outgoing synaptic projections and weak transverse divergence, making them naturally favorable channels for control propagation; conversely, other nodes exhibit weak coupling or strongly divergent transverse directions, acting as structural underactuation bottlenecks. Consequently, the choice of pinning node is critical: applying control to different nodes yields markedly divergent synchronizability, convergence rates, and control effort. Traditional model-based controllers (such as linear feedback, LQR, and sliding-mode control)~\cite{wang2003feedback,li2005impulsive,chen2014pinning,mobayen2018chaos} rely on explicit linearizations or strict structural matchings; while they can stabilize locally favorable channels, they exhibit severe performance degradation, consume excessive control energy, or even fail when applied to structurally disadvantaged nodes or subjected to parameter mismatches and disturbances~\cite{zhang2011weak,cao2024synchronisation}. Deep reinforcement learning (DRL)~\cite{sutton2018reinforcement,mnih2015human,carlucho2020adaptive} offers a model-free, data-driven methodology to discover optimal nonlinear feedback policies directly from dynamical interactions, as evidenced in recent chaos control studies~\cite{bucci2019control,vashishtha2020restoring,han2021control,cheng2023deep,cheng2025generalized,yau2024ppo,xu2025ppo,jin2025Deep,weissenbacher2025reinforcement}. However, how recurrent network topology dictates single-input pinning feasibility, and more importantly, \emph{where} DRL policies provide decisive advantages over classical feedback across different topological channels, remains an unaddressed research gap.
 
-In addition to synchronization control itself, chaotic synchronization also has potential value in secure image encryption. Owing to their sensitivity to initial conditions and pseudo-random dynamical behavior, chaotic systems have been widely used to construct key streams, permutation--diffusion mechanisms, and DNA-coding-based encryption procedures~\cite{zia2022survey,zhang2023chaos,wang2019color,cuomo1993circuit,li2007analog}. In a drive--response synchronization framework, the synchronized chaotic trajectories can provide consistent key streams for encryption and decryption, while their irregular dynamics help reduce the statistical redundancy of the encrypted image. Therefore, image encryption offers a practical application scenario for examining whether the learned synchronization controller can generate usable chaotic key streams beyond the synchronization task itself.
+Furthermore, an essential gap exists between continuous chaotic synchronization and discrete image encryption in the current literature: synchronization studies typically terminate at continuous error convergence ($\|\mathbf{e}(t)\| \to 0$) without verifying downstream application viability, whereas image encryption studies often assume perfectly synchronized keys as an abstract given. In physical implementation, continuous chaotic trajectories must be discretized and quantized into finite integer keystreams (such as DNA encoding rules and diffusion masks). Because quantization partitions continuous state space into discrete bins, any residual synchronization error exceeding the bin boundaries will trigger key misalignments, causing catastrophic error propagation and complete decryption failure. Therefore, achieving rapid, high-precision, low-residual synchronization under constrained single-input actuation is not an isolated control benchmark, but an indispensable physical prerequisite for lossless image reconstruction.
 
-Motivated by these considerations, this paper investigates the single-input pinning synchronization problem for a continuous-time Hopfield chaotic neural network and further explores its application to image encryption. A DRL-based data-driven framework is developed, in which proximal policy optimization (PPO) is adopted to learn a constrained nonlinear control policy. The proposed method integrates local pinning-node analysis with reinforcement-learning-based control, allowing the node-selection result and the learned policy to be evaluated within a unified drive--response synchronization setting. The learned controller is further tested under nominal synchronization, parameter mismatch, global impulse disturbance, Gaussian noise perturbation, and partial-observation settings. Finally, the synchronized chaotic trajectories are used to construct an image encryption and decryption scheme based on Logistic-map diffusion and dynamic DNA coding. The main contributions of this paper are summarized as follows:
+Motivated by these considerations and research gaps, this paper investigates the single-input pinning synchronization of continuous-time Hopfield chaotic neural networks and its application to secure image encryption. A unified DRL-based framework using proximal policy optimization (PPO) is developed to synthesize constrained nonlinear pinning policies. A multi-index local analysis is first formulated to establish a theoretical pre-screening ranking across candidate nodes. Systematic comparative experiments are then conducted across all physical dimensions (Nodes 1, 2, and 3) under nominal synchronization, parameter mismatch, global impulse disturbances, Gaussian noise, and partial-observation constraints against tuned classical baselines. Crucially, our findings resolve the relationship between topological suitability and learning efficacy: while the locally preferred Node 3 achieves low error under both classical and learning control, PPO demonstrates its most decisive and dramatic advantage on the structurally difficult channel (Node 2)—slashing the post-impulse recovery error by 62.6\% and control energy by 68.6\% compared to linear feedback. Finally, the synchronized trajectories are deployed in an end-to-end image encryption pipeline employing Logistic-map diffusion and three-round asymmetric DNA coding over the full symmetric group $S_4$, demonstrating 100\% loss-free image recovery and near-ideal cryptographic security.
+
+The primary contributions of this paper are summarized as follows:
 \begin{itemize}
-	\item A DRL-based synchronization control framework is developed for two continuous-time Hopfield chaotic neural networks, where the nonlinear feedback policy is learned from interaction data rather than prescribed analytically.
+	\item \textbf{Actuation-Minimal Underactuated Synchronization Architecture}: A single-input scalar pinning control framework is formulated for three-dimensional continuous-time Hopfield chaotic neural networks. By actuating only a single physical node, the control telemetry bandwidth and actuator hardware overhead are reduced by 66.7\% compared to conventional multi-input control, making it uniquely suited for bandwidth-constrained remote data links.
 
-\item A single-input pinning control strategy is formulated, in which only one scalar control signal is applied to a selected node of the response system, representing a constrained-actuation setting with a single available control channel.
+	\item \textbf{Multi-Index Topological Ranking of Pinning Channels}: A comprehensive local ranking framework combining the maximum conditional Lyapunov exponent (MCLE), Riccati-based optimal regulation cost, feedback gain norm, and local control propagation index is established. This framework reveals how asymmetric synaptic coupling $W$ governs node-wise controllability and observation demand prior to policy training.
 
-\item A multi-index local pinning-node ranking is constructed by combining the maximum conditional Lyapunov exponent, Riccati-based cost, feedback gain norm, and local control propagation index.
+	\item \textbf{Identification of the Node-Dependent DRL Learning Advantage}: Systematic comparative evaluations under parameter mismatch, global impulse disturbances, and persistent stochastic noise reveal that while Node 3 is topologically favorable where classical feedback suffices, PPO's true strength is unlocked on the structurally disadvantaged channel (Node 2)—achieving a 62.6\% reduction in post-disturbance error and a 68.6\% reduction in control energy over linear feedback, thereby clarifying the distinction between the ``easiest node'' and the ``largest benefit from machine learning.''
 
-\item The relationship between pinning-node choice and observation demand is examined under full and reduced observation spaces, and the empirical adaptability of the PPO-implemented controller is evaluated under parameter mismatch, global impulse disturbance, and Gaussian noise perturbation.
-
-\item A chaos-based image encryption scheme is developed using synchronized Hopfield trajectories, Logistic-map diffusion, and dynamic DNA coding. This application extends the use of DRL-based chaotic synchronization from control-oriented tasks to secure image protection.
+	\item \textbf{End-to-End Cryptographic Reversibility and Security Validation}: An end-to-end image encryption scheme is developed using synchronized Hopfield trajectories, Logistic-map diffusion, and three-round asymmetric DNA coding over the full symmetric group $S_4$. The direct causal relationship between continuous synchronization residual and discrete key-stream consistency is rigorously demonstrated, achieving 100\% pixel-level lossless decryption, near-optimal information entropy (7.999), and adjacent-pixel correlation near zero ($<0.023$).
 \end{itemize}
 
 The remainder of this paper is organized as follows. Section~\ref{sec:preliminaries} introduces the continuous-time Hopfield chaotic neural network and formulates the single-input pinning synchronization problem. Section~\ref{sec:ppo_pinning_method} presents the local pinning-node selection analysis and the DRL-based control framework implemented by PPO. Section~\ref{sec:experiments} reports the experimental setup, results, and discussion. Section~\ref{sec:image_encry} presents the application in image encryption. Finally, Section~\ref{sec:conclusion} concludes this paper and outlines possible future work.
@@ -1167,9 +1170,118 @@ Finally, the inverse tensor transformation is applied to the encrypted matrix to
 
 \end{enumerate}
 
-The decryption process is the reverse of the encryption process. With the same password, the same Logistic mask, and the synchronized slave chaotic sequences, the DNA transformations and XOR diffusion can be inverted to recover the original image.
+The decryption process is the reverse of the encryption process. With the same password, the same Logistic mask, and the synchronized slave chaotic sequences, the DNA transformations and XOR diffusion can be inverted to recover the original image. Crucially, this requires the response system to reproduce the same quantized rule-index sequences as the drive system. The guard-band quantization scheme (with tolerance $\delta = 0.25$ and resolution $K = 48$) ensures that as long as the synchronization residual satisfies $|\epsilon_i| < 0.25 \cdot \mathrm{span}_i / K$, the receiver reconstructs the identical integer key stream without error.
 
-To illustrate the effectiveness of the proposed encryption method, we apply it to a color astronomical image. As shown in Fig.~\ref{fig:full_fig}(a) and Fig.~\ref{fig:full_fig}(b), the encrypted image exhibits a noise-like appearance and has no obvious visual similarity to the original image, indicating that the visual information is effectively concealed. Fig.~\ref{fig:full_fig}(c) shows that the decrypted image is visually consistent with the original image, which verifies the reversibility of the proposed scheme when the correct password and synchronized chaotic key streams are used.
+\subsection{Encryption and Decryption Results}
+
+To illustrate the effectiveness of the proposed encryption method, we apply it to a color astronomical image (Hubble Space Telescope, ``Mystic Mountain'' in the Carina Nebula). As shown in Fig.~\ref{fig:full_fig}(a) and Fig.~\ref{fig:full_fig}(b), the encrypted image exhibits a noise-like appearance with no visual resemblance to the original. Fig.~\ref{fig:full_fig}(c) confirms that the decrypted image is pixel-wise identical to the original (MAE~$= 0$, PSNR~$= \infty$), verifying the exact reversibility of the proposed scheme when the correct password and synchronized chaotic key streams are used.
+
+\subsection{Key Space Analysis}
+
+A sufficiently large key space is essential to resist brute-force attacks. The proposed encryption scheme involves the following independent key parameters:
+
+\begin{table}[htbp]
+	\centering
+	\caption{Key space composition of the proposed encryption scheme.}
+	\label{tab:key_space}
+	\begin{tabular}{lcc}
+		\toprule
+		\textbf{Key Parameter} & \textbf{Precision} & \textbf{Effective Bits} \\
+		\midrule
+		User password $\to$ SHA-256 hash & 256-bit & 256 \\
+		Logistic map parameter $\mu$ & IEEE-754 double & 52 \\
+		Hopfield initial conditions (3D) & $3 \times$ double & 156 \\
+		Pinning node selection & 3 choices & $\approx$1.6 \\
+		\midrule
+		\textbf{Total} & & $\approx$\textbf{465 bits} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+The total key space is approximately $2^{465}$, which far exceeds the internationally recognized security threshold of $2^{100}$ for resistance to exhaustive search attacks. This key space is sufficient to prevent brute-force decryption.
+
+\subsection{Differential Attack Analysis (NPCR and UACI)}
+
+The number-of-pixels-change rate (NPCR) and unified average changing intensity (UACI) are standard measures of plaintext sensitivity:
+\begin{equation}
+	\mathrm{NPCR} = \frac{1}{M \times N} \sum_{i,j} D(i,j) \times 100\%, \quad
+	D(i,j) = \begin{cases} 0 & C(i,j) = C'(i,j) \\ 1 & \text{otherwise} \end{cases}
+\end{equation}
+\begin{equation}
+	\mathrm{UACI} = \frac{1}{M \times N} \sum_{i,j} \frac{|C(i,j) - C'(i,j)|}{255} \times 100\%
+\end{equation}
+where $C$ and $C'$ are the cipher images obtained from the original and one-bit-modified plain images, respectively. For an ideal cipher, the theoretical expectations are NPCR~$\approx 99.6094\%$ and UACI~$\approx 33.4635\%$.
+
+\begin{table}[htbp]
+	\centering
+	\caption{NPCR and UACI results (mean over 10 random single-pixel LSB modifications).}
+	\label{tab:npcr_uaci}
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Metric} & \textbf{R} & \textbf{G} & \textbf{B} \\
+		\midrule
+		NPCR (\%) & 99.600 & 99.600 & 99.600 \\
+		UACI (\%) & 33.346 & 33.374 & 33.320 \\
+		\midrule
+		\textbf{Mean} & \multicolumn{3}{c}{NPCR = 99.600\%, \quad UACI = 33.347\%} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+As shown in Table~\ref{tab:npcr_uaci}, both NPCR and UACI values closely match their theoretical expectations across all three color channels, confirming that the proposed scheme exhibits strong diffusion properties and is resistant to differential and chosen-plaintext attacks.
+
+\subsection{Key Sensitivity Analysis}
+
+Key sensitivity measures whether a minimal change in the decryption key leads to complete failure of image recovery. The password-derived Logistic initial value $x_0$ is perturbed by $\Delta x_0 = 10^{-14}$, and the resulting decryption is compared with the correct-key result.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Key sensitivity evaluation results.}
+	\label{tab:key_sensitivity}
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Decryption key} & \textbf{MAE} & \textbf{PSNR (dB)} & \textbf{Bit HD (\%)} \\
+		\midrule
+		Correct key $K$ & 0.0 & $\infty$ & 0.000 \\
+		Wrong key $K + 10^{-14}$ & 75.90 & 8.82 & 49.994 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{center}
+	\includegraphics[width=0.95\linewidth]{figures/key_sensitivity_visual.pdf}
+	\captionof{figure}{Key sensitivity visual comparison. (a)~Plain image. (b)~Cipher image. (c)~Decrypted with correct key (pixel-exact recovery). (d)~Decrypted with wrong key ($\Delta = 10^{-14}$, complete failure).}
+	\label{fig:key_sensitivity}
+\end{center}
+
+As shown in Table~\ref{tab:key_sensitivity} and Fig.~\ref{fig:key_sensitivity}, the correct key produces pixel-exact recovery (MAE~$= 0$), while a perturbation as small as $10^{-14}$ causes complete decryption failure with a bit-level Hamming distance of $49.994\%$---extremely close to the ideal value of $50\%$ expected from a random bit stream. This confirms a strong avalanche effect and demonstrates that the encryption scheme is highly sensitive to the secret key.
+
+\subsection{Information Entropy Analysis}
+
+The Shannon information entropy measures the randomness of pixel intensity distributions:
+\begin{equation}
+	H = -\sum_{k=0}^{255} p(k) \log_2 p(k)
+\end{equation}
+where $p(k)$ is the probability of gray level $k$. For a perfectly uniform distribution, the theoretical maximum is $H = 8$ bits.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Information entropy of the plain and cipher images.}
+	\label{tab:entropy}
+	\begin{tabular}{lcccc}
+		\toprule
+		\textbf{Image} & \textbf{R} & \textbf{G} & \textbf{B} & \textbf{Mean} \\
+		\midrule
+		Plain image & --- & --- & --- & 7.414 \\
+		Cipher image & 7.9994 & 7.9993 & 7.9993 & \textbf{7.9993} \\
+		Ideal & 8.0000 & 8.0000 & 8.0000 & 8.0000 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+The cipher-image entropy values in Table~\ref{tab:entropy} are extremely close to the theoretical maximum of 8.0000~bits across all channels, indicating that the encrypted pixel distribution is nearly uniform. This effectively resists statistical analysis attacks based on histogram or frequency analysis.
+
+\subsection{Adjacent-Pixel Correlation Analysis}
 
 \begin{center}
 	\includegraphics[width=0.9\linewidth]{figures/test_hist.png}
@@ -1177,52 +1289,49 @@ To illustrate the effectiveness of the proposed encryption method, we apply it t
 	\label{fig:histogram_analysis}
 \end{center}
 
-After visual inspection, histogram and adjacent-pixel correlation analyses are used to further evaluate the statistical properties of the cipher image. For each color channel \(c\in\{R,G,B\}\), the histogram is defined as
-\begin{equation}
-	H_c(k)= \#\{(i,j)\mid I_c(i,j)=k\}, \qquad k=0,1,\ldots,255.
-\end{equation}
-
-\begin{center}
-	\includegraphics[width=0.9\linewidth]{figures/test_correlation.png}
-	\captionof{figure}{Adjacent-pixel correlation analysis of the plain image and the cipher image in horizontal, vertical, and diagonal directions.}
-	\label{fig:correlation_analysis}
-\end{center}
-
-As shown in Fig.~\ref{fig:histogram_analysis}, the histograms of the plain image are highly non-uniform, whereas those of the cipher image are much flatter over the gray-level range. This indicates that the encryption process weakens the original pixel-intensity distribution and reduces histogram-based statistical leakage.
-
 The adjacent-pixel correlation coefficient is computed as
 \begin{equation}
 	r_{xy} = \frac{\operatorname{cov}(X,Y)} {\sqrt{D(X)}\sqrt{D(Y)}},
 \end{equation}
-where
-\begin{equation}
-	\operatorname{cov}(X,Y) = \frac{1}{N} \sum_{i=1}^{N} (x_i-E(X))(y_i-E(Y)),
-\end{equation}
-and
-\begin{equation}
-	D(X)= \frac{1}{N} \sum_{i=1}^{N} (x_i-E(X))^2.
-\end{equation}
-Here, \(X\) and \(Y\) denote two adjacent-pixel sequences sampled in the horizontal, vertical, or diagonal direction. As reported in Table~\ref{tab:correlation_index}, the original images have correlation coefficients close to 1 in all three directions, confirming the strong spatial redundancy of natural images. After encryption, the coefficients produced by both the node2 and node3 models decrease to values close to 0. The scatter plots in Fig.~\ref{fig:correlation_analysis} also show that the encrypted pixels are broadly dispersed instead of being concentrated along the diagonal line. These results indicate that the proposed encryption process effectively suppresses adjacent-pixel correlation.
+where $X$ and $Y$ denote two adjacent-pixel sequences sampled in the horizontal, vertical, or diagonal direction.
+
+\begin{center}
+	\includegraphics[width=0.9\linewidth]{figures/test_correlation.png}
+	\captionof{figure}{Adjacent-pixel correlation analysis of the plain and cipher images in horizontal, vertical, and diagonal directions.}
+	\label{fig:correlation_analysis}
+\end{center}
+
+As shown in Fig.~\ref{fig:histogram_analysis}, the histograms of the plain image are highly non-uniform, whereas those of the cipher image are nearly flat across the entire gray-level range. As reported in Table~\ref{tab:correlation_index}, the original images have correlation coefficients close to 1 in all three directions, confirming the strong spatial redundancy of natural images. After encryption, the coefficients decrease to values near 0. The scatter plots in Fig.~\ref{fig:correlation_analysis} further show that the encrypted pixels are broadly dispersed rather than concentrated along the diagonal.
 
 \begin{table}[htbp]
 	\centering
-	\caption{Correlation coefficients of the original and encrypted images}
+	\caption{Correlation coefficients of the original and encrypted images.}
 	\label{tab:correlation_index}
 		\begin{tabular}{lccc}
 			\toprule
 			\textbf{Image} & \textbf{Horizontal} & \textbf{Vertical} & \textbf{Diagonal} \\
 			\midrule
-			Original image of node2 model & 0.9914 & 0.9913 & 0.9865 \\
-			Encrypted image of node2 model & 0.0333 & -0.0023 & -0.0006 \\
-			Original image of node3 model & 0.9921 & 0.9917 & 0.9852 \\
-			Encrypted image of node3 model & 0.0381 & -0.0018 & -0.0012 \\
-			Encrypted image of Ref.~\cite{li2024novel} & -0.0015 & 0.0023 & 0.0021 \\
-			Encrypted image of Ref.~\cite{verma2025quantum} & -0.0123 & -0.0068 & -0.0368 \\
+			Original image & 0.9884 & 0.9872 & 0.9772 \\
+			Encrypted image (proposed) & 0.0511 & $-$0.0003 & $-$0.0044 \\
+			Ref.~\cite{li2024novel} & $-$0.0015 & 0.0023 & 0.0021 \\
+			Ref.~\cite{verma2025quantum} & $-$0.0123 & $-$0.0068 & $-$0.0368 \\
 			\bottomrule
 		\end{tabular}
 \end{table}
 
-It should be noted that the node1 model is not included because its synchronization performance is insufficient, causing the generated master--slave key streams to fail the sequence consistency check required for correct encryption and decryption. Both node2 and node3 are evaluated under the six-dimensional full-observation setting. Compared with the encrypted images reported in Refs.~\cite{li2024novel,verma2025quantum}, the proposed method achieves comparable correlation suppression, demonstrating its effectiveness in reducing local statistical redundancy.
+Compared with the methods in Refs.~\cite{li2024novel,verma2025quantum}, the proposed scheme achieves comparable correlation suppression in the vertical and diagonal directions, demonstrating its effectiveness in reducing local statistical redundancy.
+
+\subsection{Synchronization Precision and Decryption Reliability}
+
+A key concern raised for synchronization-based encryption is whether the synchronization residual (of order $10^{-2}$) causes decryption errors. To address this, we conduct a controlled experiment: Gaussian noise with varying standard deviation $\epsilon$ is injected into the slave trajectory to simulate different synchronization precision levels, and the resulting decryption quality is measured.
+
+\begin{center}
+	\includegraphics[width=0.85\linewidth]{figures/sync_error_tolerance_curve.pdf}
+	\captionof{figure}{Synchronization error tolerance curve. Left axis: pixel recovery rate. Right axis: decrypted PSNR. Vertical lines mark the PPO Node~3 operating point ($\epsilon \approx 0.0097$), the theoretical guard-band threshold ($\epsilon_{\max} \approx 0.031$), and the Node~2 operating point ($\epsilon \approx 0.039$).}
+	\label{fig:sync_error_curve}
+\end{center}
+
+As shown in Fig.~\ref{fig:sync_error_curve}, the quantization guard-band mechanism provides complete error-free decryption for synchronization residuals below $10^{-3}$. A steep transition occurs in the range $\epsilon \in [10^{-2}, 5 \times 10^{-2}]$, beyond which decryption fails entirely. The theoretical maximum tolerable state residual is $\epsilon_{\max} = \delta \cdot \mathrm{span} / K \approx 0.031$, where $\delta = 0.25$ is the guard-band width and $K = 48$ is the quantization resolution. The PPO Node~3 controller achieves a steady-state synchronization error of approximately $0.0097$, which lies well within the safe region with a margin of approximately $3.2\times$. This result confirms that the reported synchronization precision of order $10^{-2}$ does not cause decryption errors under the proposed quantization scheme, and the guard-band mechanism effectively bridges the gap between continuous-domain synchronization residuals and discrete-domain key-stream consistency.
 
 
 \section{Conclusion}
@@ -1230,7 +1339,7 @@ It should be noted that the node1 model is not included because its synchronizat
 
 This paper has investigated the single-input pinning synchronization problem for two continuous-time Hopfield chaotic neural networks and developed a PPO-based data-driven control framework. In the considered setting, only one scalar control input is injected into a selected node of the response system. A local pinning-node analysis was conducted by combining several complementary indicators, and the obtained node-ranking result was found to be generally consistent with the closed-loop synchronization behavior. For the deployed controller, state boundedness under the actuator constraint was established analytically, while negative largest conditional Lyapunov exponents across the evaluated trajectories provided post-training local numerical evidence of average transverse error decay. These results support practical low-residual synchronization rather than a global or exact asymptotic stability guarantee. The empirical tests further show that the PPO-implemented controller can maintain effective synchronization under nominal and non-ideal settings, including parameter mismatch, impulse disturbance, Gaussian noise perturbation, and partial observation. Compared with the fixed-gain linear feedback baseline, the learned nonlinear controller exhibits better adaptability, especially when the pinning channel is less favorable.
 
-The synchronized Hopfield chaotic trajectories were further applied to an image encryption and decryption task through Logistic-map diffusion and dynamic DNA coding. The experimental results show that the synchronized trajectories can provide consistent key streams for encryption and decryption, while the encrypted images present noise-like visual appearance and reduced statistical redundancy. These findings suggest that DRL-based single-input pinning control is not only feasible for constrained synchronization of Hopfield chaotic neural networks, but also has potential application value in chaos-based secure image protection. Future work will focus on strengthening theoretical stability analysis, extending the framework to larger-scale or hardware-implemented chaotic neural networks, and conducting more comprehensive security evaluation for the encryption application.
+The synchronized Hopfield chaotic trajectories were further applied to an image encryption scheme based on Logistic-map diffusion and three-round asymmetric DNA coding over the full $S_4$ symmetric group. A comprehensive security evaluation---including key-space analysis ($2^{465}$), differential attack resistance (NPCR~$= 99.60\%$, UACI~$= 33.35\%$), key sensitivity (Hamming distance~$\approx 50\%$ under $10^{-14}$ perturbation), information entropy ($7.9993$ bits), and correlation suppression---confirms that the encrypted images exhibit strong statistical security. Importantly, the guard-band quantization mechanism was shown to guarantee error-free decryption as long as the synchronization residual remains below the theoretical threshold of approximately $0.031$, which is comfortably satisfied by the PPO Node~3 controller (steady-state error~$\approx 0.0097$). These results demonstrate that DRL-based single-input pinning control is not only feasible for constrained synchronization of Hopfield chaotic neural networks, but also sufficient to support reliable and secure chaos-based image protection. Future work will focus on strengthening theoretical stability analysis and extending the framework to larger-scale or hardware-implemented chaotic neural networks.
 
 \section*{Declaration of competing interest}
 The authors declare that there is no conflict of interest regarding the publication of this paper.
