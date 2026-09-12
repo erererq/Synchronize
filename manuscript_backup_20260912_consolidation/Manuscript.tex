@@ -878,195 +878,20 @@ Fig.~\ref{fig:partial_observation_comparison} and Table~\ref{tab:partial_observa
 
 With these particular subsets, Node 2 shows a larger degradation than Node 3. However, dimension reduction also changes coordinate composition, so these results alone cannot attribute the degradation to observation dimension. The following matched-dimension comparison examines this distinction.
 
-To separate coordinate composition from input dimension, all three paired subsets $\mathcal O_{ij}=\{x_i,x_j,e_i,e_j\}$, with $ij\in\{12,13,23\}$, are evaluated at each of Nodes 2 and 3. This completes the two-actuator-location by three-paired-subset comparison, not all arbitrary four-coordinate subsets. Each configuration has three independently trained policies with a nominal budget of $4\times10^5$ transitions. Six additional policies complete the previously missing Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$ configurations. All six configurations are evaluated on 20 new common initial conditions, with unchanged dynamics, reward, action bounds, and PPO settings. Every final checkpoint is retained. This evaluation set differs from that in the preceding dimension-reduction comparison.
+\input{comparison_observation_identity.tex}
 
-\begin{table}[pos=htbp,width=\linewidth]
-\centering
-\caption{Complete paired four-dimensional observation comparison at Nodes 2 and 3. Entries are mean $\pm$ sample standard deviation across three training-run means over 20 common initial conditions.}
-\label{tab:observation_identity}
-\small
-\begin{tabular}{cccc}
-\toprule
-Node & Subset & MAE & $E_u$\\
-\midrule
-2 & $\mathcal O_{12}$ & $0.9104\pm0.1312$ & $9.60\pm3.59$\\
-2 & $\mathcal O_{13}$ & $0.6253\pm0.0032$ & $150.68\pm38.64$\\
-2 & $\mathcal O_{23}$ & $0.0866\pm0.0059$ & $9.64\pm0.81$\\
-3 & $\mathcal O_{12}$ & $0.5235\pm0.0115$ & $209.02\pm25.40$\\
-3 & $\mathcal O_{13}$ & $0.0438\pm0.0009$ & $6.85\pm0.39$\\
-3 & $\mathcal O_{23}$ & $0.0771\pm0.0175$ & $142.70\pm154.59$\\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{comparison_sac_observation.tex}
 
-\begin{figure*}[pos=!t,width=\textwidth]
-\centering
-\includegraphics[width=0.92\textwidth]{figures/paired_observation_complete.png}
-\caption{All paired four-dimensional subsets under single-node actuation. Each coordinate pair includes its drive states and error components. Points are individual training-run means over 20 common initial conditions; black marks average the three runs. Both error and energy are shown on logarithmic scales.}
-\label{fig:observation_identity}
-\end{figure*}
+\input{comparison_configuration_selection.tex}
 
-Table~\ref{tab:observation_identity} and Fig.~\ref{fig:observation_identity} confirm the actuator-dependent effect of coordinate composition. Node 2 performs best among these paired subsets with $\mathcal O_{23}$, whereas Node 3 favors $\mathcal O_{13}$ in both mean MAE and energy. The subsets omitting the actuated node's state--error pair, namely Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$, give much larger residuals and energy than these favorable configurations. However, including that pair is not sufficient for low residuals: Node 2/$\mathcal O_{12}$ remains poor. Thus, the identity of the accompanying coordinate also matters. The results identify favorable observation combinations under the common finite-budget learning setup. At Node 3, $\mathcal O_{23}$ also exhibits substantial energy variability across training runs; none is excluded.
-
-To check whether the direction of the observation-subset effect is specific to PPO, a targeted SAC comparison repeats the original-versus-alternative four-dimensional configurations: $\mathcal O_{12}$ versus $\mathcal O_{23}$ at Node 2, and $\mathcal O_{13}$ versus $\mathcal O_{23}$ at Node 3. Each configuration is trained independently in three runs at the same nominal budget of $4\times10^5$ transitions. The SAC settings used in the controller comparison below are unchanged apart from the observation input; no additional tuning or checkpoint selection is performed. All 12 final policies are evaluated deterministically on the same 20 initial conditions as the PPO paired-subset comparison. This check uses nominal dynamics only and does not expand the frozen candidate pool of the subsequent selection example.
-
-\begin{table}[pos=htbp,width=\linewidth]
-\centering\small
-\setlength{\tabcolsep}{3pt}
-\caption{SAC four-dimensional observation cross-check. Each value is mean $\pm$ sample SD across three training-run means over 20 common initial conditions, shared with the PPO paired-subset tests in Table~\ref{tab:observation_identity}.}
-\label{tab:sac_observation_check}
-\begin{tabular}{@{}clcc@{}}
-\toprule
-Node & Subset & MAE & $E_u$ \\
-\midrule
-2 & $\mathcal O_{12}$ & $0.4637\pm0.0659$ & $40.73\pm19.95$ \\
-2 & $\mathcal O_{23}$ & $0.1350\pm0.0101$ & $7.17\pm0.69$ \\
-3 & $\mathcal O_{13}$ & $0.0562\pm0.0067$ & $7.54\pm0.79$ \\
-3 & $\mathcal O_{23}$ & $0.0840\pm0.0059$ & $10.57\pm0.54$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:sac_observation_check} reproduces the direction of the PPO mean-error comparison. At Node 2, replacing $\mathcal O_{12}$ with $\mathcal O_{23}$ reduces SAC MAE from 0.4637 to 0.1350; at Node 3, replacing $\mathcal O_{13}$ with $\mathcal O_{23}$ increases it from 0.0562 to 0.0840. For each node, the same error ordering holds in all three SAC training runs. The agreement across PPO and SAC strengthens the evidence for placement-dependent observation preferences in the tested pairs. The SAC comparison focuses on these original and alternative subsets, complementing the complete paired-subset evaluation performed with PPO.
-
-Control effort remains algorithm dependent. The Node 2 substitution reduces SAC energy from 40.73 to 7.17, whereas PPO energy changes little on average (9.60 to 9.64). At Node 3, energy increases for both algorithms, but the SAC increase (7.54 to 10.57) is much smaller than the PPO increase (6.85 to 142.70), which includes substantial training-run variability. Mean error ordering therefore transfers more consistently than the magnitude of the effort penalty. All 240 SAC test trajectories remained within the state-protection boundary.
-
-To illustrate how measured performance can inform a resource-constrained choice, an offline screening example uses a prespecified eight-candidate pool, fixed before the paired-subset completion. A candidate $c$ specifies the actuated node and its observation subset. The pool comprises Nodes 2 and 3, each with local two-dimensional observations, the original four-dimensional subset ($\mathcal O_{12}$ at Node 2 and $\mathcal O_{13}$ at Node 3), $\mathcal O_{23}$, and full six-dimensional observations. Each candidate retains all three training runs; configuration selection therefore accounts for variability across the retained runs. The allowed actuator set may be $\{2,3\}$, $\{2\}$, or $\{3\}$. The subsequently evaluated Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$ configurations are outside this frozen pool; the complete paired-subset comparison and this limited selection example answer different questions.
-
-For a trajectory, let $z$ be the sample mean of $\|\mathbf e(t)\|_1$ over the final interval $16\leq t\leq20$. A trajectory passes when $z\leq\varepsilon$ and no state-protection boundary is reached. For training run $r$, its validation pass fraction is
-\begin{equation}
- \widehat p_{c,r}(\varepsilon)
- =\frac{1}{n_v}\sum_{\ell=1}^{n_v}
- \mathbf 1\{z_{c,r,\ell}\leq\varepsilon,\ g_{c,r,\ell}=0\},
- \label{eq:configuration_pass}
-\end{equation}
-where $g$ counts state-protection boundary hits. A candidate is feasible only if $\min_r\widehat p_{c,r}\geq0.90$. Among feasible candidates with allowed actuation, the rule first minimizes observation dimension and then validation mean applied energy $E_u$. Remaining ties are resolved by a fixed candidate ordering. If none is feasible, no configuration is selected. This lexicographic preference prioritizes feedback dimension as the structural resource measure.
-
-The rule uses 20 new common validation initial conditions and 40 separate common test initial conditions drawn from the original initial-state distribution. The illustrative tolerances $\varepsilon\in\{0.01,0.05,0.10\}$ were informed by the preceding experiments and fixed before this validation. They serve as illustrative design targets for the screening example. Choices were recorded before evaluating the selected configurations on the test set, with no test-based reselection. Dynamics, nominal parameters, action bounds, and frozen policies were unchanged.
-
-\begin{table*}[pos=!t,width=\textwidth]
-\centering
-\caption{Validation-selected configurations and independent-initial-condition tests. Test pass fractions are the minimum across three training runs, each evaluated on the same 40 test initial conditions. Error and energy average initial conditions and runs. A dash denotes no selection and hence no corresponding test; grouped tolerances have identical outcomes.}
-\label{tab:configuration_selection}
-\small
-\begin{tabular}{cccccc}
-\toprule
-Allowed nodes & $\varepsilon$ & Selected node / observations & Test pass & Test $z$ & Test $E_u$\\
-\midrule
-$\{2,3\}$ & 0.01 & -- & -- & -- & --\\
-$\{2,3\}$ & 0.05, 0.10 & $3\,/\,\mathcal O_{13}$ & 100\% & 0.0086 & 5.03\\
-$\{2\}$ & 0.01, 0.05 & -- & -- & -- & --\\
-$\{2\}$ & 0.10 & $2\,/\,\mathcal O_{23}$ & 100\% & 0.0282 & 8.11\\
-$\{3\}$ & 0.01 & -- & -- & -- & --\\
-$\{3\}$ & 0.05, 0.10 & $3\,/\,\mathcal O_{13}$ & 100\% & 0.0086 & 5.03\\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-Table~\ref{tab:configuration_selection} translates the observation comparison into conditional design choices. With either node available, the original four-dimensional Node 3 configuration is selected at tolerances 0.05 and 0.10. When actuation is restricted to Node 2, the alternative four-dimensional subset is selected at 0.10. Both selected configurations pass every test trajectory at their respective selected tolerances. No candidate in the prespecified pool meets the validation criterion at 0.01. No state-protection boundary is reached in the 480 validation or 240 test trajectories.
-
-The per-run criterion prevents aggregate averages from masking inconsistent training outcomes. At tolerance 0.05, the alternative Node 2 subset has validation pass fractions of 100\%, 75\%, and 100\%; it is rejected despite an aggregate fraction above 90\%. The local two-dimensional Node 3 policies likewise yield 100\%, 0\%, and 100\% at both 0.05 and 0.10. The resource priority affects the choice: at Node 2, the selected four-dimensional configuration has validation mean energy 11.76 versus 10.93 for six dimensions. The preference must therefore reflect the intended resource priority.
-
-The selection procedure links nominal accuracy to resource preference within the fixed candidate pool, with validation on held-out initial conditions. Pass fractions describe the tested policies and sampled initial conditions; population-level reliability and transfer to newly trained policies require further validation. The tail-mean criterion measures average late-stage accuracy, whereas pointwise error limits and application-specific recovery requirements call for their own acceptance criteria. Shared initial conditions provide paired comparisons across policies.
-
-To check the dependence of this selection example on the resource preference, a post-hoc analysis reuses only the original eight-candidate validation data, varying the minimum per-run pass fraction over 80\%, 90\%, and 100\%, and comparing dimension-first with energy-first ranking. Changing the pass-fraction requirement does not change any choice at the tested error tolerances. The ranking preference matters when only Node 2 is allowed at $\varepsilon=0.10$: dimension-first selects $\mathcal O_{23}$, whereas energy-first selects full observations. All other choices are unchanged. This provides a post-hoc assessment of preference sensitivity using the validation data. The subsequently completed paired subsets are not retroactively inserted into the original candidate set or its frozen choices.
-
-We then examine whether the nominal choices retain their requested accuracy when response parameters change. The original selected Node 2/$\mathcal O_{23}$ and Node 3/$\mathcal O_{13}$ policies are frozen and evaluated at their respective tolerances 0.10 and 0.05. For 40 new common initial conditions, response weights are set to $W_r=W\odot(1+\eta U)$, where each entry of $U$ is sampled uniformly from $[-1,1]$ and $\eta\in\{0,0.01,0.03,0.05\}$. The drive system is unchanged. Each initial condition uses the same mismatch direction across amplitudes and policies; an independent random stream preserves identical initial states. Zero weights remain zero. No retraining or configuration reselection is performed.
-
-\begin{table*}[pos=!t,width=\textwidth]
-\centering
-\caption{Frozen selected configurations under response-weight mismatch. Pass fractions are the minimum across three training runs, each evaluated on the same 40 new initial conditions. Mean tail error $z$ and energy $E_u$ average runs and initial conditions. Pass fractions track each configuration against its own previously fixed tolerance.}
-\label{tab:configuration_transfer}
-\small
-\begin{tabular}{cccccc}
-\toprule
-Configuration & $\varepsilon$ & $\eta$ & Minimum pass & Mean $z$ & Mean $E_u$\\
-\midrule
-$2/\mathcal O_{23}$ & 0.10 & 0\% & 100.0\% & 0.0266 & 10.08\\
-$2/\mathcal O_{23}$ & 0.10 & 1\% & 97.5\% & 0.0402 & 10.11\\
-$2/\mathcal O_{23}$ & 0.10 & 3\% & 57.5\% & 0.0942 & 10.20\\
-$2/\mathcal O_{23}$ & 0.10 & 5\% & 35.0\% & 0.1571 & 10.39\\
-$3/\mathcal O_{13}$ & 0.05 & 0\% & 100.0\% & 0.0084 & 5.84\\
-$3/\mathcal O_{13}$ & 0.05 & 1\% & 97.5\% & 0.0181 & 5.85\\
-$3/\mathcal O_{13}$ & 0.05 & 3\% & 75.0\% & 0.0455 & 5.91\\
-$3/\mathcal O_{13}$ & 0.05 & 5\% & 42.5\% & 0.0743 & 6.01\\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-Table~\ref{tab:configuration_transfer} shows that both configurations retain a minimum pass fraction of 97.5\% at 1\% relative mismatch, but fall below the original 90\% requirement at 3\% and 5\%. No state-protection boundary is reached in these 960 trajectories. The drop in pass fraction identifies the sensitivity of the frozen configurations to larger response-weight deviations and motivates incorporating the intended parameter range into configuration validation.
-
-
-Having examined which feedback variables to retain under single-node actuation, we next assess the complementary resource choice: the number of actuators. To quantify the performance cost of restricting actuation to one node, nominal PPO synchronization is evaluated for every nonempty subset of the three nodes: $\{1\}$, $\{2\}$, $\{3\}$, $\{1,2\}$, $\{1,3\}$, $\{2,3\}$, and $\{1,2,3\}$. For a subset $\mathcal S$, the input matrix contains the corresponding columns of $I_3$, and the policy produces $|\mathcal S|$ actions. The six-dimensional observation, error-only reward, initial-state distribution, RK4 integration, policy hidden layers, PPO hyperparameters, and nominal training budget of $4\times10^5$ transitions are unchanged. Each configuration includes three independent training runs and is evaluated on 20 common test initial conditions. All seven configurations and all three final checkpoints per configuration are reported, including configurations with poor synchronization.
-
-The same per-actuator bound $|u_j|\leq4$ is imposed in every configuration, while $E_u$ sums energy across all active channels. Thus, additional actuators provide both additional control directions and a larger admissible total input magnitude ($\|\mathbf u\|_2\leq4\sqrt{|\mathcal S|}$). The comparison therefore measures the joint effect of additional control directions and increased aggregate control authority. Only nominal synchronization is tested in this ablation. Actuator count quantifies the structural actuation requirement.
-
-\begin{table}[pos=htbp,width=\linewidth]
-\centering\small
-\setlength{\tabcolsep}{4pt}
-\caption{Nominal PPO ablation over all nonempty actuator subsets. Each configuration uses three final policies and 20 common test initial conditions per policy. Values are mean $\pm$ SD across training-seed means; energy is summed over all active inputs.}
-\label{tab:multi_input_comparison}
-\begin{tabular}{@{}ccccc@{}}
-\toprule
-Controlled nodes & Inputs & MAE & Steady L1 error & $E_u$ \\
-\midrule
-$\{1\}$ & 1 & $1.3937 \pm 0.0029$ & $4.2825 \pm 0.1571$ & $266.49 \pm 13.41$ \\
-$\{2\}$ & 1 & $0.0930 \pm 0.0022$ & $0.0426 \pm 0.0131$ & $9.09 \pm 1.53$ \\
-$\{3\}$ & 1 & $0.0431 \pm 0.0012$ & $0.0091 \pm 0.0033$ & $6.54 \pm 0.34$ \\
-$\{1,2\}$ & 2 & $0.1145 \pm 0.0110$ & $0.0679 \pm 0.0212$ & $20.61 \pm 1.28$ \\
-$\{1,3\}$ & 2 & $0.0232 \pm 0.0007$ & $0.0119 \pm 0.0019$ & $10.93 \pm 0.12$ \\
-$\{2,3\}$ & 2 & $0.0205 \pm 0.0011$ & $0.0141 \pm 0.0040$ & $8.15 \pm 0.27$ \\
-$\{1,2,3\}$ & 3 & $0.0118 \pm 0.0007$ & $0.0105 \pm 0.0026$ & $10.91 \pm 0.17$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[pos=htbp,width=\linewidth]
-  \centering
-  \includegraphics[width=0.96\linewidth]{figures/multi_input_matched_budget.pdf}
-  \caption{Nominal synchronization error and total control energy for all actuator subsets. Each colored point is a training-seed mean over 20 common test initial conditions; black horizontal marks denote the mean across three seeds. Blue, orange, and green indicate one, two, and three actuators, respectively.}
-  \label{fig:multi_input_comparison}
-\end{figure}
-
-Table~\ref{tab:multi_input_comparison} and Fig.~\ref{fig:multi_input_comparison} quantify the tradeoff. Single-node control at Node 3 gives MAE 0.0431 and energy 6.54, whereas $\{2,3\}$ gives 0.0205 and 8.15 and $\{1,2,3\}$ gives 0.0118 and 10.91. Thus, one actuator retains low-residual synchronization with lower measured energy, but incurs a higher full-horizon error than these multi-input configurations. The steady L1 error does not decrease monotonically with actuator count: it is 0.0091 for $\{3\}$, compared with 0.0141 for $\{2,3\}$ and 0.0105 for $\{1,2,3\}$. Full-horizon accuracy and steady-state precision thus capture different consequences of increasing actuator availability.
-
-The $\{1,2\}$ configuration has higher MAE and energy than $\{2\}$ under the fixed training budget, while configurations containing Node 3 perform better in full-horizon MAE. This emphasizes the effect of actuator placement and finite-budget policy optimization. Although adding an actuator enlarges the admissible control set, exploiting that flexibility also depends on policy optimization within the available training budget. These results quantify the accuracy--effort tradeoff of single-input control as a resource-constrained design choice.
+\input{comparison_multi_input.tex}
 
 \subsection{Controller Comparison and Robustness Assessment}
 \label{subsec:robustness_tests}
 
 The comparison is interpreted using the validated LQR and SMC settings, together with PPO and the SAC results in Table~\ref{tab:sac_comparison}. We first report LQR weight selection because it changes several controller rankings. The following scenario curves retain the original $R=1$ LQR reference to illustrate sensitivity to disturbance amplitude; their rankings must not be read as comparisons against the selected LQR design.
 
-
-The principal LQR comparison uses a separately validated control weight, rather than relying only on the reference design $Q=I_3$, $R=1$. A sensitivity test fixes $Q=I_3$ and considers $R\in\{0.01,0.1,1,10,100\}$. For each node, $R$ is selected using ten validation initial conditions and the same nominal, $\eta=1$, and impulse normalized-MAE score used for SMC. All five candidate scores are retained in the reproducibility records. Both nodes select $R=0.01$, which is then frozen before evaluating 20 held-out test initial conditions. This error-oriented validation does not penalize measured energy and has access to non-ideal validation scenarios, unlike nominal-only PPO training. The selected value lies at the lower edge of the tested grid and defines the validated LQR setting used here. The historical $R=1$ results and fixed gain $k=8$ are unchanged.
-
-\begin{table}[pos=htbp,width=\linewidth]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\caption{LQR weight sensitivity on held-out tests. Each entry is a mean over 20 initial conditions; PPO additionally averages three training seeds. The selected $R=0.01$ is frozen using separate validation seeds. MAE covers the full horizon, including the impulse scenario.}
-\label{tab:lqr_weight_sensitivity}
-\begin{tabular}{@{}clrrrrrr@{}}
-\toprule
- & & \multicolumn{2}{c}{PPO} & \multicolumn{2}{c}{LQR, $R=1$} & \multicolumn{2}{c}{LQR, $R=0.01$} \\
-Node & Scenario & MAE & $E_u$ & MAE & $E_u$ & MAE & $E_u$ \\
-\midrule
-2 & Nominal & 0.0930 & 9.09 & 0.0907 & 3.78 & 0.0772 & 10.58 \\
-2 & $\eta=2$ & 0.1703 & 11.85 & 0.2330 & 5.58 & 0.1486 & 14.60 \\
-2 & Impulse & 0.4339 & 17.51 & 0.5128 & 9.95 & 0.3368 & 31.23 \\
-2 & $\sigma=0.05$ & 0.2669 & 135.57 & 0.3742 & 11.67 & 0.2427 & 90.27 \\
-\midrule
-3 & Nominal & 0.0431 & 6.54 & 0.0510 & 2.65 & 0.0392 & 4.99 \\
-3 & $\eta=2$ & 0.0656 & 6.44 & 0.0989 & 3.56 & 0.0647 & 5.29 \\
-3 & Impulse & 0.2581 & 18.09 & 0.3330 & 7.49 & 0.2592 & 13.71 \\
-3 & $\sigma=0.05$ & 0.1312 & 69.96 & 0.1826 & 7.11 & 0.1264 & 23.27 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:lqr_weight_sensitivity} shows that the original LQR weighting materially affects the comparison. At Node 2, $R=0.01$ lowers MAE below PPO in all four tested settings. Under mismatch, its MAE and energy are 0.1486 and 14.60, compared with PPO's 0.1703 and 11.85. After the impulse, its mean post-pulse error is 1.5536 versus PPO's 2.0800, with energy 31.23 versus 17.51. Under noise, it improves both MAE (0.2427 versus 0.2669) and energy (90.27 versus 135.57). The selected weighting therefore changes the error ordering obtained with the reference $R=1$ design.
-
-At Node 3, the selected LQR has lower mean error and energy than PPO in the nominal, mismatch, and noise tests. PPO has a slightly lower mean post-impulse error (1.2969 versus 1.3169), but higher energy (18.09 versus 13.71). The recovery means are close, with a clearer difference in energy. The result highlights controller weighting as an important factor in the observed accuracy--effort balance.
+\input{comparison_lqr_sensitivity.tex}
 
 
 After assessing actuator placement and observation availability, the frozen controllers are evaluated under parameter mismatch~\cite{zhang2011weak}. To model uncertainty in the response system, a mismatch is introduced into the weight matrix. Let $W$ be the weight matrix of the drive system. The mismatched weight matrix of the response system is constructed as
@@ -1198,51 +1023,7 @@ At $\sigma=0.05$, the selected LQR gives lower Node 2 mean MAE and energy (0.242
 	\end{tabular}
 \end{table}
 
-
-To assess the dependence of the results on the learning algorithm, soft actor-critic (SAC)~\cite{haarnoja2018soft} is evaluated on the same single-input Node 2 and Node 3 tasks. Both algorithms use the six-dimensional observation $(\mathbf x,\mathbf e)/5$, reward $-0.1\|\mathbf e\|_1$, actuator bound $|u|\leq4$, nominal training dynamics, and final checkpoints at a nominal budget of $4\times10^5$ environment transitions. Three independent training runs and 20 common test initial conditions per seed are used. All checkpoints are retained, and evaluation uses deterministic actions without online learning. The compared test settings are nominal dynamics, mismatch $\eta=2$, the drive-state impulse at $t=10$, and response process noise with $\sigma=0.05$.
-
-Both implementations use two hidden layers of width 64, a learning rate of $3\times10^{-4}$, batch size 128, and discount factor 0.99. PPO uses Tanh hidden activations, four environments with 512 steps per rollout, ten optimization epochs, clip range 0.2, GAE parameter 0.95, and entropy coefficient 0.001. SAC uses ReLU hidden activations, one environment, a replay buffer of $10^5$ transitions, 5,000 initial exploration steps, one gradient update per subsequent transition, target-update coefficient $\tau=0.005$, and automatic entropy adjustment with target entropy $-1$. These settings are fixed across nodes and seeds. The budget matches environment interactions; gradient-update counts and training times follow each algorithm\'s update schedule. The comparison uses these fixed hyperparameter settings.
-
-\begin{table}[pos=htbp,width=\linewidth]
-\centering\small
-\setlength{\tabcolsep}{3pt}
-\caption{PPO and SAC at the same nominal budget of $4\times10^5$ environment transitions. Values are mean $\pm$ sample SD across three training-seed means, each obtained from 20 common test initial conditions. $E_{\mathrm{post}}$ is reported only for the impulse scenario.}
-\label{tab:sac_comparison}
-\begin{tabular}{@{}cllccc@{}}
-\toprule
-Node & Scenario & Method & MAE & $E_u$ & $E_{\mathrm{post}}$ \\
-\midrule
-2 & Nominal & PPO & $0.0930 \pm 0.0022$ & $9.09 \pm 1.53$ & -- \\
-2 & Nominal & SAC & $0.1173 \pm 0.0046$ & $6.27 \pm 0.45$ & -- \\
-2 & $\eta=2$ & PPO & $0.1703 \pm 0.0085$ & $11.85 \pm 1.60$ & -- \\
-2 & $\eta=2$ & SAC & $0.1513 \pm 0.0037$ & $9.31 \pm 0.43$ & -- \\
-2 & Impulse & PPO & $0.4339 \pm 0.0246$ & $17.51 \pm 1.19$ & $2.0800 \pm 0.1451$ \\
-2 & Impulse & SAC & $0.4206 \pm 0.0979$ & $25.20 \pm 9.79$ & $1.9226 \pm 0.5913$ \\
-2 & $\sigma=0.05$ & PPO & $0.2669 \pm 0.0049$ & $135.57 \pm 48.71$ & -- \\
-2 & $\sigma=0.05$ & SAC & $0.2632 \pm 0.0052$ & $86.13 \pm 8.86$ & -- \\
-\midrule
-3 & Nominal & PPO & $0.0431 \pm 0.0012$ & $6.54 \pm 0.34$ & -- \\
-3 & Nominal & SAC & $0.0416 \pm 0.0010$ & $4.60 \pm 0.11$ & -- \\
-3 & $\eta=2$ & PPO & $0.0656 \pm 0.0025$ & $6.44 \pm 0.30$ & -- \\
-3 & $\eta=2$ & SAC & $0.0644 \pm 0.0009$ & $5.07 \pm 0.16$ & -- \\
-3 & Impulse & PPO & $0.2581 \pm 0.0003$ & $18.09 \pm 3.50$ & $1.2969 \pm 0.0070$ \\
-3 & Impulse & SAC & $0.2735 \pm 0.0106$ & $12.62 \pm 0.53$ & $1.3987 \pm 0.0664$ \\
-3 & $\sigma=0.05$ & PPO & $0.1312 \pm 0.0066$ & $69.96 \pm 17.55$ & -- \\
-3 & $\sigma=0.05$ & SAC & $0.1273 \pm 0.0013$ & $50.40 \pm 14.21$ & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[pos=htbp,width=\linewidth]
-  \centering
-  \includegraphics[width=0.96\linewidth]{figures/ppo_sac_matched_budget.pdf}
-  \caption{PPO--SAC comparison at matched environment-transition budgets. Bars show the mean of three training-seed means and error bars show their sample standard deviation. Each seed is evaluated on 20 common initial conditions. The upper panels use full-horizon MAE for every scenario; the separate post-impulse metric is given in Table~\ref{tab:sac_comparison}.}
-  \label{fig:sac_comparison}
-\end{figure}
-
-Table~\ref{tab:sac_comparison} and Fig.~\ref{fig:sac_comparison} show a scenario-dependent comparison. For Node 2, PPO has lower nominal MAE (0.0930 versus 0.1173), but SAC has lower MAE under mismatch $\eta=2$ (0.1513 versus 0.1703) and also lower energy (9.31 versus 11.85). Following the impulse, SAC has lower mean $E_{\mathrm{post}}$ (1.9226 versus 2.0800), but greater variation across training-seed means (SD 0.5913 versus 0.1451) and higher mean energy (25.20 versus 17.51). At $\sigma=0.05$, the mean MAEs are close (0.2632 for SAC and 0.2669 for PPO), while SAC uses less energy.
-
-For Node 3, SAC has slightly lower mean MAE in the nominal, mismatch, and noise tests and lower mean energy in all four settings. PPO achieves lower post-impulse error (1.2969 versus 1.3987), at higher energy. The comparison reveals complementary strengths of the two learning algorithms across operating conditions. PPO is a viable implementation of the constrained pinning framework, while algorithm choice depends on the operating condition and the relative importance of error, variability, and control effort. Means and standard deviations across the three training runs summarize both performance and training variability.
+\input{comparison_sac.tex}
 
 Taken together, the configuration and controller comparisons show that observation composition matters alongside actuator placement. Under the tested PPO training setup, the matched-dimension comparison recovers low residuals at Node 2 without restoring all six inputs, whereas the same alternative subset increases residuals and effort at Node 3. Thus, the original Node 2 degradation cannot be explained by reduced input dimension alone. The targeted SAC check reproduces the direction of the subset-dependent error changes at both nodes, while energy penalties remain algorithm dependent. These within-node comparisons support joint evaluation of sensing and actuation under a common finite training budget. The prespecified-pool selection example in Table~\ref{tab:configuration_selection} gives this finding an operational interpretation: the preferred candidate depends on the allowed actuator location and the requested error tolerance, while stringent requirements may leave no feasible candidate. Its dimension-first ranking makes the resource priority explicit while enforcing the specified accuracy criterion. Post-hoc ranking checks and frozen-policy mismatch tests expose the preference dependence and the limited transfer of nominal accuracy requirements.
 
@@ -1425,74 +1206,7 @@ Here, \(X\) and \(Y\) denote two adjacent-pixel sequences sampled in the horizon
 It should be noted that the node1 model is not included because its synchronization performance is insufficient, causing the generated master--slave key streams to fail the sequence consistency check required for correct encryption and decryption. Both node2 and node3 are evaluated under the six-dimensional full-observation setting. Compared with the encrypted images reported in Refs.~\cite{li2024novel,verma2025quantum}, the proposed method achieves comparable correlation suppression, demonstrating its effectiveness in reducing local statistical redundancy.
 
 
-\FloatBarrier
-\subsection{From Synchronization Error to Discrete Recovery}
-\label{subsec:sync_application_bridge}
-
-The control analysis and image application address different requirements. Section~\ref{subsec:boundedness_local_stability} establishes state boundedness and supplies sampled evidence of local perturbation attenuation, but neither property alone guarantees identical discrete rule streams. For example, rounding 0.49 and 0.51 produces different integers despite their small separation. To make this connection explicit, the following conditional construction is evaluated separately from the preceding legacy image transform and its statistical figures.
-
-Write $h(\mathbf{x})=(x_1,x_2,x_3,x_1x_2+x_3)^{\mathsf T}$. At each block sample $b$, the sender uses a fixed width $\Delta>0$ and forms, componentwise,
-\begin{equation}
-\begin{aligned}
- k_{i,b}&=\left\lfloor h_i(\mathbf{x}_b)/\Delta+\tfrac12\right\rfloor,\\
- r_{i,b}&=h_i(\mathbf{x}_b)/\Delta-k_{i,b},\\
- s_{i,b}&=(k_{i,b}\bmod8)+1.
-\end{aligned}
-\label{eq:bridge_sender}
-\end{equation}
-The receiver receives the aligned centering offsets $r_{i,b}$ as auxiliary information, not the sender's integers, and computes
-\begin{equation}
-\widehat k_{i,b}=\left\lfloor h_i(\mathbf{y}_b)/\Delta-r_{i,b}+\tfrac12\right\rfloor,
-\quad \widehat s_{i,b}=(\widehat k_{i,b}\bmod8)+1.
-\label{eq:bridge_receiver}
-\end{equation}
-
-\begin{proposition}[Conditional discrete agreement and recovery]
-\label{prop:discrete_recovery}
-Assume aligned samples, exact arithmetic, unaltered auxiliary information, and the same byte mask at both ends. If
-\begin{equation}
- D=\max_b\|h(\mathbf{y}_b)-h(\mathbf{x}_b)\|_\infty<\Delta/2,
-\label{eq:bridge_stream_condition}
-\end{equation}
-then all reconstructed rule indices equal the sender's indices. Any blockwise bijective substitution indexed by these rules is exactly reversible. In particular, if $|x_{j,b}|,|y_{j,b}|\leq M$ for $j=1,2$ and $\max_b\|\mathbf{y}_b-\mathbf{x}_b\|_\infty\leq\varepsilon$, a sufficient state-error condition is $(2M+1)\varepsilon<\Delta/2$.
-\end{proposition}
-
-\begin{proof}
-Substituting~\eqref{eq:bridge_sender} into~\eqref{eq:bridge_receiver} gives $\widehat k_{i,b}=k_{i,b}+\lfloor (h_i(\mathbf{y}_b)-h_i(\mathbf{x}_b))/\Delta+1/2\rfloor$. Under~\eqref{eq:bridge_stream_condition}, the last floor is zero. Thus $\widehat s_{i,b}=s_{i,b}$; inverse substitution followed by XOR with the identical mask recovers each original byte. For the state-error condition, let $\mathbf{e}_b=\mathbf{y}_b-\mathbf{x}_b$. The fourth-stream difference is $y_{2,b}e_{1,b}+x_{1,b}e_{2,b}+e_{3,b}$, whose magnitude is at most $(2M+1)\varepsilon$; the other three differences are bounded by $\varepsilon$.
-\end{proof}
-
-State boundedness supplies finite amplitude bounds, but the required uniform $\varepsilon$ is not proved for PPO in Section~\ref{subsec:boundedness_local_stability}. Accordingly, the application condition is checked on the collected trajectories, not inferred from a negative Lyapunov estimate or a mean error. In finite precision, a positive margin must also cover stream-evaluation, offset-storage, and rounding errors: if the total normalized arithmetic perturbation is bounded by $\tau$, the sufficient condition becomes $D/\Delta+\tau<1/2$.
-
-\paragraph{Common-pipeline check.}
-The separate prototype replaces repeated filtering with~\eqref{eq:bridge_sender}--\eqref{eq:bridge_receiver}. To prevent serial DNA maps from cancelling, each of the four rule streams selects a permutation on a different two-bit lane of each byte; decryption uses its inverse. The eight permutations are the first eight lexicographically ordered derangements of $(0,1,2,3)$, representing four DNA symbols. Exhaustive checks verified all $8^4=4096$ byte maps and their inverses. The original XOR mask is retained only to isolate the functional effect of rule agreement.
-
-PPO and the fixed-gain, LQR, and SMC baselines use the same nominal environment, initial seeds, input limits, and image pipeline, without retraining or retuning. The check uses a $128\times128$ version of the source image, $8\times8$ blocks, $\Delta=1$, and 256 consecutive samples after 1,500 control intervals. Three independently trained PPO policies are each tested from three common initial conditions (nine trials per node); each deterministic baseline uses the same three initial conditions (three trials). No state guard was activated. Direct rounding and reconciliation use the same sender rules, substitutions, masks, and trajectories; only receiver rule reconstruction changes.
-
-\begin{table}[pos=htbp,width=\linewidth]
-\centering\small
-\setlength{\tabcolsep}{3pt}
-\caption{Functional connection check, separate from the legacy image statistics. $D_{\max}$ is the largest four-stream error across trials. Mismatch is the mean rule mismatch percentage; recovery counts denote exact pixelwise recovery. D/R denotes direct rounding/reconciliation.}
-\label{tab:sync_application_bridge}
-\begin{tabular}{@{}clccc@{}}
-\toprule
-Node & Method & $D_{\max}$ & \makecell{Mismatch (\%)\\D/R} & \makecell{Recovery\\D/R}\\
-\midrule
-2 & PPO & 0.1265 & 1.563/0 & 0/9; 9/9\\
-2 & Fixed & 8.5900 & 73.307/70.671 & 0/3; 0/3\\
-2 & LQR & 0 & 0/0 & 3/3; 3/3\\
-2 & SMC & 0 & 0/0 & 3/3; 3/3\\
-3 & PPO & 0.0360 & 0.347/0 & 0/9; 9/9\\
-3 & Fixed & 0 & 0/0 & 3/3; 3/3\\
-3 & LQR & 0 & 0/0 & 3/3; 3/3\\
-3 & SMC & 0 & 0/0 & 3/3; 3/3\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:sync_application_bridge} shows that the tested PPO residuals satisfy the four-stream condition, yet direct rounding still creates mismatched rules. Reconciliation removes these mismatches and gives zero image error in all 18 PPO trials. The same mechanism also works for the successful traditional controllers; the displayed zero stream errors mean identical stored floating-point samples, not a mathematical finite-time synchronization theorem. Node 2 fixed-gain feedback fails the condition and does not recover the image in these tests. These results connect measured synchronization quality to discrete recovery without establishing a PPO-specific encryption advantage or a population reliability rate.
-
-\paragraph{Scope and communication cost.}
-This construction requires aligned auxiliary offsets; their compact JSON representation is approximately 20.7 kB per tested image, about 42\% of the uncompressed image bytes. Their information leakage has not been bounded. The rule digest used to reject disagreements is unkeyed and is not authentication. Passing it is not proof of state synchronization: modulo-eight aliases can preserve the rules even outside~\eqref{eq:bridge_stream_condition}. Correct recovery is therefore distinct from secrecy, tamper resistance, and secure key agreement. The conditional proposition does not validate the legacy preprocessing or establish cryptographic security for either image transform.
+\input{sync_application_bridge.tex}
 
 \section{Conclusion}
 \label{sec:conclusion}

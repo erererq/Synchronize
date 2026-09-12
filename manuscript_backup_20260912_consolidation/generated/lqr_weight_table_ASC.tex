@@ -3,7 +3,7 @@
 \normalsize
 \setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{1.15}
-\caption{LQR weight sensitivity on held-out tests. Each entry is a mean over 20 initial conditions; PPO additionally averages three training seeds. The selected $R=0.01$ is frozen using separate validation seeds. MAE covers the full horizon, including the impulse scenario.}
+\caption{Effect of LQR control weighting on synchronization error and control energy. Each entry averages 20 test initial conditions; PPO additionally averages three independent training runs. The value $R=0.01$ is selected using separate validation initial conditions and kept fixed during testing. MAE covers the full simulation interval, including the impulse scenario.}
 \label{tab:lqr_weight_sensitivity}
 \begin{tabular}{@{}clrrrrrr@{}}
 \toprule
