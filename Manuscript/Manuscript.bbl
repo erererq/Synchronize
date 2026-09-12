@@ -5,21 +5,13 @@
 \expandafter\ifx\csname href\endcsname\relax
   \def\href#1#2{#2} \def\path#1{#1}\fi
 
-\bibitem{strogatz2018nonlinear}
-S.~H. Strogatz, Nonlinear Dynamics and Chaos: With Applications to Physics,
-  Biology, Chemistry, and Engineering, 2nd Edition, CRC Press, 2018.
-
-\bibitem{boccaletti2006complex}
-S.~Boccaletti, V.~Latora, Y.~Moreno, M.~Chavez, D.-U. Hwang, Complex networks:
-  structure and dynamics, Physics Reports 424~(4--5) (2006) 175--308.
-
-\bibitem{izhikevich2007dynamical}
-E.~M. Izhikevich, Dynamical Systems in Neuroscience: The Geometry of
-  Excitability and Bursting, MIT Press, 2007.
-
 \bibitem{pecora1990synchronization}
 L.~M. Pecora, T.~L. Carroll, Synchronization in chaotic systems, Physical
   Review Letters 64~(8) (1990) 821--824.
+
+\bibitem{boccaletti2002synchronization}
+S.~Boccaletti, J.~Kurths, G.~Osipov, D.~Valladares, C.~Zhou, The
+  synchronization of chaotic systems, Physics Reports 366~(1-2) (2002) 1--101.
 
 \bibitem{koronovskii2010on}
 A.~Koronovskii, O.~Moskalenko, A.~Hramov, On the use of chaotic synchronization
@@ -97,16 +89,6 @@ H.~Su, L.~Runzi, J.~Fu, M.~Huang, Fixed time stability of a class of chaotic
   systems with disturbances by using sliding mode control, ISA Transactions 118
   (2021) 75--82.
 
-\bibitem{mobayen2018chaos}
-S.~Mobayen, Chaos synchronization of uncertain chaotic systems using composite
-  nonlinear feedback based integral sliding mode control, ISA Transactions 77
-  (2018) 100--111.
-
-\bibitem{li2005impulsive}
-C.~D. Li, X.~F. Liao, X.~Y. Zhang, Impulsive synchronization of chaotic
-  systems, Chaos: An Interdisciplinary Journal of Nonlinear Science 15 (2005)
-  023104.
-
 \bibitem{chen2014pinning}
 G.~Chen, Pinning control and synchronization on complex dynamical networks,
   International Journal of Control, Automation and Systems 12~(2) (2014)
@@ -153,22 +135,16 @@ Z.~Cao, C.~Li, M.-F. Leung, The synchronisation problem of chaotic neural
 R.~S. Sutton, A.~G. Barto, Reinforcement Learning: An Introduction, 2nd
   Edition, MIT Press, 2018.
 
-\bibitem{mnih2015human}
-V.~Mnih, K.~Kavukcuoglu, D.~Silver, A.~A. Rusu, J.~Veness, M.~G. Bellemare,
-  A.~Graves, M.~Riedmiller, A.~K. Fidjeland, G.~Ostrovski, et~al., Human-level
-  control through deep reinforcement learning, nature 518~(7540) (2015)
-  529--533.
-
-\bibitem{carlucho2020adaptive}
-I.~Carlucho, M.~De~Paula, G.~G. Acosta, An adaptive deep reinforcement learning
-  approach for {MIMO} {PID} control of mobile robots, ISA Transactions 102
-  (2020) 280--294.
-
 \bibitem{bucci2019control}
 M.~A. Bucci, O.~Semeraro, A.~Allauzen, G.~Wisniewski, L.~Cordier, L.~Mathelin,
   Control of chaotic systems by deep reinforcement learning, Proceedings of the
   Royal Society A: Mathematical, Physical and Engineering Sciences 475~(2231)
   (2019) 20190351.
+
+\bibitem{carlucho2020adaptive}
+I.~Carlucho, M.~De~Paula, G.~G. Acosta, An adaptive deep reinforcement learning
+  approach for {MIMO} {PID} control of mobile robots, ISA Transactions 102
+  (2020) 280--294.
 
 \bibitem{vashishtha2020restoring}
 S.~Vashishtha, S.~Verma, Restoring chaos using deep reinforcement learning,

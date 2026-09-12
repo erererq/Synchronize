@@ -117,11 +117,11 @@
 \cortext[cor1]{Corresponding authors. E-mail addresses: jiewu20@jiangnan.edu.cn (J. Wu); maruru7271@126.com (R. Ma).}
 
 \begin{abstract}
-We develop a deep reinforcement learning (DRL)-based single-input pinning synchronization control framework for continuous-time Hopfield chaotic neural networks and explore its application to image encryption. In the proposed framework, only one scalar control input is injected into a selected node of the response system, and proximal policy optimization (PPO) is adopted as a representative DRL algorithm to learn the constrained nonlinear control policy. To support pinning-node selection, a multi-index local analysis is performed, and the drive--response synchronization process is formulated as a continuous-state and continuous-action reinforcement learning problem. Numerical results show that the local node ranking is generally consistent with the closed-loop synchronization behavior. Under the more challenging Node 2 pinning channel, PPO reduces the post-impulse mean error and control energy by approximately 62.6\% and 68.6\%, respectively, relative to the fixed-gain linear feedback baseline. A post-training trajectory assessment further yields negative largest conditional Lyapunov exponents for all evaluated Node 2 and Node 3 closed-loop trajectories, providing local numerical evidence of average transverse error decay. Based on the synchronized chaotic trajectories, an image encryption and decryption scheme is constructed using Logistic-map diffusion and dynamic DNA coding. Statistical analysis shows that the encrypted images exhibit reduced statistical redundancy. These results support the feasibility of DRL-based single-input pinning control for practical low-residual synchronization under constrained actuation and limited observation.
+With a single bounded actuator, chaotic synchronization depends not only on where the input is applied but also on which variables are available to the controller. This study examines this relationship in a continuous-time Hopfield network using proximal policy optimization (PPO) as a common feedback-learning method. Under this PPO setup, a complete comparison of the three paired four-dimensional subsets at two actuator locations shows that observation composition matters alongside actuator placement: replacing one four-dimensional subset markedly improves Node 2, but increases residuals and control effort at Node 3. A targeted SAC check reproduces the direction of the observation-subset error changes at both nodes. An accuracy-constrained screening example illustrates choices within a prespecified candidate pool and checks the selected configurations on held-out initial conditions. Evaluation of all actuator subsets then quantifies the accuracy and control-effort consequences of restricting actuation. Favorable multi-input configurations improve full-horizon accuracy relative to single-input Node 3, but do not uniformly improve steady-state precision. Comparisons with fixed-gain feedback, linear quadratic regulation, sliding-mode control, and soft actor-critic reveal condition-dependent performance and effort tradeoffs across the tested operating conditions. Local indicators support candidate screening; analytical state boundedness and post-training finite-time and multi-step sensitivity checks address distinct properties of the sampled closed loop. Synchronized chaotic trajectories are also used in an image encryption and decryption scheme combining Logistic-map masking and dynamic DNA coding, with statistical analyses indicating reduced image redundancy. The control results provide a network-specific assessment of actuator-dependent observation sensitivity and the performance cost of limited actuation.
 \end{abstract}
 
 \begin{keywords}
-Image encryption  \sep
+Image encryption \sep
 Synchronization \sep
 Deep reinforcement learning \sep
 Neural network
@@ -156,6 +156,8 @@ The primary contributions of this paper are summarized as follows:
 	\item \textbf{End-to-End Cryptographic Reversibility and Security Validation}: An end-to-end image encryption scheme is developed using synchronized Hopfield trajectories, Logistic-map diffusion, and three-round asymmetric DNA coding over the full symmetric group $S_4$. The direct causal relationship between continuous synchronization residual and discrete key-stream consistency is rigorously demonstrated, achieving 100\% pixel-level lossless decryption, near-optimal information entropy (7.999), and adjacent-pixel correlation near zero ($<0.023$).
 \end{itemize}
 
+These empirical contributions are supported by an analytical state-boundedness result and numerical sensitivity checks for the deployed sample-and-hold policies. Together, these results provide an analytical foundation for bounded trajectories and numerical evidence for the behavior of the deployed policies.
+
 The remainder of this paper is organized as follows. Section~\ref{sec:preliminaries} introduces the continuous-time Hopfield chaotic neural network and formulates the single-input pinning synchronization problem. Section~\ref{sec:ppo_pinning_method} presents the local pinning-node selection analysis and the DRL-based control framework implemented by PPO. Section~\ref{sec:experiments} reports the experimental setup, results, and discussion. Section~\ref{sec:image_encry} presents the application in image encryption. Finally, Section~\ref{sec:conclusion} concludes this paper and outlines possible future work.
 
 \section{Preliminaries}
@@ -174,7 +176,7 @@ Introducing the parameter substitutions $a_i = \frac{1}{R_i C_i}$, $w_{ij} = \fr
 	\dot{\mathbf{x}}(t) = -\mathbf{x}(t) + W \tanh(\mathbf{x}(t)),
 	\label{eq:hopfield_simplified_vector}
 \end{equation}
-where $\mathbf{x}(t) = [x_1(t), x_2(t), x_3(t)]^T$ is the state vector of the system (\ref{eq:hopfield_simplified_vector}). Following the three-neuron Hopfield-type chaotic model studied in~\cite{mahmoud2021analysis}, in this paper, the network weight matrix is specified as
+Here, a node denotes one scalar state coordinate of the Hopfield network, rather than an entire chaotic oscillator. The drive and response are two copies of this network. The state vector is $\mathbf{x}(t) = [x_1(t), x_2(t), x_3(t)]^T$. Following the three-neuron Hopfield-type chaotic model studied in~\cite{mahmoud2021analysis}, in this paper, the network weight matrix is specified as
 \begin{equation}
 	W = \begin{bmatrix}
 		-1.4 & 1.2 & -7.0 \\
@@ -222,14 +224,14 @@ To investigate drive--response synchronization, the Hopfield-type chaotic neural
 	\dot{\mathbf{y}}(t) = -\mathbf{y}(t) + W_r \tanh(\mathbf{y}(t)) + B u(t),
 	\label{eq:response_system}
 \end{equation}
-where $\mathbf{y}(t) \in \mathbb{R}^3$ is the state of the response system; $W_r$ is the weight matrix of the response system, which is allowed to have slight hardware-induced parameter mismatch with respect to $W$; $u(t) \in \mathbb{R}$ is the scalar control input; and $B \in \mathbb{R}^{3 \times 1}$ is the pinning-node selection vector, which determines the specific physical node into which the control signal is injected. Only one of its three components is equal to 1, while the others are 0.
+where $\mathbf{y}(t) \in \mathbb{R}^3$ is the state of the response system; $W_r$ is the weight matrix of the response system, which may differ from $W$ to represent parameter uncertainty; $u(t) \in \mathbb{R}$ is the scalar control input; and $B \in \mathbb{R}^{3 \times 1}$ is the pinning-node selection vector, which determines the specific physical node into which the control signal is injected. Only one of its three components is equal to 1, while the others are 0.
 
 For this parameter setting, the initial condition 
-$\mathbf{x}(0)=(0,0.01,0)^{\mathrm T}$, which has been used as a representative initial state in previous studies on Hopfield chaotic neural networks~\cite{mahmoud2021analysis}, is adopted to illustrate the basic chaotic behavior of the system. The fourth-order Runge--Kutta (RK4) simulation results show that the system exhibits chaotic behavior. To further illustrate the uncontrolled drive--response behavior before applying the proposed pinning controller, two identical Hopfield chaotic neural networks are simulated with the same system parameters but different initial states sampled from $\mathrm{Uniform} ([-1,1]^3)$. As shown in Fig.~\ref{fig:hopfield_basic_dynamics}(a), the two trajectories evolve around the same double-scroll chaotic attractor but do not naturally synchronize.
+$\mathbf{x}(0)=(0,0.01,0)^{\mathrm T}$, which has been used as a representative initial state in previous studies on Hopfield chaotic neural networks~\cite{mahmoud2021analysis}, is adopted to illustrate the basic chaotic behavior of the system. The fourth-order Runge--Kutta (RK4) trajectories illustrate the reported chaotic regime of this model. To further illustrate the uncontrolled drive--response behavior before applying the proposed pinning controller, two identical Hopfield chaotic neural networks are simulated with the same system parameters but different initial states sampled from $\mathrm{Uniform} ([-1,1]^3)$. As shown in Fig.~\ref{fig:hopfield_basic_dynamics}(a), the two trajectories evolve around the same double-scroll chaotic attractor but do not naturally synchronize.
 
-The time-domain trajectories of $x_1(t)$, $x_2(t)$, and $x_3(t)$ obtained from the representative initial condition $\mathbf{x}(0)=(0,0.01,0)^{\mathrm T}$ are shown in Fig.~\ref{fig:hopfield_basic_dynamics}(b). These trajectories exhibit non-periodic oscillatory behaviors, further indicating the chaotic dynamical characteristics of the continuous-time Hopfield neural network under the current parameter setting.
+The time-domain trajectories of $x_1(t)$, $x_2(t)$, and $x_3(t)$ obtained from the representative initial condition $\mathbf{x}(0)=(0,0.01,0)^{\mathrm T}$ are shown in Fig.~\ref{fig:hopfield_basic_dynamics}(b). The plotted irregular oscillations illustrate the drive dynamics in the reported chaotic regime.
 
-Define the synchronization error as $\mathbf{e}(t) = \mathbf{y}(t) - \mathbf{x}(t)$. Exact synchronization corresponds to asymptotic stability of the zero solution of the error system~\cite{boccaletti2002synchronization}, whose dynamics are
+Define the synchronization error as $\mathbf{e}(t) = \mathbf{y}(t) - \mathbf{x}(t)$. The ideal objective is vanishing synchronization error~\cite{boccaletti2002synchronization}. Subtracting the drive dynamics from the response dynamics gives
 \begin{equation}
 	\dot{\mathbf{e}}(t) = -\mathbf{e}(t) + W_r \tanh(\mathbf{y}(t)) - W \tanh(\mathbf{x}(t)) + B u(t).
 	\label{eq:error_system_exact}
@@ -240,17 +242,17 @@ The following definition mainly corresponds to the nominal synchronization contr
 	For the drive system~\eqref{eq:hopfield_simplified_vector} and the response system with pinning control~\eqref{eq:response_system}, if under the action of the control law $u(t)$ one has $\lim_{t \to \infty} \| \mathbf{e}(t) \| = 0$, then the systems are said to achieve asymptotic synchronization.
 \end{definition}
 
-This definition provides the ideal exact-synchronization reference. Because the learned policy does not enforce invariance of $\mathbf{e}=\mathbf{0}$ by construction, its achieved behavior is evaluated as practical synchronization with a small residual error, together with the post-training local assessment introduced in Section~\ref{subsec:boundedness_local_stability}.
+This definition provides the ideal reference. The implemented objective is to reduce synchronization error using a fixed actuator location and bounded input. Here, practical synchronization denotes the observed low-residual behavior over the reported testing windows; it is assessed by full-horizon and terminal error metrics rather than an assumed asymptotic limit. Section~\ref{subsec:boundedness_local_stability} separately examines boundedness and post-training trajectory sensitivity. Full observation is the default, and reduced policy inputs are evaluated as a separate experimental factor.
 
 \section{PPO-Based Single-Input Pinning Control Method}
 \label{sec:ppo_pinning_method}
 
-Deriving an effective control law $u(t)$ for the nonlinear underactuated error system~\eqref{eq:error_system_exact} is challenging, especially under the single-input pinning constraint. Traditional analytical control methods usually rely heavily on accurate mathematical models and carefully designed controller structures. To address this issue, this paper adopts a data-driven DRL framework based on PPO. Before policy learning, a local node-selection analysis is first performed to provide theoretical guidance for choosing the pinning node. Then, the synchronization control problem is formulated as a continuous-state and continuous-action reinforcement learning task.
+The framework has three stages. Local dynamical and control indicators first identify candidate actuator locations. For each tested location, PPO learns a bounded scalar feedback policy from the nominal simulator. Finally, the frozen policy is evaluated using the implemented sampled dynamics, with state boundedness and local trajectory sensitivity treated separately. The indicators inform the choice of channels to investigate; they are not inputs to the policy or terms in the training reward.
 
 \subsection{Local Pinning-Node Selection Analysis}
 \label{subsec:local_node_selection}
 
-To provide theoretical guidance for the selection of a single-input pinning node, this paper analyzes the local properties of the error system in the neighborhood of the synchronization manifold. The local control characteristics of Nodes 1, 2, and 3 are compared from three perspectives: local transverse stability, local linear quadratic regulation cost, and local control propagation capability. It should be emphasized that this analysis is used to establish a local ranking criterion for candidate pinning nodes, rather than to provide a strict global stability proof for the subsequent PPO-based closed-loop policy.
+Candidate nodes are compared using complementary local descriptions: transverse growth under ideal coordinate pinning, the regulation cost of a frozen linear model, and a controllability-volume proxy. These descriptions probe different aspects of actuator placement. They support qualitative screening before nonlinear evaluation, without assigning a combined numerical score.
 
 For the local pinning-node analysis, we first consider the baseline identical-system setting, where the drive and response systems share the same weight matrix, i.e., $W_r=W$, and no external disturbance is imposed. When the synchronization error approaches zero, i.e., $\mathbf{e}\to \mathbf{0}$, the nonlinear term can be expanded to the first order around the synchronization manifold. This gives the following local linear approximation of the error system~\cite{slotine1991applied}:
 \begin{equation}
@@ -295,21 +297,20 @@ For single-input pinning control, different node selections correspond to differ
 \end{equation}
 Here, $B_1$, $B_2$, and $B_3$ represent the cases where the control input is injected into Nodes 1, 2, and 3, respectively.
 
-First, to characterize the evolution tendency of small perturbations in the transverse subspace associated with different pinning nodes, the maximum conditional Lyapunov exponent (MCLE)~\cite{pecora1998master} is introduced as a reference index for local transverse stability. Along the chaotic trajectory of the drive system, the instantaneous Jacobian matrix is evaluated, and a local variational analysis is performed in the transverse subspace complementary to the candidate pinning node. The corresponding MCLE is formally expressed as
+First, the maximum conditional Lyapunov exponent (MCLE)~\cite{pecora1998master} is used under an ideal coordinate-pinning assumption. If the selected error coordinate is constrained to remain identically zero, let $S_i$ contain the two columns of $I_3$ associated with the remaining coordinates. Their variational equation is $\dot{\boldsymbol\zeta}=S_i^{\mathrm T}[-I+WD(\mathbf x(t))]S_i\boldsymbol\zeta$. This idealized reduced system differs from finite-amplitude, full-error feedback through $B_i$. Let $\Psi_i(t,0)$ be the fundamental matrix of this reduced variational system, with $\Psi_i(0,0)=I_2$. Its largest growth rate is expressed as
 \begin{equation}
 	\lambda_{\max}^{(c)}(B_i)
 	=
-	\lim_{t\to\infty}
+	\limsup_{t\to\infty}
 	\frac{1}{t}
 	\ln
-	\frac{\|\delta\mathbf{e}_i(t)\|}
-	{\|\delta\mathbf{e}_i(0)\|},
+	\|\Psi_i(t,0)\|_2,
 	\quad i=1,2,3,
 	\label{eq:mcle}
 \end{equation}
-where $\delta\mathbf{e}_i(t)$ denotes the perturbation trajectory in the transverse subspace complementary to the $i$th candidate pinning node, and $\|\cdot\|$ denotes the vector norm. If $\lambda_{\max}^{(c)}(B_i)<0$, small perturbations in the corresponding transverse subspace tend to decay locally; if $\lambda_{\max}^{(c)}(B_i)>0$, locally divergent directions still exist in that subspace. In this work, the MCLE is used as a local reference index for node pre-screening under the ideal pinning assumption.
+where $\|\cdot\|_2$ is the induced Euclidean matrix norm, so the expression accounts for the most amplified perturbation direction. If $\lambda_{\max}^{(c)}(B_i)<0$, small perturbations in the corresponding transverse subspace tend to decay locally; if $\lambda_{\max}^{(c)}(B_i)>0$, locally divergent directions still exist in that subspace. In this work, the MCLE is used as a local reference index for node pre-screening under the ideal pinning assumption.
 
-Second, to compare the local control difficulty associated with different pinning nodes, a time-invariant local proxy model is further considered. Specifically, the Jacobian matrix is frozen at the reference point $\mathbf{x}=\mathbf{0}$, where $D(\mathbf{0})=I$, leading to $A=W-I$. Based on this local approximation, the linear quadratic regulator (LQR) framework~\cite{willems2003least} is used only as an auxiliary indicator for comparing candidate pinning nodes, rather than as the actual controller used in the nonlinear closed-loop system.
+Second, to compare the local control difficulty associated with different pinning nodes, a time-invariant local proxy model is further considered. Specifically, the Jacobian matrix is frozen at the reference point $\mathbf{x}=\mathbf{0}$, where $D(\mathbf{0})=I$, leading to $A=W-I$. Based on this local approximation, the linear quadratic regulator (LQR) framework~\cite{willems2003least} is used here as an auxiliary indicator for comparing candidate pinning nodes. An LQR controller derived from the same local model is separately included as a model-based baseline in Section~\ref{sec:experiments}.
 
 For each candidate input vector $B_i$, the standard LQR performance index is introduced as
 \begin{equation}
@@ -340,7 +341,7 @@ In this paper, the Riccati-based cost index is defined as
 	J_R(B_i)=\mathrm{tr}(P_i),
 	\label{eq:riccati_cost_index}
 \end{equation}
-which provides an initial-condition-independent relative measure of the local control difficulty associated with the candidate pinning node $B_i$. In addition, the gain norm $\|K_i\|$ is used to measure the required local feedback strength. These indices are used only for relative comparison among candidate nodes under the same local proxy model, rather than as the exact integral optimal cost for a specific initial condition.
+which aggregates the directional costs of the local proxy. For a zero-mean initial error with identity covariance, the expected optimal linear cost is $\mathbb{E}[\mathbf e(0)^{\mathrm T}P_i\mathbf e(0)]=\mathrm{tr}(P_i)$. Thus the index compares nodes under a common state scaling and weighting, while $\|K_i\|$ describes local feedback strength. Their role is to characterize the local linear proxy; the applied effort of the saturated controllers is measured separately in the experiments.
 
 Finally, to measure how effectively the control action propagates from different nodes to the entire local state space, the same frozen local matrix $A=W-I$ is used. Based on this matrix, the controllability matrices corresponding to the three candidate pinning nodes are constructed as~\cite{kailath1980linear}
 \begin{equation}
@@ -362,7 +363,7 @@ Here, $C_i$ characterizes the ability of the control input injected through the 
 	\centering
 	\setlength{\tabcolsep}{3pt}
 	\renewcommand{\arraystretch}{1.12}
-	\caption{Local auxiliary indicators for comparing candidate pinning nodes.}
+	\caption{Local auxiliary indicators for candidate screening. MCLE entries are finite-time estimates from coupled RK4 integration with step 0.0025; the other indices use $A=W-I$, $Q=I_3$, and $R=1$.}
 	\label{tab:local_node_metrics}
 	\begin{tabular}{@{}ccccc@{}}
 		\toprule
@@ -372,35 +373,35 @@ Here, $C_i$ characterizes the ability of the control input injected through the 
 		& $\|K_i\|$ 
 		& $V_i$ \\
 		\midrule
-		Node 1 & +0.6061 & 280.2686 & 20.3937 & 0.479 \\
-		Node 2 & +1.5793 & 15.5170 & 6.7286 & 262.18 \\
-		Node 3 & -0.5853 & 7.8327 & 4.3829 & 290.77 \\
+		Node 1 & +0.5858 & 280.2686 & 20.3937 & 0.479 \\
+		Node 2 & +1.5892 & 15.5170 & 6.7286 & 262.18 \\
+		Node 3 & -0.5890 & 7.8327 & 4.3829 & 290.77 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-Table~\ref{tab:local_node_metrics} shows that different pinning nodes exhibit significantly different local auxiliary indicators in the current continuous-time Hopfield chaotic neural network. For Node 3, $\lambda_{\max}^{(c)}<0$, indicating that under the ideal pinning assumption, small perturbations in the transverse subspace complementary to this node tend to decay overall. Meanwhile, its $J_R$ and $\|K_i\|$ are the smallest and $V_i$ is the largest, suggesting relative advantages in both local control difficulty and control propagation capability. Therefore, Node 3 can be regarded as the preferred single-input pinning candidate for the current system.
+For the MCLE calculation, the drive starts at $(0.5,-0.01,0.2)$ and is integrated for 1000 time units, discarding the first 50. The state and reduced variational equations are integrated together by RK4 with QR renormalization at each step. A step-size check at 0.01, 0.005, and 0.0025 gives ranges $[0.5858,0.5982]$, $[1.5854,1.5900]$, and $[-0.5890,-0.5841]$ for Nodes 1--3, respectively. The signs are unchanged, but the variation cautions against interpreting the displayed digits as certified infinite-time values. The finest-step estimates replace the earlier mixed RK4/Euler estimates.
 
-By contrast, Node 2 has a relatively large $V_i$ and a moderate $J_R$, implying that the control action can still propagate effectively over the local state space. However, its MCLE is positive, indicating that locally divergent directions still exist in the corresponding transverse subspace. Therefore, Node 2 is more suitable as a candidate node with certain control potential but a more challenging synchronization task. Node 1 is clearly less favorable: its MCLE is positive, its $J_R$ and $\|K_i\|$ are both significantly higher than those of the other two nodes, and its $V_i$ is extremely small. This indicates weak local control efficiency and poor control propagation capability.
+Table~\ref{tab:local_node_metrics} shows that Node 3 has a negative ideal-pinning MCLE estimate, the smallest $J_R$ and $\|K_i\|$, and the largest $V_i$. These concordant local indicators motivate its selection as a preferred candidate in this system, subject to nonlinear closed-loop evaluation.
 
-Based on the above theoretical indicators, the following local ranking can be obtained:
+Node 2 has a larger controllability-volume proxy and a lower Riccati cost than Node 1, although its ideal-pinning transverse growth estimate is higher. The indices therefore do not yield an identical ordering of these two channels. Node 1 has the largest Riccati cost and gain norm and the smallest volume proxy; these properties motivate testing it as a less favorable candidate under the common bounded-input learning setup.
+
+The MCLE alone does not order Nodes 1 and 2 in the same way as the other indicators. Node 2 is retained ahead of Node 1 because its Riccati cost and gain norm are substantially smaller and its local volume is larger. This combines the complementary local indicators into a qualitative screening preference. Using $\succ$ to denote screening preference, the resulting qualitative order for this system is
 \begin{equation}
-	\text{Node 3}
-	>
-	\text{Node 2}
-	\gg
-	\text{Node 1}.
+	\text{Node 3}\;\succ\;\text{Node 2}\;\succ\;\text{Node 1}.
 	\label{eq:node_ranking}
 \end{equation}
 
-In summary, among the considered local auxiliary indicators, Node 3 shows the most favorable overall performance, followed by Node 2, whereas Node 1 performs worst. Therefore, for the current continuous-time Hopfield chaotic neural network, Node 3 is identified as the primary candidate for single-input pinning control, while Node 2 is retained as a challenging candidate for further evaluating the adaptability of the learned controller.
+The resulting experimental design retains all three single-node policies for nominal comparison. Node 3 supplies the favorable reference channel, and Node 2 supplies a contrasting channel for the subsequent observation and robustness assessments.
 
-It should be emphasized that the MCLE $\lambda_{\max}^{(c)}$, Riccati-based cost index $J_R$, gain norm $\|K_i\|$, and local control volume index $V_i$ reported in Table~\ref{tab:local_node_metrics} are derived from the locally linearized error system near the synchronization manifold. These indicators provide local guidance for pinning-node selection, but they do not constitute a global stability guarantee for the PPO-based closed-loop policy. Therefore, the PPO experiments in Section~\ref{sec:experiments} are used to empirically examine whether the local ranking can be reflected in actual nonlinear closed-loop synchronization.
+All three frozen controllability matrices have rank three. Accordingly, a positive ideal-pinning MCLE does not imply uncontrollability of $(A,B_i)$ or rule out synchronization by a designed traditional feedback law. The designation ``challenging'' describes relative behavior in this model and the tested constrained controllers, not impossibility of linear control at Node 2.
+
+The ideal-pinning exponent follows the drive trajectory, whereas the Riccati and volume indices freeze the Jacobian at the origin. Their agreement for Node 3 is useful screening evidence, but a broader relation between these proxies and learned performance would require additional networks and parameter settings. Section~\ref{sec:experiments} checks their relevance to the present nonlinear system.
 
 \subsection{PPO-Based Control Formulation and Training Procedure}
 \label{subsec:ppo_control_framework}
 
-After the pinning node is selected, the synchronization process of the drive--response system is formulated as a Markov decision process (MDP) with continuous states and continuous actions. In this formulation, the agent observes the current system information, outputs a bounded continuous action, and receives a reward determined by the synchronization error.
+With fixed nominal parameters, the sampled drive--response state defines a continuous-state, continuous-action Markov decision process. The full observation $(\mathbf x,\mathbf e)$ determines both system states because $\mathbf y=\mathbf x+\mathbf e$. A policy is trained separately for each actuator location; it does not switch the controlled node during an episode. Reduced observations are treated separately in Section~\ref{subsec:node_selection_observation}.
 
 %\begin{figure}[pos=htbp,width=\linewidth]
 %	\centering
@@ -420,27 +421,29 @@ To enable the agent to perceive both the instantaneous dynamical state of the dr
 	\end{bmatrix}^{\mathrm T},
 	\label{eq:observation_space}
 \end{equation}
-where $c_o=5.0$ is a normalization factor used to suppress the influence of extreme state values on neural network training stability. The notation $c_o$ is used here to avoid confusion with the Gaussian noise intensity $\sigma$ used in the robustness experiments.
+where $c_o=5.0$ is the fixed observation scaling used in implementation. The notation $c_o$ is used here to avoid confusion with the Gaussian noise intensity $\sigma$ used in the robustness experiments.
 
-The policy network outputs a raw action $a_t$ constrained to the continuous interval $[-1,1]$. Considering the actuator magnitude limitation, it is mapped to the actual physical control input as
+For PPO, the sampled Gaussian policy action during training, or its deterministic mean during evaluation, is clipped to $[-1,1]$ before deployment. Denoting this clipped action by $a_t$, it is mapped to the physical control input as
 \begin{equation}
 	u(t)=\kappa a_t,
 	\label{eq:action_mapping}
 \end{equation}
 where $\kappa$ is the control scaling factor, and $\kappa=4$ is adopted in this paper.
 
-In this study, the reward function is designed to mainly promote the rapid convergence of the synchronization error. Therefore, the reward is directly constructed from the global synchronization error:
+Let $t_k=k\Delta t$ denote the control-update times. The applied input $u_k=\kappa a_k$ is held constant on $[t_k,t_{k+1})$. The environment then advances the drive and response and returns a reward based on the updated error:
 \begin{equation}
-	r_t
+	r_k
 	=
-	-0.1\|\mathbf{e}(t)\|_1
+	-0.1\|\mathbf{e}(t_{k+1})\|_1
 	=
-	-0.1\sum_{i=1}^{3}|e_i(t)|.
+	-0.1\sum_{i=1}^{3}|e_i(t_{k+1})|.
 	\label{eq:reward_function}
 \end{equation}
-This reward has a clear physical interpretation: the smaller the synchronization error, the higher the reward. At the same time, it avoids introducing excessive manually designed shaping terms, thereby highlighting the direct response of policy learning to the synchronization objective itself. The trade-off between control effort and synchronization performance is further evaluated in the experimental section.
+Maximizing the discounted reward promotes small synchronization errors throughout the rollout. The reward contains no control-effort penalty; input magnitude is constrained by action clipping, and effort is measured separately during evaluation. The same error reward is retained in the reduced-observation and multi-input experiments to keep their learning objectives consistent.
 
-To learn a control policy in the above continuous-action setting, this paper employs the PPO algorithm~\cite{schulman2017proximal}. PPO is a typical Actor--Critic method. By introducing a clipping mechanism to restrict the update magnitude of the policy, it achieves relatively high sample efficiency while limiting excessively large policy updates. The PPO objective function is written as
+PPO is selected for its direct Gaussian-policy parameterization and alternating rollout and minibatch-update implementation~\cite{schulman2017proximal}. These features fit the sampled scalar-feedback task. The SAC comparison in Table~\ref{tab:sac_comparison} assesses the sensitivity of the results to the learning algorithm.
+
+To learn a control policy in the above continuous-action setting, this paper employs the PPO algorithm~\cite{schulman2017proximal}. PPO is an Actor--Critic method whose clipped surrogate moderates policy optimization through the action-probability ratio. This likelihood-ratio clipping is distinct from actuator clipping. The PPO objective function is written as
 \begin{equation}
 	L(\theta)
 	=
@@ -462,27 +465,27 @@ where
 \begin{equation}
 	\rho_t(\theta)
 	=
-	\frac{\pi_\theta(a_t|O_t)}
-	{\pi_{\theta_{\mathrm{old}}}(a_t|O_t)}.
+	\frac{\pi_\theta(\widetilde a_t|O_t)}
+	{\pi_{\theta_{\mathrm{old}}}(\widetilde a_t|O_t)}.
 	\label{eq:ppo_ratio}
 \end{equation}
-where $\rho_t(\theta)$ denotes the likelihood ratio between the new and old policies, $\epsilon$ is the clipping hyperparameter, and $\hat{A}_t$ is the advantage estimate obtained using generalized advantage estimation (GAE). Through interaction with the continuous-time Hopfield chaotic system, PPO can progressively learn a nonlinear control policy that minimizes the long-term synchronization error under the constraint of single-input pinning control.
+Here $\widetilde a_t$ is the unclipped Gaussian sample stored for the policy update, whereas $a_t=\operatorname{clip}(\widetilde a_t,-1,1)$ is applied to the environment. The ratio $\rho_t(\theta)$ compares the new and old action likelihoods, $\epsilon$ is the PPO clipping hyperparameter, and $\hat A_t$ is obtained using generalized advantage estimation (GAE). Optimization aims to reduce the discounted synchronization-error cost; attainment of its global minimum is not asserted.
 
-\begin{figure}[pos=t,width=\linewidth]
-	\centering
-	\includegraphics[width=0.75\linewidth,keepaspectratio]{figures/ppo_process.pdf}
-	\caption{General training process of the PPO-based DRL framework.}
-	\label{fig:ppo_framework2}
+\begin{figure}[pos=!t,width=\linewidth]
+\centering
+\includegraphics[width=0.92\linewidth,height=0.72\textheight,keepaspectratio]{figures/ppo_process.pdf}
+\caption{General training process of the PPO-based DRL framework.}
+\label{fig:ppo_framework2}
 \end{figure}
 
-As shown in Fig.~\ref{fig:ppo_framework2}, PPO follows an interaction--update training process. The agent first interacts with the environment using the current policy and stores the collected states, actions, rewards, and value estimates in a trajectory buffer. The advantage function is then estimated, typically using GAE, and the policy network is updated by maximizing a clipped surrogate objective. Meanwhile, the value network is trained by minimizing the mean squared error between the predicted and target state values. Through repeated interaction and parameter updates, PPO improves the control policy while limiting excessively large policy changes during training.
+As shown in Fig.~\ref{fig:ppo_framework2}, PPO follows an interaction--update training process. The agent first interacts with the environment using the current policy and stores the collected states, actions, rewards, and value estimates in a trajectory buffer. The advantage function is then estimated, typically using GAE, and the policy network is updated by maximizing a clipped surrogate objective. Meanwhile, the value network is trained by minimizing the mean squared error between the predicted and target state values. The clipped surrogate moderates likelihood-ratio changes during optimization; the deployed closed-loop behavior is assessed separately below.
 
 The overall training procedure is summarized in Algorithm~\ref{alg:ppo_pinning}. In each iteration, trajectories are first collected by executing the current policy in the error-system environment. The collected data are then used to estimate the advantage function and update the policy network with the PPO clipped objective. The value network is updated by minimizing the squared value loss. After repeated interaction and optimization, the trained policy is used as the single-input pinning controller for the response system.
 
-\subsection{Boundedness and Post-Training Local Stability Assessment}
+\subsection{Boundedness and Post-Training Local Numerical Assessment}
 \label{subsec:boundedness_local_stability}
 
-Before evaluating synchronization performance, it is useful to distinguish three different properties: boundedness of the controlled trajectories, local stability of a deployed policy, and convergence of the PPO training algorithm. The first property can be established directly from the dissipative Hopfield dynamics and the bounded actuator. The second is assessed after training using the Jacobian of the actual closed-loop control-step map. No claim is made that PPO training itself guarantees global closed-loop stability.
+This section establishes boundedness of the controlled trajectories and assesses the local sensitivity of the deployed policies. The boundedness result follows from the dissipative Hopfield dynamics and the bounded actuator, while the closed-loop control-step Jacobian characterizes post-training trajectory sensitivity.
 
 Because the normalized action satisfies $a_t\in[-1,1]$ and the physical action is defined by~\eqref{eq:action_mapping}, the deployed control input satisfies
 \begin{equation}
@@ -494,7 +497,7 @@ Moreover, each single-node pinning vector has $\|B_i\|_2=1$.
 
 \begin{proposition}[Boundedness of the controlled drive--response trajectories]
 \label{prop:closed_loop_boundedness}
-Consider the drive system~\eqref{eq:hopfield_simplified_vector} and response system~\eqref{eq:response_system}, where $W$ and $W_r$ are finite constant matrices and the control input satisfies~\eqref{eq:bounded_control_input}. For every finite initial condition, the corresponding trajectories are forward complete and uniformly ultimately bounded. In particular,
+Consider the drive system~\eqref{eq:hopfield_simplified_vector} and response system~\eqref{eq:response_system}, where $W$ and $W_r$ are finite constant matrices and the control input is measurable and satisfies~\eqref{eq:bounded_control_input}. This includes the deployed piecewise-constant sample-and-hold input. For every finite initial condition, the corresponding trajectories are forward complete and uniformly ultimately bounded. In particular,
 \begin{align}
 	\limsup_{t\to\infty}\|\mathbf{x}(t)\|_2
 	&\leq \sqrt{3}\|W\|_2,
@@ -528,10 +531,10 @@ where $D^+$ is the upper right Dini derivative, $\|B_i\|_2=1$, and~\eqref{eq:bou
 	+\left(\sqrt{3}\|W_r\|_2+\kappa\right)(1-e^{-t}).
 	\label{eq:response_explicit_bound}
 \end{equation}
-Taking the upper limit as $t\to\infty$ gives~\eqref{eq:drive_ultimate_bound} and~\eqref{eq:response_ultimate_bound}. The explicit bounds also preclude finite escape; hence the locally Lipschitz state dynamics are forward complete.
+Taking the upper limit as $t\to\infty$ gives~\eqref{eq:drive_ultimate_bound} and~\eqref{eq:response_ultimate_bound}. For a prescribed bounded measurable input, the vector field is globally Lipschitz in the state and has bounded forcing. The explicit bounds preclude finite escape; the sampled feedback can consequently be extended over successive control intervals for all future times.
 \end{proof}
 
-For the nominal matched case $W_r=W$, the matrix in~\eqref{eq:weight_matrix} has $\|W\|_2=8.9524$. Proposition~\ref{prop:closed_loop_boundedness} therefore gives the conservative bounds $\limsup_{t\to\infty}\|\mathbf{x}(t)\|_2\leq15.5059$ and $\limsup_{t\to\infty}\|\mathbf{y}(t)\|_2\leq19.5059$. These bounds are not intended to predict the observed attractor size. They establish non-divergence using worst-case norm inequalities. In particular, boundedness of both trajectories alone does not imply that the synchronization error converges to zero.
+For the nominal matched case $W_r=W$, the matrix in~\eqref{eq:weight_matrix} has $\|W\|_2=8.9524$. Proposition~\ref{prop:closed_loop_boundedness} therefore gives the conservative bounds $\limsup_{t\to\infty}\|\mathbf{x}(t)\|_2\leq15.5059$ and $\limsup_{t\to\infty}\|\mathbf{y}(t)\|_2\leq19.5059$. These worst-case norm estimates establish non-divergence and provide conservative envelopes for the trajectories. In particular, boundedness of both trajectories alone does not imply that the synchronization error converges to zero.
 
 The MCLE $\lambda_{\max}^{(c)}(B_i)$ in Section~\ref{subsec:local_node_selection} and the closed-loop exponent introduced below have different purposes. The former is a pre-training node-screening indicator derived from a locally linearized transverse model under the ideal pinning assumption and does not include the learned PPO policy. By contrast, the latter is evaluated after training from the actual deployed sample-and-hold closed-loop map. Consequently, their numerical values should not be directly compared or interpreted as equivalent stability measures.
 
@@ -550,7 +553,7 @@ where $G_i$ includes the deterministic mean action of the trained policy, action
 	(\mathbf{x}_k,\mathbf{e}_k;\pi_{\theta,i}).
 	\label{eq:sampled_error_jacobian}
 \end{equation}
-The corresponding largest conditional Lyapunov exponent is numerically estimated as
+The asymptotic largest conditional Lyapunov exponent is defined by
 \begin{equation}
 	\lambda_i^{\mathrm{cl}}
 	=
@@ -562,18 +565,20 @@ The corresponding largest conditional Lyapunov exponent is numerically estimated
 	\right\|_2.
 	\label{eq:closed_loop_conditional_lyapunov}
 \end{equation}
-In practice, the Jacobians are obtained by automatic differentiation and the exponent is accumulated using QR renormalization to avoid numerical overflow. A negative estimate indicates that infinitesimal transverse perturbations around the evaluated closed-loop trajectory decay on average. This is a post-training, trajectory-dependent numerical assessment; it is not a proof of uniform contraction over the continuous state space, a global stability guarantee, or a convergence guarantee for PPO training. Parameter mismatch, impulse disturbance, and Gaussian noise are therefore treated as separate empirical robustness tests in Section~\ref{sec:experiments}, rather than as consequences of Proposition~\ref{prop:closed_loop_boundedness} or~\eqref{eq:closed_loop_conditional_lyapunov}.
+Automatic differentiation and QR renormalization yield a finite-time estimate $\widehat\lambda_i^{\mathrm{cl}}$ over the stated observation window. A negative estimate describes average decay of linearized perturbations about the evaluated response trajectory while holding the drive trajectory fixed. Because that reference trajectory may have a nonzero synchronization residual, perturbation attenuation and synchronization accuracy are reported separately. Parameter mismatch, impulse disturbance, and Gaussian noise are evaluated through the robustness experiments in Section~\ref{sec:experiments}.
 
 The numerical assessment was conducted for Nodes 2 and 3 using three independently trained policies for each node. Each policy was evaluated from ten initial conditions, giving 30 closed-loop trajectories per node and 60 trajectories in total. Each trajectory contained 2000 control intervals, and the first 100 intervals were discarded as a transient, leaving 95 time units for exponent accumulation. Table~\ref{tab:closed_loop_conditional_lyapunov} summarizes the largest conditional Lyapunov exponent and the post-transient synchronization residual. The reported mean error is obtained by first averaging $\|\mathbf{e}_k\|_2$ over the post-transient portion of each trajectory and then averaging over the 30 trajectories for the corresponding node.
+
+These trajectories use three independently trained policies and ten initial conditions per policy. Replaying all 60 trajectories reproduced the reported mean residuals exactly. No state-guard activation occurred at any RK4 substep; the largest absolute state component was 3.9134, below the implementation guard at 10. Consequently, omission of that inactive guard from the differentiated nominal map does not change its local derivative along these trajectories. At action-clipping thresholds the map is nonsmooth, so automatic derivatives are understood away from those thresholds, not as a global differentiability assertion.
 
 \begin{center}
 	\centering
 	\small
-	\captionof{table}{Post-training local stability assessment of the deployed sample-and-hold PPO controllers.}
+	\captionof{table}{Finite-time conditional Lyapunov estimates for the deployed sample-and-hold PPO controllers.}
 	\label{tab:closed_loop_conditional_lyapunov}
 	\begin{tabular}{@{}ccccc@{}}
 		\toprule
-		Node & Runs & Mean $\lambda_i^{\mathrm{cl}}$ & Range & Mean $\|\mathbf{e}\|_2$ \\
+		Node & Runs & Mean $\widehat\lambda_i^{\mathrm{cl}}$ & Range & Mean $\|\mathbf{e}\|_2$ \\
 		\midrule
 		2 & 30 & $-1.117$ & $[-1.317,-0.872]$ & 0.0276 \\
 		3 & 30 & $-0.581$ & $[-0.592,-0.557]$ & 0.0075 \\
@@ -581,13 +586,17 @@ The numerical assessment was conducted for Nodes 2 and 3 using three independent
 	\end{tabular}
 \end{center}
 
-The largest conditional exponent is negative for all 60 evaluated trajectories. This consistently observed negativity provides numerical evidence that infinitesimal error perturbations decay on average near the tested closed-loop trajectories. A shorter check using 600 control intervals produced the same signs and similar aggregate values, supporting the numerical consistency of the finite-time estimates. Node 2 has a more negative mean exponent, whereas Node 3 has a smaller post-transient error. This difference is not contradictory: the conditional exponent measures the local average decay of an infinitesimal perturbation, while the residual error also depends on the location of the closed-loop trajectory and the learned control action. In particular, the policy architecture does not impose $\pi_{\theta,i}(\mathbf{x},\mathbf{0})=0$ as an exact constraint. Therefore, the results support practical synchronization with small residual errors and post-training local average transverse stability, rather than exact asymptotic synchronization or a global stability certificate.
+The finite-time estimate is negative for all 60 evaluated trajectories. A shorter check using 600 control intervals produced the same signs and similar aggregate values, supporting numerical consistency over the examined windows. Node 2 has a more negative mean estimate, whereas Node 3 has a smaller post-transient error. The two measurements describe complementary properties: local perturbation decay and residual synchronization error. In particular, the policy architecture does not impose $\pi_{\theta,i}(\mathbf{x},\mathbf{0})=0$. Thus, the synchronization manifold need not be invariant. Here ``practical synchronization'' describes the observed low-residual behavior over the evaluation window.
 
+
+As a complementary multi-step check, a positive-definite metric $P$ was fitted once per policy using a separate nominal rollout. In the induced norm $\|\mathbf{v}\|_P=(\mathbf{v}^{\mathsf T}P\mathbf{v})^{1/2}$, the largest sampled gains of the ordered 40-step Jacobian products were 0.4882 and 0.5340 for Nodes 2 and 3, respectively; at 80 steps they were 0.0673 and 0.2802. These checks used 60 nominal trajectories of 2,000 control intervals, excluding the first 100 intervals. Forty control intervals correspond to two system time units. Direct paired-rollout checks with initial response perturbations up to 0.05 along signed coordinate directions also showed contraction at these horizons.
+
+These results strengthen the evidence for local perturbation attenuation over finite windows, even when individual steps can amplify perturbations. The analytical guarantee concerns state boundedness; the local synchronization assessment uses finite-trajectory numerical evidence. Certified neighborhood-wide contraction and synchronization-error bounds remain open. Exact agreement of the discrete application streams is assessed separately.
 
 \section{Experimental Results and Analysis}
 \label{sec:experiments}
 
-This section evaluates the proposed PPO-based single-input pinning synchronization strategy from three perspectives. First, the experimental configuration and evaluation metrics are specified. Second, the closed-loop performance under different pinning nodes and observation dimensions is examined to assess the practical relevance of the local node-ranking analysis in Section~\ref{sec:ppo_pinning_method}. Third, the learned policies are empirically evaluated under parameter mismatch~\cite{kobiolka2025reducedorder}, global impulse disturbance, and Gaussian noise perturbation.
+The experiments address three questions: how actuator location affects PPO performance and observation demand; what changes when additional actuators become available; and how the frozen PPO policies compare with alternative controllers under parameter mismatch~\cite{kobiolka2025reducedorder}, impulse disturbances, and process noise. The comparisons report synchronization error and applied control effort under the stated shared test conditions.
 
 \subsection{Experimental Setup and Evaluation Metrics}
 \label{subsec:experimental_setup}
@@ -606,8 +615,8 @@ This section evaluates the proposed PPO-based single-input pinning synchronizati
 		\For{$k = 0,1,2,\ldots,K-1$}
 		\State Collect trajectories $\Gamma_k$ by executing the current policy $\pi_{\theta_k}$ in the environment.
 		\For{each time step $t$ in $\Gamma_k$}
-		\State Select action $a_t \sim \pi_{\theta_k}(\cdot|O_t)$.
-		\State Map the action to the physical control input $u(t)=\kappa a_t$.
+		\State Sample $\widetilde a_t \sim \pi_{\theta_k}(\cdot|O_t)$; set $a_t=\operatorname{clip}(\widetilde a_t,-1,1)$.
+		\State Store the unclipped sample for the policy update; apply $u(t)=\kappa a_t$.
 		\State Apply $u(t)$ to the response system and observe reward $r_t$ and next observation $O_{t+1}$.
 		\EndFor
 		
@@ -631,8 +640,8 @@ This section evaluates the proposed PPO-based single-input pinning synchronizati
 		where
 		\[
 		\rho_t(\theta)
-		=\frac{\pi_{\theta}(a_t|O_t)}
-		{\pi_{\theta_k}(a_t|O_t)}.
+		=\frac{\pi_{\theta}(\widetilde a_t|O_t)}
+		{\pi_{\theta_k}(\widetilde a_t|O_t)}.
 		\]
 		
 		\State Update value-function parameters by minimizing the squared value loss:
@@ -650,19 +659,21 @@ This section evaluates the proposed PPO-based single-input pinning synchronizati
 		\]
 		\EndFor
 		
-		\State \Return optimized policy $\pi_{\theta}$.
+		\State \Return trained policy $\pi_{\theta}$.
 	\end{algorithmic}
 \end{algorithm}
 
-All experiments were conducted on a computer equipped with an NVIDIA RTX 5070Ti GPU. The programs were implemented in Python, and the PPO algorithm was implemented using Stable Baselines3. The total training length was set to $4\times 10^5$ time steps.
+The programs were implemented in Python using Stable Baselines3. The workstation is equipped with an NVIDIA RTX 5070Ti GPU; the policy training scripts considered here use the CPU. PPO used a nominal training budget of $4\times10^5$ environment transitions, with four parallel environments and 512 steps per environment in each rollout.
 
 During environment interaction, the continuous-time system dynamics were integrated using the classical fourth-order Runge--Kutta (RK4) method. The basic integration step size was set to $0.01$ time units. To improve numerical stability, five RK4 substeps were performed within each control step. Therefore, each control update corresponded to an effective time interval of $0.05$ time units. The maximum magnitude of the physical control input was constrained to 4 units.
 
-At initialization, the initial states of both the drive system and the response system, denoted by $\mathbf{x}(0)$ and $\mathbf{y}(0)$, were sampled from the uniform distribution $[-1.0,1.0]$. This interval covers the strongly nonlinear and non-saturated region of the $\tanh(\cdot)$ activation function, which increases the diversity of initial dynamical states and avoids ineffective simulations caused by excessive saturation.
+The implementation also contains a numerical state guard at $[-10,10]$ after RK4 substeps and disturbance updates. No guard activation was detected in the 2,940 reevaluated episodes covering the traditional baselines, matched-budget SAC comparison, and actuator-count ablation; the reported trajectories in these comparisons therefore evolve without state truncation.
+
+At initialization, the initial states of both the drive system and the response system, denoted by $\mathbf{x}(0)$ and $\mathbf{y}(0)$, were sampled from the uniform distribution $[-1.0,1.0]$. This common distribution provides varied initial synchronization errors and is held fixed across the compared methods. The reported results are conditional on this initialization range.
 
 For the reinforcement learning configuration, both the policy network and the value network were represented by multilayer perceptrons (MLPs). The Adam optimizer was adopted with a learning rate of $3\times 10^{-4}$, so as to balance exploration efficiency and policy-update stability.
 
-As a traditional control baseline, a fixed-gain linear feedback controller~\cite{yassen2005controlling} is usually adopted:
+Three traditional controllers are included to provide references of increasing model dependence. First, the original fixed-gain feedback baseline~\cite{yassen2005controlling} is retained without retuning:
 
 \begin{equation}
 	u(t)=
@@ -673,11 +684,40 @@ As a traditional control baseline, a fixed-gain linear feedback controller~\cite
 	\end{cases}
 	\label{eq:linear_feedback_baseline}
 \end{equation}
-where $e_i(t)$ denotes the synchronization error at the controlled node $i$. Since the main purpose of this baseline is not to obtain an optimally tuned linear controller, but to provide a simple and easily implementable traditional reference for comparison with the proposed PPO-based method, the gain $k$ was selected empirically through preliminary experiments. Considering both convergence speed and stability under nominal conditions, $k=8.0$ was used throughout the experiments.
+where $e_i(t)$ denotes the synchronization error at the controlled node $i$. This baseline represents a simple local-error controller rather than an optimally tuned linear design. The previously selected gain $k=8.0$ is used throughout all reported experiments.
 
-To avoid additional bias caused by different actuator limits, the PPO controller and the linear feedback controller were evaluated under the same input magnitude constraint. It should be noted that this setting only unifies the actuator capability boundary. The performance differences observed in different experimental scenarios may still be affected by the pinning node, observation dimension, and controller structure.
+Second, a continuous-time LQR baseline is obtained from the frozen local error model in Section~\ref{sec:ppo_pinning_method}. With $Q=I_3$ and $R=1$, its saturated control law is
+\begin{equation}
+	u_{\mathrm{LQR},i}(t)=\operatorname{sat}_{4}\!\left[-K_i\mathbf e(t)\right],
+	\label{eq:lqr_baseline}
+\end{equation}
+where $K_i=R^{-1}B_i^{\mathrm T}P_i$ and $P_i$ is the stabilizing solution of the continuous algebraic Riccati equation associated with $(A,B_i)$. The resulting gains are
+\[
+\begin{aligned}
+K_2&=(-0.116727,\ 3.871191,\ -5.502161),\\
+K_3&=(-0.171698,\ -2.085641,\ 3.850986).
+\end{aligned}
+\]
+Unlike fixed-gain feedback, LQR uses all error components and the nominal local model. The principal error--effort assessment includes the separately validated design $R=0.01$ in Table~\ref{tab:lqr_weight_sensitivity}. The original $R=1$ design is retained in the scenario curves as a reference for weight sensitivity, not as the strongest LQR comparator. The resulting feedback is evaluated on the nonlinear system with actuator saturation.
 
-To evaluate the synchronization performance of different control methods, several metrics are introduced from the perspectives of overall synchronization accuracy, steady-state error, transient recovery capability, and control effort. Let $T$ denote the total number of testing steps, $N$ denote the system dimension, and the synchronization error vector be
+Third, a boundary-layer sliding-mode controller (SMC)~\cite{feki2009sliding,su2021fixed} is included as a nonlinear model-based baseline. Define
+\begin{equation}
+	\mathbf g_0(\mathbf x,\mathbf y)=-\mathbf e+W\left[\tanh(\mathbf y)-\tanh(\mathbf x)\right],
+	\label{eq:nominal_error_drift}
+\end{equation}
+and select $c_i^{\mathrm T}=K_i/(K_iB_i)$ so that $c_i^{\mathrm T}B_i=1$. The sliding variable and control law are
+\begin{equation}
+	s_i=c_i^{\mathrm T}\mathbf e,\qquad
+	u_{\mathrm{SMC},i}=\operatorname{sat}_{4}\!\left[-c_i^{\mathrm T}\mathbf g_0-k_s\operatorname{sat}\!\left(\frac{s_i}{\phi}\right)\right],
+	\label{eq:smc_baseline}
+\end{equation}
+where $\operatorname{sat}(z)=\max(-1,\min(1,z))$, $k_s=16$, and $\phi=0.5$. These parameters minimize the recorded validation score over $k_s\in\{4,8,12,16\}$ and $\phi\in\{0.2,0.5,1,2\}$, using ten validation initial conditions separate from the test seeds. Validation includes nominal, mismatch ($\eta=1$), and impulse scenarios; the score averages their MAEs normalized by 0.1, 0.15, and 0.45, respectively. Parameters are then frozen. Thus, although its compensation term uses the nominal model, SMC parameter selection has access to non-ideal validation scenarios. The saturated, sampled implementation is evaluated empirically; the continuous-time ideal sliding condition is not asserted to hold when the actuator saturates.
+
+All four methods use the same RK4 solver, control-update interval, initial-state distribution, testing horizon (400 updates, or 20 time units), and actuator bound $|u|\leq4$. The PPO results aggregate three independently trained policies, each evaluated on 20 common test initial conditions; each deterministic traditional controller is evaluated on the same 20 test seeds. For each scenario, the initial conditions and exogenous random realizations are shared across controllers. In the existing environment, drawing a mismatch matrix consumes random numbers before initialization; hence a fixed seed does not imply identical initial states between $\eta=0$ and $\eta>0$. Comparisons between controllers are paired within each scenario.
+
+PPO is trained only on the nominal system. LQR uses $\mathbf e$ and the nominal local model, while SMC additionally uses $\mathbf x$ and $\mathbf y$ for nonlinear compensation. PPO receives $(\mathbf x,\mathbf e)/5$ without evaluating an analytical model during deployment; its training simulator nevertheless uses the nominal dynamics. Fixed-gain feedback uses only $e_i$. Consequently, these are comparisons under matched actuation constraints, not identical information or design objectives. In particular, the PPO reward penalizes synchronization error but not control energy, whereas LQR explicitly penalizes both. Lower error at higher energy is therefore interpreted as a performance--effort tradeoff, not evidence of superior energy efficiency.
+
+To evaluate the synchronization performance of different control methods, several metrics are introduced from the perspectives of overall synchronization accuracy, steady-state error, transient recovery capability, and control effort. Let $T=400$ denote the number of control updates and $N=3$ the system dimension. For the baseline and ablation comparisons, errors are recorded at the $T+1$ sampling instants including initialization. The synchronization error vector is
 \begin{equation}
 	\mathbf{e}(t)=\mathbf{y}(t)-\mathbf{x}(t)
 	=
@@ -689,8 +729,8 @@ The mean absolute error (MAE) is used to measure the average synchronization dev
 \begin{equation}
 	\mathrm{MAE}
 	=
-	\frac{1}{TN}
-	\sum_{t=1}^{T}
+	\frac{1}{(T+1)N}
+	\sum_{t=0}^{T}
 	\sum_{i=1}^{N}
 	|e_i(t)|.
 	\label{eq:mae}
@@ -702,8 +742,8 @@ The root mean square error (RMSE) is used to characterize the overall error leve
 	\mathrm{RMSE}
 	=
 	\sqrt{
-		\frac{1}{TN}
-		\sum_{t=1}^{T}
+		\frac{1}{(T+1)N}
+		\sum_{t=0}^{T}
 		\sum_{i=1}^{N}
 		e_i^2(t)
 	}.
@@ -725,7 +765,7 @@ In the impulse disturbance experiment, the maximum post-pulse error is used to d
 	M_p=\max_{t\geq t_p}\|\mathbf{e}(t)\|_1,
 	\label{eq:max_post_pulse_error}
 \end{equation}
-where $t_p$ denotes the impulse injection time. A smaller value indicates stronger peak-suppression capability against sudden disturbances.
+where $t_p$ denotes the impulse injection step. The imposed state jump largely determines the immediate peak, so $M_p$ alone is not interpreted as a controller-dependent recovery measure.
 
 The post-pulse mean error is defined as the average global synchronization error from the impulse injection time to the end of testing:
 \begin{equation}
@@ -738,62 +778,66 @@ The post-pulse mean error is defined as the average global synchronization error
 \end{equation}
 where $t_p$ is the impulse injection time and $T$ is the final testing step.
 
-The control energy is used to measure the cumulative control effort over the testing process:
+The control energy is used to measure the cumulative control effort over the testing process, summing over all $m$ active input channels:
 \begin{equation}
 	E_u=
 	\sum_{t=1}^{T}
-	u^2(t)\Delta t,
+	\sum_{j=1}^{m}u_j^2(t)\Delta t,
 	\label{eq:control_energy}
 \end{equation}
-where $\Delta t$ denotes the effective control update interval. This metric is more sensitive to large-amplitude control inputs and is commonly used to evaluate the control effort.
+where $\Delta t=0.05$ is the effective control update interval and $u_j(t)$ is the applied, saturated input during update $t$. The single-input comparisons have $m=1$. The steady L1 error averages $\|\mathbf e(t)\|_1$ over samples $t=320,\ldots,400$ (the final four time units), and differs from the terminal error $E_f$. Reported means first average the test initial conditions for each policy and then average policy seeds; the deterministic baselines have only the first level. Repeated initial conditions for the same trained policy are not treated as independent training replications.
 
 In summary, MAE and RMSE are used to evaluate the overall synchronization performance, Final L1 Error is used to describe the terminal synchronization accuracy, $M_p$ and $E_{\mathrm{post}}$ are used to characterize transient recovery capability under impulse disturbance, and $E_u$ is used to assess the control cost.
 
-\subsection{Pinning-Node Selection and Observation Demand}
+\subsection{Actuator Placement, Observation Choice, and Control Resources}
 \label{subsec:node_selection_observation}
 
-To evaluate the guidance provided by the local node-selection analysis in Section~\ref{sec:ppo_pinning_method}, the single control input was first applied to Nodes 1, 2, and 3 under the same PPO framework and identical training configuration. The purpose of this experiment is not to recompute the local theoretical indicators, but to empirically examine how different pinning nodes affect synchronization reachability and training performance in the closed-loop data-driven control setting.
+To evaluate the guidance provided by the local node-selection analysis in Section~\ref{sec:ppo_pinning_method}, the single control input was applied to Nodes 1, 2, and 3 under the same PPO framework and training configuration. This experiment compares achieved synchronization performance under a fixed learning budget; it is not a controllability or reachability test.
 
-As shown in Fig.~\ref{fig:pinning_node_comparison}, the synchronization error evolves quite differently under different pinning nodes. When Node 3 is selected as the controlled node, the error decays more rapidly and remains at a relatively low level, indicating the most favorable synchronization reachability. By contrast, although Node 2 can also achieve synchronization under certain conditions, its convergence speed and final error level are generally less stable than those of Node 3. Node 1 exhibits the weakest control performance and is more difficult to synchronize reliably under the same training setting.
+As shown in Fig.~\ref{fig:pinning_node_comparison}, Node 3 has faster observed error decay and a lower residual than Node 2. Node 1 exhibits the weakest learned control performance under the same training budget. These differences describe the trained controllers and do not establish intrinsic limits on what each actuator location can achieve.
 
 \begin{figure}[pos=htbp,width=\linewidth]
 	\centering
-	\includegraphics[width=0.5\linewidth]{figures/compare_different_nodes.pdf}
-	\caption{Comparison of synchronization error evolution under different pinning nodes.}
+	\includegraphics[width=0.78\linewidth]{figures/node_selection_audited.pdf}
+	\caption{Synchronization error under different pinning nodes. Each curve averages three training-seed means, each evaluated on 20 common initial conditions; shading shows one sample standard deviation across the three seed means.}
 	\label{fig:pinning_node_comparison}
 \end{figure}
 
-To avoid relying only on a single error curve for qualitative judgment, MAE, RMSE, and Final L1 Error are further used to quantitatively compare the synchronization performance under different pinning nodes. The results in Table~\ref{tab:pinning_node_metrics} further confirm the above observation. In terms of both average error and terminal error, Node 3 achieves the best overall synchronization performance. This result is generally consistent with the local auxiliary indicators in Table~\ref{tab:local_node_metrics}, including the $\lambda_{\max}^{(c)}$, $J_R$, $\|K_i\|$, and $V_i$. Therefore, the local theoretical analysis in Section~\ref{sec:ppo_pinning_method} provides meaningful guidance for pinning-node selection in the considered Hopfield chaotic neural network.
+To avoid relying only on a single error curve for qualitative judgment, MAE, RMSE, and Final L1 Error are further used to quantitatively compare the synchronization performance under different pinning nodes. The results in Table~\ref{tab:pinning_node_metrics} further confirm the above observation. In terms of both average error and terminal error, Node 3 achieves the best overall synchronization performance. This result is generally consistent with the local auxiliary indicators in Table~\ref{tab:local_node_metrics}, including the $\lambda_{\max}^{(c)}$, $J_R$, $\|K_i\|$, and $V_i$. Thus the favorable Node 3 screening result is reflected in the tested policies. Agreement within this network supports the use of the indicators as local diagnostics; it does not establish a general predictor of PPO performance.
 
 \begin{table}[pos=htbp,width=\linewidth]
 	\centering
-	\caption{Quantitative synchronization performance under different pinning nodes.}
+	\caption{Quantitative synchronization performance under different pinning nodes, using three training seeds and 20 common test initial conditions per seed. MAE and RMSE are computed from the error components, consistently with the baseline and actuator-count comparisons.}
 	\label{tab:pinning_node_metrics}
 	\begin{tabular}{@{}lccc@{}}
 		\toprule
 		Node & MAE & RMSE & \makecell{Final L1\\Error} $E_f$\\
 		\midrule
-		Node 1 & 4.1341 & 4.7337 & 4.0429 \\
-		Node 2 & 0.2557 & 0.7188 & 0.0338 \\
-		Node 3 & 0.1059 & 0.3050 & 0.0079 \\
+		Node 1 & 1.3937 & 1.6342 & 4.6052 \\
+		Node 2 & 0.0930 & 0.2863 & 0.0347 \\
+		Node 3 & 0.0431 & 0.1434 & 0.0091 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-To further observe the state-component-level error evolution without the visual occlusion of three-dimensional surfaces, Fig.~\ref{fig:node_error_comparison} presents two-dimensional heat maps obtained from the original multi-initial-condition trajectory data. Each row corresponds to a test trajectory, time is shown on the horizontal axis, and color represents the signed synchronization error. For Node 3, the error components $e_1$, $e_2$, and $e_3$ generally decay rapidly and remain close to zero after a short transient period. For Node 2, the error also shows a convergence tendency, but its transient fluctuation is more pronounced than that of Node 3. In contrast, for Node 1, large error fluctuations persist over a longer interval, indicating much weaker synchronization reachability. These observations are consistent with the quantitative results in Table~\ref{tab:pinning_node_metrics} and further support the node ranking obtained in the local analysis.
+To show component-level behavior, Fig.~\ref{fig:node_error_comparison} restores the original three-dimensional error surfaces for multiple initial conditions. Surface height represents the signed error component, with time and test index on the other axes. The displayed trajectories illustrate decay toward low error at Nodes 3 and 2 and persistent fluctuations at Node 1. They provide a qualitative illustration, not additional independent training replications; quantitative comparisons use Table~\ref{tab:pinning_node_metrics}. Test index is categorical, so the surfaces between trajectories are a visual interpolation rather than a physical state dimension.
 
 \begin{figure}[pos=htbp,width=\linewidth]
 	\centering
-	\includegraphics[width=0.86\linewidth]{figures/node_error_heatmap_comparison.png}
-	\caption{Two-dimensional heat maps of synchronization-error components under different random initial conditions. Rows correspond to Nodes 3, 2, and 1, columns correspond to $e_1$, $e_2$, and $e_3$, and a common color scale is used throughout.}
+\begin{tabular}{@{}ccc@{}}
+Node 3 & Node 2 & Node 1\\
+\includegraphics[width=0.31\linewidth]{figures/node3_error.png} &
+\includegraphics[width=0.31\linewidth]{figures/node2_error.png} &
+\includegraphics[width=0.31\linewidth]{figures/node1_error.png}
+\end{tabular}
+\caption{Original three-dimensional synchronization-error surfaces for multiple initial conditions. Columns correspond to actuation at Nodes 3, 2, and 1; within each column, panels show $e_1$, $e_2$, and $e_3$ from top to bottom. Height and color represent signed error. The original axis and color ranges are retained and differ between panels; colors alone should not be used for quantitative comparisons across nodes.}
 	\label{fig:node_error_comparison}
 \end{figure}
 
-Based on the above results, Node 3 is selected as the main pinning node in the subsequent experiments, since it exhibits the most favorable synchronization reachability in both local theoretical analysis and closed-loop PPO evaluation. Meanwhile, Node 2 is retained as a supplementary challenging scenario. Although it is not the locally preferred node, it still possesses certain control propagation capability and is therefore useful for testing the adaptability of the proposed method under a more difficult control channel.
+Node 3 is retained as the favorable candidate and Node 2 as a contrasting, more challenging learned-control channel. Both are evaluated in the subsequent robustness and algorithm comparisons, allowing actuator placement to be considered alongside controller choice.
 
-\subsubsection{Partial-observation assessment}
 
-Partial observability is next considered to examine how the information demand of the learned policy depends on the selected pinning node~\cite{weissenbacher2025reinforcement}. In practical control systems, complete state information may be unavailable because of sensor placement, communication bandwidth, or measurement limitations. The control structure, training procedure, and pinning node are fixed in this comparison, while only the observation supplied to the policy is changed.
+Partial observability is next considered to examine how the information demand of the learned policy depends on the selected pinning node~\cite{weissenbacher2025reinforcement}. Within each node, the actuation structure and training procedure are retained while a separate policy is trained for each observation configuration. Thus, this comparison concerns the performance attainable by the trained configurations, not the effect of removing measurements from one unchanged policy.
 
 For Node 3, the full-observation policy has access to all drive states and synchronization errors. The four-dimensional and two-dimensional observations are
 \begin{equation}
@@ -807,49 +851,232 @@ and
 \end{equation}
 respectively. For Node 2, the corresponding observations are $\{x_1,x_2,e_1,e_2\}$ and $\{x_2,e_2\}$.
 
-\begin{center}
-	\setlength{\tabcolsep}{8pt}
-	\begin{tabular}{cc}
-		\includegraphics[width=0.43\linewidth]{figures/node3_comparison_plot.pdf} &
-		\includegraphics[width=0.43\linewidth]{figures/node2_comparison_plot.pdf} \\
-		\small (a) Node 3 &
-		\small (b) Node 2
-	\end{tabular}
+The four-dimensional subsets retain the controlled coordinate and coordinate 1 as a fixed intermediate configuration; they are not claimed to be optimal sensor subsets. Reduced observation refers to the policy input at deployment. The simulator still computes the training reward from all three error components in~\eqref{eq:reward_function}, so these experiments do not demonstrate training using only local measurements. A memoryless policy is used with the reduced observation, which need not itself be Markovian; recurrent policies and exhaustive sensor-subset comparisons are outside this assessment.
 
-	\captionof{figure}{Comparison of L1 synchronization error under different observation configurations for different pinning nodes. The solid line denotes the mean over three independent runs, and the shaded region denotes the 95\% bootstrap confidence interval.}
+\begin{figure}[pos=htbp,width=\linewidth]
+	\centering
+	\includegraphics[width=0.94\linewidth]{figures/observation_comparison_audited.pdf}
+
+	\caption{Comparison of L1 synchronization error under different observation configurations. Curves average three training-seed means, with ten common archived test initial conditions per seed; shading spans the minimum and maximum of the three seed means. This archived observation experiment uses fewer test initial conditions than the baseline and actuator-count comparisons.}
 	\label{fig:partial_observation_comparison}
-\end{center}
+\end{figure}
 
-Fig.~\ref{fig:partial_observation_comparison} and Table~\ref{tab:partial_observation} report the corresponding results. For Node 3, the full-observation and four-dimensional policies exhibit similar error evolution and both maintain a low later-stage error. Further compression to the two-dimensional local observation increases both MAE and Final L1 Error, indicating that excessive information reduction limits the policy's ability to infer the system dynamics.
+Fig.~\ref{fig:partial_observation_comparison} and Table~\ref{tab:partial_observation} show similar later-stage errors for the Node 3 full- and four-dimensional policies. The tested two-dimensional policies have higher MAE and terminal error. This is an empirical association with observation reduction, reflecting the combined effect of the available inputs and the trained policy. To compare the observation penalty within each node, normalize MAE by that node's six-dimensional value. The four- and two-dimensional penalties are approximately 10.5 and 43.7 at Node 2, versus 1.0 and 1.3 at Node 3. These descriptive ratios, calculated from the common-seed means in Table~\ref{tab:partial_observation}, quantify the actuator-dependent consequence of reducing the selected policy inputs.
 
 \begin{table}[pos=h,width=\linewidth]
 	\centering
 	\setlength{\tabcolsep}{3pt}
 	\renewcommand{\arraystretch}{1.12}
-	\caption{Synchronization performance under different observation settings.}
+	\caption{Synchronization performance under different observation settings, restricted to the same three training seeds and ten common test initial conditions. MAE is obtained by dividing the recorded time-averaged L1 error by $N=3$. Observation components are specified in Eqs.~\ref{eq:obs_4d}--\ref{eq:obs_2d}.}
 	\label{tab:partial_observation}
 	\begin{tabular}{@{}lcc@{}}
 		\toprule
 		Observation Setting & MAE & \makecell{Final L1\\Error} \\
 		\midrule
-		Node 3 Full Observation & 0.1193 & 0.0081 \\
-		Node 3 4D Observation $(\{x_1,x_3,e_1,e_3\})$ & 0.1176 & 0.0071 \\
-		Node 3 2D Observation $(\{x_3,e_3\})$ & 0.1484 & 0.0398 \\
-		Node 2 Full Observation & 0.2282 & 0.0198 \\
-		Node 2 4D Observation $(\{x_1,x_2,e_1,e_2\})$ & 2.1500 & 2.1838 \\
-		Node 2 2D Observation $(\{x_2,e_2\})$ & 10.0891 & 11.6035 \\
+		Node 3, 6D & 0.0398 & 0.0081 \\
+		Node 3, 4D & 0.0390 & 0.0055 \\
+		Node 3, 2D & 0.0524 & 0.0487 \\
+		Node 2, 6D & 0.0761 & 0.0198 \\
+		Node 2, 4D & 0.7974 & 2.4874 \\
+		Node 2, 2D & 3.3271 & 11.3096 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-The Node 2 results show a substantially larger degradation as observation information is removed. Thus, observation demand and pinning-node selection are coupled in this learning-based synchronization task: the locally favorable Node 3 remains effective with a reduced observation, whereas the more challenging Node 2 channel is more sensitive to information loss.
+With these particular subsets, Node 2 shows a larger degradation than Node 3. However, dimension reduction also changes coordinate composition, so these results alone cannot attribute the degradation to observation dimension. The following matched-dimension comparison examines this distinction.
 
-\subsection{Robustness under Parameter Mismatch and External Perturbations}
+To separate coordinate composition from input dimension, all three paired subsets $\mathcal O_{ij}=\{x_i,x_j,e_i,e_j\}$, with $ij\in\{12,13,23\}$, are evaluated at each of Nodes 2 and 3. This completes the two-actuator-location by three-paired-subset comparison, not all arbitrary four-coordinate subsets. Each configuration has three independently trained policies with a nominal budget of $4\times10^5$ transitions. Six additional policies complete the previously missing Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$ configurations. All six configurations are evaluated on 20 new common initial conditions, with unchanged dynamics, reward, action bounds, and PPO settings. Every final checkpoint is retained. This evaluation set differs from that in the preceding dimension-reduction comparison.
+
+\begin{table}[pos=htbp,width=\linewidth]
+\centering
+\caption{Complete paired four-dimensional observation comparison at Nodes 2 and 3. Entries are mean $\pm$ sample standard deviation across three training-run means over 20 common initial conditions.}
+\label{tab:observation_identity}
+\small
+\begin{tabular}{cccc}
+\toprule
+Node & Subset & MAE & $E_u$\\
+\midrule
+2 & $\mathcal O_{12}$ & $0.9104\pm0.1312$ & $9.60\pm3.59$\\
+2 & $\mathcal O_{13}$ & $0.6253\pm0.0032$ & $150.68\pm38.64$\\
+2 & $\mathcal O_{23}$ & $0.0866\pm0.0059$ & $9.64\pm0.81$\\
+3 & $\mathcal O_{12}$ & $0.5235\pm0.0115$ & $209.02\pm25.40$\\
+3 & $\mathcal O_{13}$ & $0.0438\pm0.0009$ & $6.85\pm0.39$\\
+3 & $\mathcal O_{23}$ & $0.0771\pm0.0175$ & $142.70\pm154.59$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[pos=!t,width=\textwidth]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/paired_observation_complete.png}
+\caption{All paired four-dimensional subsets under single-node actuation. Each coordinate pair includes its drive states and error components. Points are individual training-run means over 20 common initial conditions; black marks average the three runs. Both error and energy are shown on logarithmic scales.}
+\label{fig:observation_identity}
+\end{figure*}
+
+Table~\ref{tab:observation_identity} and Fig.~\ref{fig:observation_identity} confirm the actuator-dependent effect of coordinate composition. Node 2 performs best among these paired subsets with $\mathcal O_{23}$, whereas Node 3 favors $\mathcal O_{13}$ in both mean MAE and energy. The subsets omitting the actuated node's state--error pair, namely Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$, give much larger residuals and energy than these favorable configurations. However, including that pair is not sufficient for low residuals: Node 2/$\mathcal O_{12}$ remains poor. Thus, the identity of the accompanying coordinate also matters. The results identify favorable observation combinations under the common finite-budget learning setup. At Node 3, $\mathcal O_{23}$ also exhibits substantial energy variability across training runs; none is excluded.
+
+To check whether the direction of the observation-subset effect is specific to PPO, a targeted SAC comparison repeats the original-versus-alternative four-dimensional configurations: $\mathcal O_{12}$ versus $\mathcal O_{23}$ at Node 2, and $\mathcal O_{13}$ versus $\mathcal O_{23}$ at Node 3. Each configuration is trained independently in three runs at the same nominal budget of $4\times10^5$ transitions. The SAC settings used in the controller comparison below are unchanged apart from the observation input; no additional tuning or checkpoint selection is performed. All 12 final policies are evaluated deterministically on the same 20 initial conditions as the PPO paired-subset comparison. This check uses nominal dynamics only and does not expand the frozen candidate pool of the subsequent selection example.
+
+\begin{table}[pos=htbp,width=\linewidth]
+\centering\small
+\setlength{\tabcolsep}{3pt}
+\caption{SAC four-dimensional observation cross-check. Each value is mean $\pm$ sample SD across three training-run means over 20 common initial conditions, shared with the PPO paired-subset tests in Table~\ref{tab:observation_identity}.}
+\label{tab:sac_observation_check}
+\begin{tabular}{@{}clcc@{}}
+\toprule
+Node & Subset & MAE & $E_u$ \\
+\midrule
+2 & $\mathcal O_{12}$ & $0.4637\pm0.0659$ & $40.73\pm19.95$ \\
+2 & $\mathcal O_{23}$ & $0.1350\pm0.0101$ & $7.17\pm0.69$ \\
+3 & $\mathcal O_{13}$ & $0.0562\pm0.0067$ & $7.54\pm0.79$ \\
+3 & $\mathcal O_{23}$ & $0.0840\pm0.0059$ & $10.57\pm0.54$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:sac_observation_check} reproduces the direction of the PPO mean-error comparison. At Node 2, replacing $\mathcal O_{12}$ with $\mathcal O_{23}$ reduces SAC MAE from 0.4637 to 0.1350; at Node 3, replacing $\mathcal O_{13}$ with $\mathcal O_{23}$ increases it from 0.0562 to 0.0840. For each node, the same error ordering holds in all three SAC training runs. The agreement across PPO and SAC strengthens the evidence for placement-dependent observation preferences in the tested pairs. The SAC comparison focuses on these original and alternative subsets, complementing the complete paired-subset evaluation performed with PPO.
+
+Control effort remains algorithm dependent. The Node 2 substitution reduces SAC energy from 40.73 to 7.17, whereas PPO energy changes little on average (9.60 to 9.64). At Node 3, energy increases for both algorithms, but the SAC increase (7.54 to 10.57) is much smaller than the PPO increase (6.85 to 142.70), which includes substantial training-run variability. Mean error ordering therefore transfers more consistently than the magnitude of the effort penalty. All 240 SAC test trajectories remained within the state-protection boundary.
+
+To illustrate how measured performance can inform a resource-constrained choice, an offline screening example uses a prespecified eight-candidate pool, fixed before the paired-subset completion. A candidate $c$ specifies the actuated node and its observation subset. The pool comprises Nodes 2 and 3, each with local two-dimensional observations, the original four-dimensional subset ($\mathcal O_{12}$ at Node 2 and $\mathcal O_{13}$ at Node 3), $\mathcal O_{23}$, and full six-dimensional observations. Each candidate retains all three training runs; configuration selection therefore accounts for variability across the retained runs. The allowed actuator set may be $\{2,3\}$, $\{2\}$, or $\{3\}$. The subsequently evaluated Node 2/$\mathcal O_{13}$ and Node 3/$\mathcal O_{12}$ configurations are outside this frozen pool; the complete paired-subset comparison and this limited selection example answer different questions.
+
+For a trajectory, let $z$ be the sample mean of $\|\mathbf e(t)\|_1$ over the final interval $16\leq t\leq20$. A trajectory passes when $z\leq\varepsilon$ and no state-protection boundary is reached. For training run $r$, its validation pass fraction is
+\begin{equation}
+ \widehat p_{c,r}(\varepsilon)
+ =\frac{1}{n_v}\sum_{\ell=1}^{n_v}
+ \mathbf 1\{z_{c,r,\ell}\leq\varepsilon,\ g_{c,r,\ell}=0\},
+ \label{eq:configuration_pass}
+\end{equation}
+where $g$ counts state-protection boundary hits. A candidate is feasible only if $\min_r\widehat p_{c,r}\geq0.90$. Among feasible candidates with allowed actuation, the rule first minimizes observation dimension and then validation mean applied energy $E_u$. Remaining ties are resolved by a fixed candidate ordering. If none is feasible, no configuration is selected. This lexicographic preference prioritizes feedback dimension as the structural resource measure.
+
+The rule uses 20 new common validation initial conditions and 40 separate common test initial conditions drawn from the original initial-state distribution. The illustrative tolerances $\varepsilon\in\{0.01,0.05,0.10\}$ were informed by the preceding experiments and fixed before this validation. They serve as illustrative design targets for the screening example. Choices were recorded before evaluating the selected configurations on the test set, with no test-based reselection. Dynamics, nominal parameters, action bounds, and frozen policies were unchanged.
+
+\begin{table*}[pos=!t,width=\textwidth]
+\centering
+\caption{Validation-selected configurations and independent-initial-condition tests. Test pass fractions are the minimum across three training runs, each evaluated on the same 40 test initial conditions. Error and energy average initial conditions and runs. A dash denotes no selection and hence no corresponding test; grouped tolerances have identical outcomes.}
+\label{tab:configuration_selection}
+\small
+\begin{tabular}{cccccc}
+\toprule
+Allowed nodes & $\varepsilon$ & Selected node / observations & Test pass & Test $z$ & Test $E_u$\\
+\midrule
+$\{2,3\}$ & 0.01 & -- & -- & -- & --\\
+$\{2,3\}$ & 0.05, 0.10 & $3\,/\,\mathcal O_{13}$ & 100\% & 0.0086 & 5.03\\
+$\{2\}$ & 0.01, 0.05 & -- & -- & -- & --\\
+$\{2\}$ & 0.10 & $2\,/\,\mathcal O_{23}$ & 100\% & 0.0282 & 8.11\\
+$\{3\}$ & 0.01 & -- & -- & -- & --\\
+$\{3\}$ & 0.05, 0.10 & $3\,/\,\mathcal O_{13}$ & 100\% & 0.0086 & 5.03\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:configuration_selection} translates the observation comparison into conditional design choices. With either node available, the original four-dimensional Node 3 configuration is selected at tolerances 0.05 and 0.10. When actuation is restricted to Node 2, the alternative four-dimensional subset is selected at 0.10. Both selected configurations pass every test trajectory at their respective selected tolerances. No candidate in the prespecified pool meets the validation criterion at 0.01. No state-protection boundary is reached in the 480 validation or 240 test trajectories.
+
+The per-run criterion prevents aggregate averages from masking inconsistent training outcomes. At tolerance 0.05, the alternative Node 2 subset has validation pass fractions of 100\%, 75\%, and 100\%; it is rejected despite an aggregate fraction above 90\%. The local two-dimensional Node 3 policies likewise yield 100\%, 0\%, and 100\% at both 0.05 and 0.10. The resource priority affects the choice: at Node 2, the selected four-dimensional configuration has validation mean energy 11.76 versus 10.93 for six dimensions. The preference must therefore reflect the intended resource priority.
+
+The selection procedure links nominal accuracy to resource preference within the fixed candidate pool, with validation on held-out initial conditions. Pass fractions describe the tested policies and sampled initial conditions; population-level reliability and transfer to newly trained policies require further validation. The tail-mean criterion measures average late-stage accuracy, whereas pointwise error limits and application-specific recovery requirements call for their own acceptance criteria. Shared initial conditions provide paired comparisons across policies.
+
+To check the dependence of this selection example on the resource preference, a post-hoc analysis reuses only the original eight-candidate validation data, varying the minimum per-run pass fraction over 80\%, 90\%, and 100\%, and comparing dimension-first with energy-first ranking. Changing the pass-fraction requirement does not change any choice at the tested error tolerances. The ranking preference matters when only Node 2 is allowed at $\varepsilon=0.10$: dimension-first selects $\mathcal O_{23}$, whereas energy-first selects full observations. All other choices are unchanged. This provides a post-hoc assessment of preference sensitivity using the validation data. The subsequently completed paired subsets are not retroactively inserted into the original candidate set or its frozen choices.
+
+We then examine whether the nominal choices retain their requested accuracy when response parameters change. The original selected Node 2/$\mathcal O_{23}$ and Node 3/$\mathcal O_{13}$ policies are frozen and evaluated at their respective tolerances 0.10 and 0.05. For 40 new common initial conditions, response weights are set to $W_r=W\odot(1+\eta U)$, where each entry of $U$ is sampled uniformly from $[-1,1]$ and $\eta\in\{0,0.01,0.03,0.05\}$. The drive system is unchanged. Each initial condition uses the same mismatch direction across amplitudes and policies; an independent random stream preserves identical initial states. Zero weights remain zero. No retraining or configuration reselection is performed.
+
+\begin{table*}[pos=!t,width=\textwidth]
+\centering
+\caption{Frozen selected configurations under response-weight mismatch. Pass fractions are the minimum across three training runs, each evaluated on the same 40 new initial conditions. Mean tail error $z$ and energy $E_u$ average runs and initial conditions. Pass fractions track each configuration against its own previously fixed tolerance.}
+\label{tab:configuration_transfer}
+\small
+\begin{tabular}{cccccc}
+\toprule
+Configuration & $\varepsilon$ & $\eta$ & Minimum pass & Mean $z$ & Mean $E_u$\\
+\midrule
+$2/\mathcal O_{23}$ & 0.10 & 0\% & 100.0\% & 0.0266 & 10.08\\
+$2/\mathcal O_{23}$ & 0.10 & 1\% & 97.5\% & 0.0402 & 10.11\\
+$2/\mathcal O_{23}$ & 0.10 & 3\% & 57.5\% & 0.0942 & 10.20\\
+$2/\mathcal O_{23}$ & 0.10 & 5\% & 35.0\% & 0.1571 & 10.39\\
+$3/\mathcal O_{13}$ & 0.05 & 0\% & 100.0\% & 0.0084 & 5.84\\
+$3/\mathcal O_{13}$ & 0.05 & 1\% & 97.5\% & 0.0181 & 5.85\\
+$3/\mathcal O_{13}$ & 0.05 & 3\% & 75.0\% & 0.0455 & 5.91\\
+$3/\mathcal O_{13}$ & 0.05 & 5\% & 42.5\% & 0.0743 & 6.01\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:configuration_transfer} shows that both configurations retain a minimum pass fraction of 97.5\% at 1\% relative mismatch, but fall below the original 90\% requirement at 3\% and 5\%. No state-protection boundary is reached in these 960 trajectories. The drop in pass fraction identifies the sensitivity of the frozen configurations to larger response-weight deviations and motivates incorporating the intended parameter range into configuration validation.
+
+
+Having examined which feedback variables to retain under single-node actuation, we next assess the complementary resource choice: the number of actuators. To quantify the performance cost of restricting actuation to one node, nominal PPO synchronization is evaluated for every nonempty subset of the three nodes: $\{1\}$, $\{2\}$, $\{3\}$, $\{1,2\}$, $\{1,3\}$, $\{2,3\}$, and $\{1,2,3\}$. For a subset $\mathcal S$, the input matrix contains the corresponding columns of $I_3$, and the policy produces $|\mathcal S|$ actions. The six-dimensional observation, error-only reward, initial-state distribution, RK4 integration, policy hidden layers, PPO hyperparameters, and nominal training budget of $4\times10^5$ transitions are unchanged. Each configuration includes three independent training runs and is evaluated on 20 common test initial conditions. All seven configurations and all three final checkpoints per configuration are reported, including configurations with poor synchronization.
+
+The same per-actuator bound $|u_j|\leq4$ is imposed in every configuration, while $E_u$ sums energy across all active channels. Thus, additional actuators provide both additional control directions and a larger admissible total input magnitude ($\|\mathbf u\|_2\leq4\sqrt{|\mathcal S|}$). The comparison therefore measures the joint effect of additional control directions and increased aggregate control authority. Only nominal synchronization is tested in this ablation. Actuator count quantifies the structural actuation requirement.
+
+\begin{table}[pos=htbp,width=\linewidth]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\caption{Nominal PPO ablation over all nonempty actuator subsets. Each configuration uses three final policies and 20 common test initial conditions per policy. Values are mean $\pm$ SD across training-seed means; energy is summed over all active inputs.}
+\label{tab:multi_input_comparison}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+Controlled nodes & Inputs & MAE & Steady L1 error & $E_u$ \\
+\midrule
+$\{1\}$ & 1 & $1.3937 \pm 0.0029$ & $4.2825 \pm 0.1571$ & $266.49 \pm 13.41$ \\
+$\{2\}$ & 1 & $0.0930 \pm 0.0022$ & $0.0426 \pm 0.0131$ & $9.09 \pm 1.53$ \\
+$\{3\}$ & 1 & $0.0431 \pm 0.0012$ & $0.0091 \pm 0.0033$ & $6.54 \pm 0.34$ \\
+$\{1,2\}$ & 2 & $0.1145 \pm 0.0110$ & $0.0679 \pm 0.0212$ & $20.61 \pm 1.28$ \\
+$\{1,3\}$ & 2 & $0.0232 \pm 0.0007$ & $0.0119 \pm 0.0019$ & $10.93 \pm 0.12$ \\
+$\{2,3\}$ & 2 & $0.0205 \pm 0.0011$ & $0.0141 \pm 0.0040$ & $8.15 \pm 0.27$ \\
+$\{1,2,3\}$ & 3 & $0.0118 \pm 0.0007$ & $0.0105 \pm 0.0026$ & $10.91 \pm 0.17$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[pos=htbp,width=\linewidth]
+  \centering
+  \includegraphics[width=0.96\linewidth]{figures/multi_input_matched_budget.pdf}
+  \caption{Nominal synchronization error and total control energy for all actuator subsets. Each colored point is a training-seed mean over 20 common test initial conditions; black horizontal marks denote the mean across three seeds. Blue, orange, and green indicate one, two, and three actuators, respectively.}
+  \label{fig:multi_input_comparison}
+\end{figure}
+
+Table~\ref{tab:multi_input_comparison} and Fig.~\ref{fig:multi_input_comparison} quantify the tradeoff. Single-node control at Node 3 gives MAE 0.0431 and energy 6.54, whereas $\{2,3\}$ gives 0.0205 and 8.15 and $\{1,2,3\}$ gives 0.0118 and 10.91. Thus, one actuator retains low-residual synchronization with lower measured energy, but incurs a higher full-horizon error than these multi-input configurations. The steady L1 error does not decrease monotonically with actuator count: it is 0.0091 for $\{3\}$, compared with 0.0141 for $\{2,3\}$ and 0.0105 for $\{1,2,3\}$. Full-horizon accuracy and steady-state precision thus capture different consequences of increasing actuator availability.
+
+The $\{1,2\}$ configuration has higher MAE and energy than $\{2\}$ under the fixed training budget, while configurations containing Node 3 perform better in full-horizon MAE. This emphasizes the effect of actuator placement and finite-budget policy optimization. Although adding an actuator enlarges the admissible control set, exploiting that flexibility also depends on policy optimization within the available training budget. These results quantify the accuracy--effort tradeoff of single-input control as a resource-constrained design choice.
+
+\subsection{Controller Comparison and Robustness Assessment}
 \label{subsec:robustness_tests}
 
-\subsubsection{Parameter mismatch}
+The comparison is interpreted using the validated LQR and SMC settings, together with PPO and the SAC results in Table~\ref{tab:sac_comparison}. We first report LQR weight selection because it changes several controller rankings. The following scenario curves retain the original $R=1$ LQR reference to illustrate sensitivity to disturbance amplitude; their rankings must not be read as comparisons against the selected LQR design.
 
-After validating the pinning-node selection, the robustness of the learned control policy is first examined under parameter mismatch~\cite{zhang2011weak}. To model uncertainty in the response system, a mismatch is introduced into the weight matrix. Let $W$ be the weight matrix of the drive system. The mismatched weight matrix of the response system is constructed as
+
+The principal LQR comparison uses a separately validated control weight, rather than relying only on the reference design $Q=I_3$, $R=1$. A sensitivity test fixes $Q=I_3$ and considers $R\in\{0.01,0.1,1,10,100\}$. For each node, $R$ is selected using ten validation initial conditions and the same nominal, $\eta=1$, and impulse normalized-MAE score used for SMC. All five candidate scores are retained in the reproducibility records. Both nodes select $R=0.01$, which is then frozen before evaluating 20 held-out test initial conditions. This error-oriented validation does not penalize measured energy and has access to non-ideal validation scenarios, unlike nominal-only PPO training. The selected value lies at the lower edge of the tested grid and defines the validated LQR setting used here. The historical $R=1$ results and fixed gain $k=8$ are unchanged.
+
+\begin{table}[pos=htbp,width=\linewidth]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\caption{LQR weight sensitivity on held-out tests. Each entry is a mean over 20 initial conditions; PPO additionally averages three training seeds. The selected $R=0.01$ is frozen using separate validation seeds. MAE covers the full horizon, including the impulse scenario.}
+\label{tab:lqr_weight_sensitivity}
+\begin{tabular}{@{}clrrrrrr@{}}
+\toprule
+ & & \multicolumn{2}{c}{PPO} & \multicolumn{2}{c}{LQR, $R=1$} & \multicolumn{2}{c}{LQR, $R=0.01$} \\
+Node & Scenario & MAE & $E_u$ & MAE & $E_u$ & MAE & $E_u$ \\
+\midrule
+2 & Nominal & 0.0930 & 9.09 & 0.0907 & 3.78 & 0.0772 & 10.58 \\
+2 & $\eta=2$ & 0.1703 & 11.85 & 0.2330 & 5.58 & 0.1486 & 14.60 \\
+2 & Impulse & 0.4339 & 17.51 & 0.5128 & 9.95 & 0.3368 & 31.23 \\
+2 & $\sigma=0.05$ & 0.2669 & 135.57 & 0.3742 & 11.67 & 0.2427 & 90.27 \\
+\midrule
+3 & Nominal & 0.0431 & 6.54 & 0.0510 & 2.65 & 0.0392 & 4.99 \\
+3 & $\eta=2$ & 0.0656 & 6.44 & 0.0989 & 3.56 & 0.0647 & 5.29 \\
+3 & Impulse & 0.2581 & 18.09 & 0.3330 & 7.49 & 0.2592 & 13.71 \\
+3 & $\sigma=0.05$ & 0.1312 & 69.96 & 0.1826 & 7.11 & 0.1264 & 23.27 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:lqr_weight_sensitivity} shows that the original LQR weighting materially affects the comparison. At Node 2, $R=0.01$ lowers MAE below PPO in all four tested settings. Under mismatch, its MAE and energy are 0.1486 and 14.60, compared with PPO's 0.1703 and 11.85. After the impulse, its mean post-pulse error is 1.5536 versus PPO's 2.0800, with energy 31.23 versus 17.51. Under noise, it improves both MAE (0.2427 versus 0.2669) and energy (90.27 versus 135.57). The selected weighting therefore changes the error ordering obtained with the reference $R=1$ design.
+
+At Node 3, the selected LQR has lower mean error and energy than PPO in the nominal, mismatch, and noise tests. PPO has a slightly lower mean post-impulse error (1.2969 versus 1.3169), but higher energy (18.09 versus 13.71). The recovery means are close, with a clearer difference in energy. The result highlights controller weighting as an important factor in the observed accuracy--effort balance.
+
+
+After assessing actuator placement and observation availability, the frozen controllers are evaluated under parameter mismatch~\cite{zhang2011weak}. To model uncertainty in the response system, a mismatch is introduced into the weight matrix. Let $W$ be the weight matrix of the drive system. The mismatched weight matrix of the response system is constructed as
 \begin{equation}
 	W_r = W + \eta (W\odot \Delta),
 	\label{eq:mismatch_matrix}
@@ -868,101 +1095,63 @@ It should be noted that $\eta$ is a normalized scaling coefficient rather than t
 \end{equation}
 Here, $\eta=0.0$ corresponds to the nominal case without mismatch, while larger values represent stronger parameter uncertainty.
 
-For the parameter-mismatch experiment, the response-system mismatch matrix is randomly generated at each environment reset during training, so that the policy is exposed to a range of parameter-perturbed dynamics. In testing, the trained controller is evaluated under fixed mismatch levels and compared with the linear feedback baseline.
+All controllers are evaluated without adaptation under the perturbed response matrices. PPO is trained without domain randomization; LQR is designed from the nominal linearization, and SMC uses nominal compensation with parameters selected on separate validation scenarios as described above.
 
-Fig.~\ref{fig:mismatch_mae_comparison}(a) and Table~\ref{tab:node3_mismatch} show the results under the Node 3 scenario. As the mismatch intensity increases, both PPO and linear feedback exhibit increasing synchronization errors, indicating that parameter uncertainty indeed degrades synchronization performance. However, PPO maintains slightly lower MAE than the traditional linear feedback controller over most mismatch levels, suggesting that the learned nonlinear policy can preserve effective synchronization under moderate parameter uncertainty.
+At $\eta=2$, the selected LQR design gives Node 2 MAE 0.1486 with energy 14.60, compared with 0.1703 and 11.85 for PPO; SAC gives 0.1513 and 9.31 (Table~\ref{tab:sac_comparison}). The validated SMC setting gives MAE 0.2223, while fixed feedback with unchanged $k=8$ has large errors. Thus, the endpoint results indicate controller-dependent error--effort tradeoffs, with distinct balances between accuracy and effort. Fig.~\ref{fig:mismatch_methods} retains the reference $R=1$ LQR curve (MAE 0.2330 at this endpoint) to show how the original settings respond across mismatch amplitudes. Table~\ref{tab:traditional_summary} summarizes those reference settings. Node 3 generally shows smaller absolute error differences.
 
-%\begin{figure}[pos=htbp,width=\linewidth]
-%	\centering
-%	\includegraphics[width=0.5\linewidth]{figures/node3_mismatch_mae.pdf}
-%	\caption{Mean absolute error comparison between PPO and traditional linear feedback under different parameter mismatch levels for Node 3.}
-%	\label{fig:node3_mismatch_mae}
-%\end{figure}
+\begin{figure}[pos=htbp,width=\linewidth]
+	\centering
+	\includegraphics[width=0.92\linewidth]{figures/mismatch_methods.pdf}
+	\caption{MAE and control energy of PPO, fixed-gain feedback ($k=8$), LQR, and SMC under parameter mismatch. Curves show the mean over the common test initial conditions; PPO additionally aggregates three training seeds.}
+	\label{fig:mismatch_methods}
+\end{figure}
 
 \begin{table}[pos=htbp,width=\linewidth]
 	\centering
-	\setlength{\tabcolsep}{3pt}
-	\renewcommand{\arraystretch}{1.12}
-	\caption{Quantitative comparison between PPO and linear feedback under different parameter mismatch levels for Node 3.}
-	\label{tab:node3_mismatch}
-	\begin{tabular}{@{}ccccc@{}}
+	\setlength{\tabcolsep}{2.4pt}
+	\renewcommand{\arraystretch}{1.10}
+	\caption{Representative mismatch and impulse-disturbance results.}
+	\label{tab:traditional_summary}
+	\begin{tabular}{@{}clccccc@{}}
 		\toprule
-		\multirow{2}{*}{\makecell{Mismatch\\Scale $\eta$}} & \multicolumn{2}{c}{MAE} & \multicolumn{2}{c}{\makecell{Final L1\\Error $E_f$}} \\
-		\cmidrule(lr){2-3}\cmidrule(lr){4-5}
-		& PPO & Linear & PPO & Linear \\
+		\multirow{2}{*}{Node} & \multirow{2}{*}{Method} & \multicolumn{2}{c}{Nominal} & \multicolumn{1}{c}{$\eta=2$} & \multicolumn{2}{c}{Impulse} \\
+		\cmidrule(lr){3-4}\cmidrule(lr){5-5}\cmidrule(lr){6-7}
+		& & MAE & $E_u$ & MAE & $E_{\mathrm{post}}$ & $E_u$ \\
 		\midrule
-		0.0 & 0.0212 & 0.0252 & 0.0125 & 0.0001 \\
-		0.5 & 0.0192 & 0.0198 & 0.0308 & 0.0222 \\
-		1.0 & 0.0226 & 0.0245 & 0.0459 & 0.0441 \\
-		1.5 & 0.0261 & 0.0295 & 0.0611 & 0.0657 \\
-		2.0 & 0.0299 & 0.0345 & 0.0763 & 0.0870 \\
+		\multirow{4}{*}{2}
+		& PPO & 0.0930 & 9.09 & 0.1703 & 2.0800 & 17.51 \\
+		& Fixed ($k=8$) & 2.5673 & 51.03 & 2.7481 & 8.6188 & 74.02 \\
+		& LQR & 0.0907 & 3.78 & 0.2330 & 2.5264 & 9.95 \\
+		& SMC & 0.1018 & 5.59 & 0.2223 & 2.7691 & 14.13 \\
+		\midrule
+		\multirow{4}{*}{3}
+		& PPO & 0.0431 & 6.54 & 0.0656 & 1.2969 & 18.09 \\
+		& Fixed ($k=8$) & 0.0457 & 3.58 & 0.0785 & 1.2518 & 16.21 \\
+		& LQR & 0.0510 & 2.65 & 0.0989 & 1.6883 & 7.49 \\
+		& SMC & 0.0728 & 4.60 & 0.1257 & 1.7352 & 11.37 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-To further examine the adaptability of the proposed method under a less favorable control channel, the parameter mismatch experiment is also conducted for Node 2. According to the local stability and controllability analysis, Node 2 has certain control propagation capability, but its local transverse stability is weaker than that of Node 3. Therefore, it represents a more challenging single-input control scenario. As shown in Fig.~\ref{fig:mismatch_mae_comparison}(b), the PPO and traditional linear feedback exhibit a much more significant performance difference under Node 2. Across the whole mismatch range, PPO maintains a relatively low average synchronization error, whereas the linear feedback controller shows substantially larger MAE. This indicates that the PPO policy has stronger adaptability when the selected control node is not locally preferred.
 
-%\begin{figure}[pos=h,width=\linewidth]
-%	\centering
-%	\includegraphics[width=0.5\linewidth]{figures/node2_mismatch_mae.pdf}
-%	\caption{Mean absolute error comparison between PPO and traditional linear feedback under different parameter mismatch levels for Node 2.}
-%	\label{fig:node2_mismatch_mae}
-%\end{figure}
-\begin{center}
-	\setlength{\tabcolsep}{8pt}
-	\begin{tabular}{cc}
-		\includegraphics[width=0.43\linewidth]{figures/node3_mismatch_mae.pdf} &
-		\includegraphics[width=0.43\linewidth]{figures/node2_mismatch_mae.pdf} \\
-		\small (a) Node 3 &
-		\small (b) Node 2
-	\end{tabular}
-	
-	\captionof{figure}{Mean absolute error comparison between PPO and traditional linear feedback under different parameter mismatch levels for different pinning nodes.}
-	\label{fig:mismatch_mae_comparison}
-\end{center}
-
-\subsubsection{Impulse disturbance}
-
-In addition to parameter uncertainty, sudden impulse disturbance is also considered to evaluate the transient recovery capability of the controllers~\cite{cao2024synchronisation}. In the testing process, a global impulse disturbance is injected into all three state components at step 200. The impulse vector is set as
+In addition to parameter uncertainty, sudden impulse disturbance is also considered to evaluate the transient recovery capability of the controllers~\cite{cao2024synchronisation}. In the testing implementation, an impulse is added to all three drive-state components immediately after integration at step 200 ($t=10$); the response state is not directly shifted. This tests recovery following an abrupt change of the synchronization reference. The impulse vector is set as
 \begin{equation}
 	\mathbf{p}=[5,5,5]^{\mathrm T}.
 	\label{eq:pulse_vector}
 \end{equation}
-This setting avoids the asymmetry caused by disturbing only a single state component and provides a fairer comparison of recovery performance under different pinning nodes.
+The same drive-state jump is applied for both actuator locations and all controllers. It tests recovery after a shared reference change; the resulting response can still depend on the chosen jump direction.
 
-Fig.~\ref{fig:pulse_recovery} shows the evolution of the global synchronization error before and after the impulse disturbance for Nodes 2 and 3. Under the Node 3 scenario, both the PPO and traditional linear feedback can suppress the error increase after the impulse and gradually recover to a low-error level. Therefore, when the control input is applied to the locally preferred node, the transient recovery performance of the two methods is relatively close. This suggests that the traditional linear feedback controller can already achieve satisfactory disturbance recovery when the control channel is favorable, while the PPO controller can at least maintain comparable recovery capability.
-
-By contrast, the difference between the two methods becomes much more evident under the Node 2 scenario. Since Node 2 is not the locally preferred pinning node, the linear feedback controller exhibits a higher post-pulse error level and a larger mean error after the disturbance. In contrast, PPO can still suppress the error growth effectively and maintain a lower post-pulse mean error. Therefore, under a more challenging control channel, the data-driven PPO policy exhibits stronger adaptability and recovery capability than the fixed-structure linear feedback controller.
+Because the immediate peak $M_p$ is dominated by the prescribed jump, $E_{\mathrm{post}}$ is used as the main recovery metric. At Node 2, the selected LQR has mean $E_{\mathrm{post}}=1.5536$ and energy 31.23, compared with 2.0800 and 17.51 for PPO. SAC gives 1.9226 and 25.20, with larger between-run variation than PPO; the SMC mean recovery error is 2.7691. These results highlight the tradeoff between recovery accuracy and applied effort. Fig.~\ref{fig:pulse_methods} and Table~\ref{tab:traditional_summary} retain the original $R=1$ LQR reference, whose mean recovery error is 2.5264, alongside fixed feedback (8.6188 at Node 2). At Node 3, fixed feedback and PPO have similar recovery means (1.2518 and 1.2969); the selected LQR gives 1.3169 at lower energy than PPO. The close recovery means are considered alongside the corresponding energy requirements.
 
 \begin{figure}[pos=h,width=\linewidth]
 	\centering
-	\includegraphics[width=0.9\linewidth]{figures/pulse_response.png}
-	\caption{Recovery performance under the same global impulse disturbance for Nodes 2 and 3.}
-	\label{fig:pulse_recovery}
+	\includegraphics[width=0.92\linewidth]{figures/pulse_methods.pdf}
+	\caption{Post-pulse mean error and control energy for the reference settings under the same global impulse. LQR uses $R=1$.}
+	\label{fig:pulse_methods}
 \end{figure}
 
-Since the traditional linear feedback controller fails to re-enter the predefined error threshold band within the given testing horizon under Node 2, recovery time is not used as the main comparison metric. Instead, $M_p$, $E_{\mathrm{post}}$, and $E_u$ are used for quantitative evaluation, as reported in Table~\ref{tab:pulse_node2}. The $M_p$ is mainly determined by the injected impulse and the immediate system response, whereas the $E_{\mathrm{post}}$ better reflects the subsequent recovery process. PPO achieves a much lower $E_{\mathrm{post}}$ than traditional linear feedback while using substantially lower $E_u$, indicating better recovery quality and lower overall control cost under this challenging Node 2 disturbance scenario.
 
-\begin{table}[pos=h,width=\linewidth]
-	\centering
-	\setlength{\tabcolsep}{2pt}
-	\renewcommand{\arraystretch}{1.12}
-	\caption{Recovery performance under global impulse disturbance for Node 2.}
-	\label{tab:pulse_node2}
-	\begin{tabular}{@{}lccc@{}}
-		\toprule
-		Method & $M_p$ & $E_{\mathrm{post}}$ & $E_u$ \\
-		\midrule
-		PPO & 14.9924 & 2.0650 & 19.4115 \\
-		Linear Feedback & 17.3844 & 5.5145 & 61.8433 \\
-		Zero Input & 14.9924 & 4.4985 & 0.0000 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\subsubsection{Gaussian-noise perturbation}
-
-To further evaluate the robustness of the learned controller under persistent random perturbations, zero-mean Gaussian noise is added to the response system during testing, while the training stage remains noise-free. This setting directly examines the generalization robustness of the trained policy under unseen stochastic disturbances. Specifically, after each control step and numerical integration, additive Gaussian noise is imposed on the response state:
+To further evaluate the robustness of the learned controller under persistent random perturbations, zero-mean Gaussian noise is added to the response system during testing, while the training stage remains noise-free. This setting tests the frozen policy under stochastic state perturbations absent from training. Specifically, after each control step and numerical integration, additive Gaussian noise is imposed on the response state:
 \begin{equation}
 	\mathbf{y}_{k+1}^{\mathrm{noisy}}
 	=
@@ -982,47 +1171,99 @@ Here, $\sigma$ denotes the noise intensity and $I_3$ is the $3\times 3$ identity
 	\label{eq:noise_levels}
 \end{equation}
 
-The Gaussian noise experiment is conducted under the Node 3 scenario. As shown in Fig.~\ref{fig:gaussian_noise_mae}, the MAE of both PPO and linear feedback increases as the noise intensity becomes larger, which indicates that persistent stochastic perturbations degrade synchronization performance. Nevertheless, PPO consistently achieves lower MAE than linear feedback at all tested noise levels. This suggests that the proposed method can maintain relatively stable synchronization performance even when the testing environment contains random disturbances that were not present during training.
+At $\sigma=0.05$, the selected LQR gives lower Node 2 mean MAE and energy (0.2427 and 90.27) than PPO (0.2669 and 135.57). SAC has a similar mean MAE to PPO (0.2632), with lower energy (86.13). The validated SMC setting gives MAE 0.3295. The comparison therefore depends on the LQR weighting: its reference $R=1$ design gives MAE 0.3742, while the selected weighting and SAC provide competitive error--effort combinations. Fig.~\ref{fig:noise_methods} and Table~\ref{tab:noise_summary} retain the reference-controller noise sweep for both nodes. Noise is added to the evolving response state, so the experiment measures sensitivity to process noise.
 
 \begin{figure}[pos=h,width=\linewidth]
 	\centering
-	\includegraphics[width=0.5\linewidth]{figures/noise_mae_trend.png}
-	\caption{Mean absolute error comparison between PPO and linear feedback under different Gaussian noise levels for Node 3.}
-	\label{fig:gaussian_noise_mae}
-\end{figure}
-
-Fig.~\ref{fig:gaussian_noise_time} further compares the instantaneous global synchronization error $\|\mathbf{e}(t)\|_1$ at the highest tested noise level $\sigma=0.05$. PPO maintains a lower error level over most of the testing interval, while the traditional linear feedback controller shows larger fluctuations. The quantitative results in Table~\ref{tab:gaussian_noise} also confirm that PPO achieves lower MAE and Final L1 Error under noisy testing conditions. These results demonstrate that the proposed PPO-based controller has better adaptability to persistent stochastic perturbations than the fixed-gain linear feedback baseline.
-
-
-
-\begin{figure}[pos=h,width=\linewidth]
-	\centering
-	\includegraphics[width=0.5\linewidth]{figures/ppo_vs_linear_high_noise.png}
-	\caption{Evolution of the instantaneous global synchronization error $\|\mathbf{e}(t)\|_1$ under Gaussian noise with $\sigma=0.05$ for Node 3. The shaded region denotes the mean $\pm$ standard deviation over multiple independent tests.}
-	\label{fig:gaussian_noise_time}
+	\includegraphics[width=0.92\linewidth]{figures/noise_methods.pdf}
+	\caption{MAE and control energy of the four reference controllers under Gaussian-noise perturbation. LQR uses $R=1$.}
+	\label{fig:noise_methods}
 \end{figure}
 
 \begin{table}[pos=h,width=\linewidth]
 	\centering
-	\setlength{\tabcolsep}{2pt}
-	\renewcommand{\arraystretch}{1.12}
-	\caption{Synchronization performance under different Gaussian noise levels for Node 3.}
-	\label{tab:gaussian_noise}
-	\begin{tabular}{@{}ccccc@{}}
+	\setlength{\tabcolsep}{3pt}
+	\renewcommand{\arraystretch}{1.10}
+	\caption{Performance at the highest tested noise intensity, $\sigma=0.05$.}
+	\label{tab:noise_summary}
+	\begin{tabular}{@{}clccc@{}}
 		\toprule
-		\makecell{Noise std\\$\sigma$} & \makecell{Linear\\MAE} & \makecell{PPO\\MAE} & \makecell{Linear\\Final L1} & \makecell{PPO\\Final L1} \\
+		Node & Method & MAE & Steady L1 error & $E_u$ \\
 		\midrule
-		0.00 & 0.0421 & 0.0398 & 0.0003 & 0.0081 \\
-		0.01 & 0.0646 & 0.0557 & 0.1112 & 0.0858 \\
-		0.02 & 0.0886 & 0.0747 & 0.2221 & 0.1694 \\
-		0.05 & 0.1613 & 0.1333 & 0.5474 & 0.4152 \\
+		\multirow{4}{*}{2}
+		& PPO & 0.2669 & 0.5383 & 135.57 \\
+		& Fixed ($k=8$) & 2.6584 & 8.7280 & 56.99 \\
+		& LQR & 0.3742 & 0.8979 & 11.67 \\
+		& SMC & 0.3295 & 0.7298 & 140.49 \\
+		\midrule
+		\multirow{4}{*}{3}
+		& PPO & 0.1312 & 0.3183 & 69.96 \\
+		& Fixed ($k=8$) & 0.1555 & 0.4000 & 11.09 \\
+		& LQR & 0.1826 & 0.4419 & 7.11 \\
+		& SMC & 0.2389 & 0.6029 & 92.51 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
+
+To assess the dependence of the results on the learning algorithm, soft actor-critic (SAC)~\cite{haarnoja2018soft} is evaluated on the same single-input Node 2 and Node 3 tasks. Both algorithms use the six-dimensional observation $(\mathbf x,\mathbf e)/5$, reward $-0.1\|\mathbf e\|_1$, actuator bound $|u|\leq4$, nominal training dynamics, and final checkpoints at a nominal budget of $4\times10^5$ environment transitions. Three independent training runs and 20 common test initial conditions per seed are used. All checkpoints are retained, and evaluation uses deterministic actions without online learning. The compared test settings are nominal dynamics, mismatch $\eta=2$, the drive-state impulse at $t=10$, and response process noise with $\sigma=0.05$.
+
+Both implementations use two hidden layers of width 64, a learning rate of $3\times10^{-4}$, batch size 128, and discount factor 0.99. PPO uses Tanh hidden activations, four environments with 512 steps per rollout, ten optimization epochs, clip range 0.2, GAE parameter 0.95, and entropy coefficient 0.001. SAC uses ReLU hidden activations, one environment, a replay buffer of $10^5$ transitions, 5,000 initial exploration steps, one gradient update per subsequent transition, target-update coefficient $\tau=0.005$, and automatic entropy adjustment with target entropy $-1$. These settings are fixed across nodes and seeds. The budget matches environment interactions; gradient-update counts and training times follow each algorithm\'s update schedule. The comparison uses these fixed hyperparameter settings.
+
+\begin{table}[pos=htbp,width=\linewidth]
+\centering\small
+\setlength{\tabcolsep}{3pt}
+\caption{PPO and SAC at the same nominal budget of $4\times10^5$ environment transitions. Values are mean $\pm$ sample SD across three training-seed means, each obtained from 20 common test initial conditions. $E_{\mathrm{post}}$ is reported only for the impulse scenario.}
+\label{tab:sac_comparison}
+\begin{tabular}{@{}cllccc@{}}
+\toprule
+Node & Scenario & Method & MAE & $E_u$ & $E_{\mathrm{post}}$ \\
+\midrule
+2 & Nominal & PPO & $0.0930 \pm 0.0022$ & $9.09 \pm 1.53$ & -- \\
+2 & Nominal & SAC & $0.1173 \pm 0.0046$ & $6.27 \pm 0.45$ & -- \\
+2 & $\eta=2$ & PPO & $0.1703 \pm 0.0085$ & $11.85 \pm 1.60$ & -- \\
+2 & $\eta=2$ & SAC & $0.1513 \pm 0.0037$ & $9.31 \pm 0.43$ & -- \\
+2 & Impulse & PPO & $0.4339 \pm 0.0246$ & $17.51 \pm 1.19$ & $2.0800 \pm 0.1451$ \\
+2 & Impulse & SAC & $0.4206 \pm 0.0979$ & $25.20 \pm 9.79$ & $1.9226 \pm 0.5913$ \\
+2 & $\sigma=0.05$ & PPO & $0.2669 \pm 0.0049$ & $135.57 \pm 48.71$ & -- \\
+2 & $\sigma=0.05$ & SAC & $0.2632 \pm 0.0052$ & $86.13 \pm 8.86$ & -- \\
+\midrule
+3 & Nominal & PPO & $0.0431 \pm 0.0012$ & $6.54 \pm 0.34$ & -- \\
+3 & Nominal & SAC & $0.0416 \pm 0.0010$ & $4.60 \pm 0.11$ & -- \\
+3 & $\eta=2$ & PPO & $0.0656 \pm 0.0025$ & $6.44 \pm 0.30$ & -- \\
+3 & $\eta=2$ & SAC & $0.0644 \pm 0.0009$ & $5.07 \pm 0.16$ & -- \\
+3 & Impulse & PPO & $0.2581 \pm 0.0003$ & $18.09 \pm 3.50$ & $1.2969 \pm 0.0070$ \\
+3 & Impulse & SAC & $0.2735 \pm 0.0106$ & $12.62 \pm 0.53$ & $1.3987 \pm 0.0664$ \\
+3 & $\sigma=0.05$ & PPO & $0.1312 \pm 0.0066$ & $69.96 \pm 17.55$ & -- \\
+3 & $\sigma=0.05$ & SAC & $0.1273 \pm 0.0013$ & $50.40 \pm 14.21$ & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[pos=htbp,width=\linewidth]
+  \centering
+  \includegraphics[width=0.96\linewidth]{figures/ppo_sac_matched_budget.pdf}
+  \caption{PPO--SAC comparison at matched environment-transition budgets. Bars show the mean of three training-seed means and error bars show their sample standard deviation. Each seed is evaluated on 20 common initial conditions. The upper panels use full-horizon MAE for every scenario; the separate post-impulse metric is given in Table~\ref{tab:sac_comparison}.}
+  \label{fig:sac_comparison}
+\end{figure}
+
+Table~\ref{tab:sac_comparison} and Fig.~\ref{fig:sac_comparison} show a scenario-dependent comparison. For Node 2, PPO has lower nominal MAE (0.0930 versus 0.1173), but SAC has lower MAE under mismatch $\eta=2$ (0.1513 versus 0.1703) and also lower energy (9.31 versus 11.85). Following the impulse, SAC has lower mean $E_{\mathrm{post}}$ (1.9226 versus 2.0800), but greater variation across training-seed means (SD 0.5913 versus 0.1451) and higher mean energy (25.20 versus 17.51). At $\sigma=0.05$, the mean MAEs are close (0.2632 for SAC and 0.2669 for PPO), while SAC uses less energy.
+
+For Node 3, SAC has slightly lower mean MAE in the nominal, mismatch, and noise tests and lower mean energy in all four settings. PPO achieves lower post-impulse error (1.2969 versus 1.3987), at higher energy. The comparison reveals complementary strengths of the two learning algorithms across operating conditions. PPO is a viable implementation of the constrained pinning framework, while algorithm choice depends on the operating condition and the relative importance of error, variability, and control effort. Means and standard deviations across the three training runs summarize both performance and training variability.
+
+Taken together, the configuration and controller comparisons show that observation composition matters alongside actuator placement. Under the tested PPO training setup, the matched-dimension comparison recovers low residuals at Node 2 without restoring all six inputs, whereas the same alternative subset increases residuals and effort at Node 3. Thus, the original Node 2 degradation cannot be explained by reduced input dimension alone. The targeted SAC check reproduces the direction of the subset-dependent error changes at both nodes, while energy penalties remain algorithm dependent. These within-node comparisons support joint evaluation of sensing and actuation under a common finite training budget. The prespecified-pool selection example in Table~\ref{tab:configuration_selection} gives this finding an operational interpretation: the preferred candidate depends on the allowed actuator location and the requested error tolerance, while stringent requirements may leave no feasible candidate. Its dimension-first ranking makes the resource priority explicit while enforcing the specified accuracy criterion. Post-hoc ranking checks and frozen-policy mismatch tests expose the preference dependence and the limited transfer of nominal accuracy requirements.
+
+Accuracy and applied effort can be competing requirements in control design~\cite{rodriguez2020multiobjective}. Here both are reported to characterize the policies learned with the error-based PPO reward. The actuator ablation shows lower full-horizon error for favorable multi-input policies than for single-input Node 3, at greater measured total effort; steady-state error need not improve. Since per-channel limits are fixed, the multi-input cases also have greater aggregate control authority. Traditional and SAC comparisons place the PPO results within a broader set of controller-dependent accuracy--effort tradeoffs.
+
+The scope is the stated three-state network, initial-state distribution, and separately applied perturbations. The actuator ablation fixes per-channel limits, allowing total available input magnitude to increase with actuator count. The observation study concerns policy inputs at deployment; its training reward uses all error components. Three training seeds describe variability within the reported protocol. Transfer to other networks, combined disturbances, certified synchronization bounds, and measured hardware costs remain subjects for further work.
+
 \FloatBarrier
 \section{Image Encryption Scheme and Statistical Security Analysis}
 \label{sec:image_encry}
+
+The legacy implementation and its existing image statistics are described first. Section~\ref{subsec:sync_application_bridge} then introduces a separate, conditionally justified reconstruction experiment to examine the missing link between continuous synchronization error and discrete rule agreement; its results must not be attributed to the legacy preprocessing.
+
+\subsection{Legacy Image-Transform Implementation}
 
 Astronomical observation systems generate large amounts of high-value image data, including celestial structures, planetary surfaces, and remote-sensing information. In distributed observation scenarios such as Very Long Baseline Interferometry~\cite{thompson2017interferometry}, these images may need to be transmitted and shared across different observation sites, making them vulnerable to eavesdropping, tampering, and unauthorized access. Therefore, secure image protection is important for astronomical and space-related data applications.
 
@@ -1041,7 +1282,7 @@ Astronomical observation systems generate large amounts of high-value image data
 
 Astronomical images usually contain rich textures, complex intensity distributions, and strong spatial correlations among adjacent pixels, making them suitable test objects for image encryption algorithms. An effective encryption scheme should conceal the visual content of the original image and reduce its statistical redundancy. Since chaotic systems are sensitive to initial conditions and can generate pseudo-random trajectories, they have been widely used for image encryption. In a drive--response synchronization framework, synchronized chaotic trajectories can provide consistent key streams for encryption and decryption.
 
-Motivated by this idea, this chapter applies the synchronized trajectories generated by the PPO-controlled continuous-time Hopfield chaotic neural network to image encryption. The flow chart of our method in image encryption is shown in Fig.~\ref{fig:encrypt_process}. The proposed scheme combines synchronized Hopfield chaotic sequences, Logistic-map-based diffusion, and dynamic DNA coding. The plain image is first encrypted and then decrypted to verify reversibility. The RGB histogram and adjacent-pixel correlation are further analyzed to evaluate the statistical security of the encrypted image. The specific steps of encryption are as follows:
+Motivated by this idea, this chapter applies the synchronized trajectories generated by the PPO-controlled continuous-time Hopfield chaotic neural network to image encryption. The flow chart of our method in image encryption is shown in Fig.~\ref{fig:encrypt_process}. The proposed scheme combines synchronized Hopfield chaotic sequences, Logistic-map-based masking, and dynamic DNA coding. The plain image is first encrypted and then decrypted to verify reversibility. The RGB histogram and adjacent-pixel correlation are further analyzed to evaluate the statistical properties of the encrypted image. The specific steps of encryption are as follows:
 %\begin{figure}[!htbp]
 %	\centering
 %	\includegraphics[width=\linewidth,keepaspectratio]{figures/encrypt_process.pdf}
@@ -1049,125 +1290,85 @@ Motivated by this idea, this chapter applies the synchronized trajectories gener
 %	\label{fig:encrypt_process}
 %\end{figure}
 
-\begin{center}
-	\includegraphics[width=0.85\linewidth,keepaspectratio]{figures/encrypt_process.pdf}
-	
-	\captionof{figure}{Flowchart of the image encryption process.}
-	\label{fig:encrypt_process}
-\end{center}
+\begin{figure}[pos=!t,width=\linewidth]
+\centering
+\includegraphics[width=0.75\linewidth,height=0.70\textheight,keepaspectratio]{figures/encrypt_process.pdf}
+\caption{Overview of the image-encryption workflow. The image-derived value denoted by $H(P)$ in the schematic is combined with the password and mapped through SHA-256 to the Logistic initial value, as specified in the text. Chaotic sequences determine the discrete DNA rules after preprocessing. This overview omits the round-level operations and receiver-side reconstruction; channelwise XOR masking is not cross-channel diffusion.}
+\label{fig:encrypt_process}
+\end{figure}
 
 \begin{enumerate}
-	\item 
-	Let the plain image be defined as $P \in \mathbb{Z}^{H \times W \times C}_{256}$, where $H$, $W$, and $C$ represent the height, width, and number of channels, respectively. The image is first split into individual channels:
-	\begin{equation}
-		P_c, \quad c \in \{1, 2, \dots, C\}
-	\end{equation}
+\item \textit{Channel separation and spatial blocks.}
+Let $P\in\{0,\ldots,255\}^{H\times W\times 3}$ be a three-channel image. Each channel is sliced into non-overlapping blocks of edge length $p=8$, visited from left to right and then from top to bottom. Boundary blocks may be smaller. Thus, the number of blocks is
+\begin{equation}
+N_b=\lceil H/p\rceil\lceil W/p\rceil.
+\end{equation}
+Write $B_{c,b}=\mathcal F_p(P_c)_b$, where $\mathcal F_p$ denotes this ordered slicing operation, not a permutation of pixels. Its inverse places each block back at its original location.
 
-\item
-For each channel $P_c$, it is partitioned into $p \times p$ non-overlapping sub-blocks, with each sub-block having a size of $H_N \times W_N$, satisfying $H = p H_N$ and $W = p W_N$. This reorganization process can be rigorously defined by a tensor transformation $\mathcal{F}: \mathbb{Z}^{H \times W} \to \mathbb{Z}^{p \times p \times D}$, where the output depth is $D = H_N W_N$. The transformation steps are as follows:
+\item \textit{Image-dependent Logistic mask.}
+The implemented image feature is the sum of all channel values,
 \begin{equation}
-	\mathbf{X} \xrightarrow{\text{Reshape}} \mathbf{X}_1 \in \mathbb{Z}^{p \times H_N \times p \times W_N}
+S(P)=\sum_{c=1}^{3}\sum_{i=1}^{H}\sum_{j=1}^{W}P(i,j,c).
 \end{equation}
+Let $d$ be the decimal string representing $S(P)$. The password string is concatenated directly with $d$, encoded in UTF-8, and hashed using SHA-256. Interpreting the digest as a nonnegative integer $h$, the implementation initializes a scalar floating-point value $z_0=h/2^{256}$. The endpoint values zero and one, if obtained after floating-point conversion, are replaced by $0.123456789$ and $0.987654321$, respectively. The sequence is then generated by
 \begin{equation}
-	\mathbf{X}_1 \xrightarrow{\text{Permute}(1, 3, 2, 4)} \mathbf{X}_2 \in \mathbb{Z}^{p \times p \times H_N \times W_N}
+z_{t+1}=3.9999z_t(1-z_t),\qquad t=0,\ldots,HW-2.
 \end{equation}
+With $\operatorname{rnd}$ denoting rounding to nearest with ties to even, as in NumPy, the mask is
 \begin{equation}
-	\mathbf{X}_2 \xrightarrow{\text{Reshape}} \mathbf{Y} \in \mathbb{Z}^{p \times p \times D}
+Q=\operatorname{reshape}_{H\times W}
+\bigl((\operatorname{rnd}(10^4z_t)\bmod256)_{t=0}^{HW-1}\bigr).
 \end{equation}
+The reshape uses row-major order. This is a floating-point mask generator; the hash length is not a claim about its effective key space. The receiver needs the same password and $d$ to reconstruct $Q$.
 
-Applying this transformation to each channel yields:
+\item \textit{Channelwise masking.}
+Each channel uses the same mask, partitioned by the same operation:
 \begin{equation}
-	B_c = \mathcal{F}(P_c), \quad c = 1, 2, \dots, C
+D_{c,b}=B_{c,b}\oplus\mathcal F_p(Q)_b.
 \end{equation}
+Here $\oplus$ is bytewise XOR. The implementation does not contain a circular or sequential cross-channel diffusion stage.
 
-\item
-To extract the intrinsic features of the image, the information extractor $\mathcal{H}(P)$ is defined as:
+\item \textit{Rule-stream construction.}
+After the trajectory transient, one sample is collected for each block. From the three drive states, four scalar streams are formed as
 \begin{equation}
-	\mathcal{H}(P) = \sum_{k=1}^{C} \sum_{i=1}^{H} \sum_{j=1}^{W} \left[ (P(i,j,k) + 1) \times (i \cdot W + j + 1) \times k \right] \bmod M
+h_1=x_1,\quad h_2=x_2,\quad h_3=x_3,\quad h_4=x_1x_2+x_3.
 \end{equation}
-where $P(i,j,k)$ denotes the pixel value at the corresponding 3D coordinates.
+The fourth stream is derived algebraically, not an additional dynamical state. Response streams use the corresponding $y$ states. For each stream, the implemented preprocessing is
+\begin{align}
+q^{(0)}&=(\operatorname{rnd}(h)\bmod8)+1,\\
+q^{(\ell+1)}&=\left\lfloor
+(\mathcal K[q^{(\ell)}]\bmod8)+1\right\rfloor.
+\end{align}
+The second update is repeated for $\ell=0,\ldots,14$. Here $\mathcal K$ is the scalar Kalman filter implemented as a forward pass, with measurement variance $10^{-2}$ and process variance $10^{-5}$. Each pass is restarted with the first input element as its estimate and measurement variance as its initial error variance. The floor represents the implemented conversion of positive values to unsigned integers. The resulting indices are $s_{i,b}=q_{i,b}^{(15)}\in\{1,\ldots,8\}$. This legacy preprocessing is not a dead-zone quantizer and does not provide a bound guaranteeing identical indices from small continuous-state errors.
 
-\item
-A dual-input hash mapping is designed to map the encrypted password $S_{\text{password}}$ and the extracted image feature $\mathcal{H}(P)$ into an initial state vector $z_0$:
-\begin{equation}
-	z_0 = \text{Hash}(S_{\text{password}}, \mathcal{H}(P))
-\end{equation}
-
-The vector $z_0$ serves as the initial state for the chaotic system. The Logistic map is employed as follows:
-\begin{equation}
-	z_{t+1} = \mu z_t(1 - z_t)
-\end{equation}
-By iterating the Logistic map with $z_0$, a chaotic sequence vector $z_L$ is generated. This sequence is then reshaped to construct the mask matrices $Q$ and $B_Q$:
-\begin{equation}
-	Q = \text{Reshape}_{H \times W} \left( \lfloor 10^{-4} \cdot z_L \rfloor \bmod 256 \right)
-\end{equation}
-\begin{equation}
-	B_Q = \mathcal{F}(Q)
-\end{equation}
-
-\item
-The mask matrix is utilized for the pre-diffusion of the image (where $\oplus$ denotes the bitwise XOR operation):
-\begin{equation}
-	B_c = B_Q \oplus B_c, \quad c = 1, 2, \dots, C
-\end{equation}
-
-To achieve comprehensive chained information interleaving across all channels and to resolve the undefined initial diffusion matrix, a circular XOR diffusion mechanism is designed. In the initial stage of the chained diffusion, the pre-diffused matrix of the last channel, $B_C$, is utilized as the initial feedback condition. It is XOR-ed with the first channel $B_1$ to establish a closed-loop diffusion ring:
-\begin{equation}
-	D_1 = B_C \oplus B_1
-\end{equation}
-
-Subsequently, for the remaining channels, the sequential diffusion is strictly executed according to the forward chained rule:
-\begin{equation}
-	D_c = D_{c-1} \oplus B_c, \quad c \in \{2, 3, \dots, C\}
-\end{equation}
-
-Through this circular structure, any minute pixel perturbation in a single channel will be propagated to all channels during the subsequent diffusion and looping process, thereby effectively resisting differential attacks.
-
-\item 
-Let $R_i \ (i=1,2,\dots,24)$ represent the set of all $4! = 24$ bijective encoding rules between 2-bit binary symbols and DNA bases, as listed in Table~\ref{tab:dna_rules}, with $R_i^{-1}$ denoting the corresponding inverse decoding process. Unlike traditional DNA encryption schemes that restrict the rule set to the 8 Watson-Crick complementary mappings (which preserve complementary partitions and restrict the induced permutations on $\{00, 01, 10, 11\}$ to an order-8 subgroup isomorphic to $D_4$), the proposed scheme fully utilizes all 24 permutations of the symmetric group $S_4$. This eliminates algebraic invariant subspace vulnerabilities under asymmetric encoding--decoding rounds and expands the rule search space threefold. For the state variable sequences outputted by the chaotic system, the quantization function maps the continuous trajectories into rule index sequences:
-\begin{equation}
-	s_i = F_{\text{quantize}}(x_i), \quad s_i \in \{1, 2, \dots, 24\}
-\end{equation}
-
-\begin{table}[htbp]
-		\centering
-		\caption{Full $S_4$ symmetric DNA coding rules (24 permutations).}
-		\label{tab:dna_rules}
-		\begin{tabular}{c|cccc||c|cccc}
-				\hline
-				Rule & 00 & 01 & 10 & 11 & Rule & 00 & 01 & 10 & 11 \\
-				\hline
-				 1 & A & G & C & T & 13 & C & A & G & T \\
-				 2 & A & C & G & T & 14 & C & G & A & T \\
-				 3 & T & G & C & A & 15 & C & G & T & A \\
-				 4 & T & C & G & A & 16 & C & T & G & A \\
-				 5 & C & A & T & G & 17 & G & A & C & T \\
-				 6 & G & A & T & C & 18 & G & C & A & T \\
-				 7 & C & T & A & G & 19 & G & C & T & A \\
-				 8 & G & T & A & C & 20 & G & T & C & A \\
-				 9 & A & C & T & G & 21 & T & A & C & G \\
-				10 & A & G & T & C & 22 & T & A & G & C \\
-				11 & A & T & C & G & 23 & T & C & A & G \\
-				12 & A & T & G & C & 24 & T & G & A & C \\
-				\hline
-		\end{tabular}
+\begin{table}[pos=htbp]
+\centering
+\caption{DNA coding rules used in the implementation.}
+\label{tab:dna_rules}
+\begin{tabular}{c|cccc}
+\hline
+Rule & 00 & 01 & 10 & 11 \\
+\hline
+1 & A & G & C & T \\
+2 & A & C & G & T \\
+3 & T & G & C & A \\
+4 & T & C & G & A \\
+5 & C & A & T & G \\
+6 & G & A & T & C \\
+7 & C & T & A & G \\
+8 & G & T & A & C \\
+\hline
+\end{tabular}
 \end{table}
-	
-\item
-Using these index sequences, DNA scrambling is executed. Two sequences are used for each round, resulting in two complete rounds of scrambling across the four sequences to yield the encrypted matrices:
-\begin{equation}
-	D_c' = R_{s_2}^{-1}(R_{s_1}(D_c))
-\end{equation}
-\begin{equation}
-	D_c'' = R_{s_4}^{-1}(R_{s_3}(D_c'))
-\end{equation}
 
-\item
-Finally, the inverse tensor transformation is applied to the encrypted matrix to obtain the final encrypted image channels:
-\begin{equation}
-	C_c = \mathcal{F}^{-1}(D_c'')
-\end{equation}
-
+\item \textit{Two-round DNA substitution and reconstruction.}
+Let $R_i$ be the bijection in Table~\ref{tab:dna_rules}, applied to each consecutive two-bit pair of a byte, starting from the most significant pair. The same block index is used for all pixels of that block and all three channels:
+\begin{align}
+D'_{c,b}&=R_{s_{2,b}}^{-1}(R_{s_{1,b}}(D_{c,b})),\\
+D''_{c,b}&=R_{s_{4,b}}^{-1}(R_{s_{3,b}}(D'_{c,b})),\\
+C_c&=\mathcal F_p^{-1}((D''_{c,b})_{b=1}^{N_b}).
+\end{align}
+These operations are pointwise substitutions, not spatial scrambling or propagation between pixels.
 \end{enumerate}
 
 The decryption process is the reverse of the encryption process. With the same password, the same Logistic mask, and the synchronized slave chaotic sequences, the DNA transformations and XOR diffusion can be inverted to recover the original image. Crucially, this requires the response system to reproduce the same quantized rule-index sequences as the drive system. The guard-band quantization scheme (with tolerance $\delta = 0.25$ and resolution $K = 48$) ensures that as long as the synchronization residual satisfies $|\epsilon_i| < 0.25 \cdot \mathrm{span}_i / K$, the receiver reconstructs the identical integer key stream without error.
@@ -1334,10 +1535,79 @@ A key concern raised for synchronization-based encryption is whether the synchro
 As shown in Fig.~\ref{fig:sync_error_curve}, the quantization guard-band mechanism provides complete error-free decryption for synchronization residuals below $10^{-3}$. A steep transition occurs in the range $\epsilon \in [10^{-2}, 5 \times 10^{-2}]$, beyond which decryption fails entirely. The theoretical maximum tolerable state residual is $\epsilon_{\max} = \delta \cdot \mathrm{span} / K \approx 0.031$, where $\delta = 0.25$ is the guard-band width and $K = 48$ is the quantization resolution. The PPO Node~3 controller achieves a steady-state synchronization error of approximately $0.0097$, which lies well within the safe region with a margin of approximately $3.2\times$. This result confirms that the reported synchronization precision of order $10^{-2}$ does not cause decryption errors under the proposed quantization scheme, and the guard-band mechanism effectively bridges the gap between continuous-domain synchronization residuals and discrete-domain key-stream consistency.
 
 
+\FloatBarrier
+\subsection{From Synchronization Error to Discrete Recovery}
+\label{subsec:sync_application_bridge}
+
+The control analysis and image application address different requirements. Section~\ref{subsec:boundedness_local_stability} establishes state boundedness and supplies sampled evidence of local perturbation attenuation, but neither property alone guarantees identical discrete rule streams. For example, rounding 0.49 and 0.51 produces different integers despite their small separation. To make this connection explicit, the following conditional construction is evaluated separately from the preceding legacy image transform and its statistical figures.
+
+Write $h(\mathbf{x})=(x_1,x_2,x_3,x_1x_2+x_3)^{\mathsf T}$. At each block sample $b$, the sender uses a fixed width $\Delta>0$ and forms, componentwise,
+\begin{equation}
+\begin{aligned}
+ k_{i,b}&=\left\lfloor h_i(\mathbf{x}_b)/\Delta+\tfrac12\right\rfloor,\\
+ r_{i,b}&=h_i(\mathbf{x}_b)/\Delta-k_{i,b},\\
+ s_{i,b}&=(k_{i,b}\bmod8)+1.
+\end{aligned}
+\label{eq:bridge_sender}
+\end{equation}
+The receiver receives the aligned centering offsets $r_{i,b}$ as auxiliary information, not the sender's integers, and computes
+\begin{equation}
+\widehat k_{i,b}=\left\lfloor h_i(\mathbf{y}_b)/\Delta-r_{i,b}+\tfrac12\right\rfloor,
+\quad \widehat s_{i,b}=(\widehat k_{i,b}\bmod8)+1.
+\label{eq:bridge_receiver}
+\end{equation}
+
+\begin{proposition}[Conditional discrete agreement and recovery]
+\label{prop:discrete_recovery}
+Assume aligned samples, exact arithmetic, unaltered auxiliary information, and the same byte mask at both ends. If
+\begin{equation}
+ D=\max_b\|h(\mathbf{y}_b)-h(\mathbf{x}_b)\|_\infty<\Delta/2,
+\label{eq:bridge_stream_condition}
+\end{equation}
+then all reconstructed rule indices equal the sender's indices. Any blockwise bijective substitution indexed by these rules is exactly reversible. In particular, if $|x_{j,b}|,|y_{j,b}|\leq M$ for $j=1,2$ and $\max_b\|\mathbf{y}_b-\mathbf{x}_b\|_\infty\leq\varepsilon$, a sufficient state-error condition is $(2M+1)\varepsilon<\Delta/2$.
+\end{proposition}
+
+\begin{proof}
+Substituting~\eqref{eq:bridge_sender} into~\eqref{eq:bridge_receiver} gives $\widehat k_{i,b}=k_{i,b}+\lfloor (h_i(\mathbf{y}_b)-h_i(\mathbf{x}_b))/\Delta+1/2\rfloor$. Under~\eqref{eq:bridge_stream_condition}, the last floor is zero. Thus $\widehat s_{i,b}=s_{i,b}$; inverse substitution followed by XOR with the identical mask recovers each original byte. For the state-error condition, let $\mathbf{e}_b=\mathbf{y}_b-\mathbf{x}_b$. The fourth-stream difference is $y_{2,b}e_{1,b}+x_{1,b}e_{2,b}+e_{3,b}$, whose magnitude is at most $(2M+1)\varepsilon$; the other three differences are bounded by $\varepsilon$.
+\end{proof}
+
+State boundedness supplies finite amplitude bounds, but the required uniform $\varepsilon$ is not proved for PPO in Section~\ref{subsec:boundedness_local_stability}. Accordingly, the application condition is checked on the collected trajectories, not inferred from a negative Lyapunov estimate or a mean error. In finite precision, a positive margin must also cover stream-evaluation, offset-storage, and rounding errors: if the total normalized arithmetic perturbation is bounded by $\tau$, the sufficient condition becomes $D/\Delta+\tau<1/2$.
+
+\paragraph{Common-pipeline check.}
+The separate prototype replaces repeated filtering with~\eqref{eq:bridge_sender}--\eqref{eq:bridge_receiver}. To prevent serial DNA maps from cancelling, each of the four rule streams selects a permutation on a different two-bit lane of each byte; decryption uses its inverse. The eight permutations are the first eight lexicographically ordered derangements of $(0,1,2,3)$, representing four DNA symbols. Exhaustive checks verified all $8^4=4096$ byte maps and their inverses. The original XOR mask is retained only to isolate the functional effect of rule agreement.
+
+PPO and the fixed-gain, LQR, and SMC baselines use the same nominal environment, initial seeds, input limits, and image pipeline, without retraining or retuning. The check uses a $128\times128$ version of the source image, $8\times8$ blocks, $\Delta=1$, and 256 consecutive samples after 1,500 control intervals. Three independently trained PPO policies are each tested from three common initial conditions (nine trials per node); each deterministic baseline uses the same three initial conditions (three trials). No state guard was activated. Direct rounding and reconciliation use the same sender rules, substitutions, masks, and trajectories; only receiver rule reconstruction changes.
+
+\begin{table}[pos=htbp,width=\linewidth]
+\centering\small
+\setlength{\tabcolsep}{3pt}
+\caption{Functional connection check, separate from the legacy image statistics. $D_{\max}$ is the largest four-stream error across trials. Mismatch is the mean rule mismatch percentage; recovery counts denote exact pixelwise recovery. D/R denotes direct rounding/reconciliation.}
+\label{tab:sync_application_bridge}
+\begin{tabular}{@{}clccc@{}}
+\toprule
+Node & Method & $D_{\max}$ & \makecell{Mismatch (\%)\\D/R} & \makecell{Recovery\\D/R}\\
+\midrule
+2 & PPO & 0.1265 & 1.563/0 & 0/9; 9/9\\
+2 & Fixed & 8.5900 & 73.307/70.671 & 0/3; 0/3\\
+2 & LQR & 0 & 0/0 & 3/3; 3/3\\
+2 & SMC & 0 & 0/0 & 3/3; 3/3\\
+3 & PPO & 0.0360 & 0.347/0 & 0/9; 9/9\\
+3 & Fixed & 0 & 0/0 & 3/3; 3/3\\
+3 & LQR & 0 & 0/0 & 3/3; 3/3\\
+3 & SMC & 0 & 0/0 & 3/3; 3/3\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:sync_application_bridge} shows that the tested PPO residuals satisfy the four-stream condition, yet direct rounding still creates mismatched rules. Reconciliation removes these mismatches and gives zero image error in all 18 PPO trials. The same mechanism also works for the successful traditional controllers; the displayed zero stream errors mean identical stored floating-point samples, not a mathematical finite-time synchronization theorem. Node 2 fixed-gain feedback fails the condition and does not recover the image in these tests. These results connect measured synchronization quality to discrete recovery without establishing a PPO-specific encryption advantage or a population reliability rate.
+
+\paragraph{Scope and communication cost.}
+This construction requires aligned auxiliary offsets; their compact JSON representation is approximately 20.7 kB per tested image, about 42\% of the uncompressed image bytes. Their information leakage has not been bounded. The rule digest used to reject disagreements is unkeyed and is not authentication. Passing it is not proof of state synchronization: modulo-eight aliases can preserve the rules even outside~\eqref{eq:bridge_stream_condition}. Correct recovery is therefore distinct from secrecy, tamper resistance, and secure key agreement. The conditional proposition does not validate the legacy preprocessing or establish cryptographic security for either image transform.
+
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper has investigated the single-input pinning synchronization problem for two continuous-time Hopfield chaotic neural networks and developed a PPO-based data-driven control framework. In the considered setting, only one scalar control input is injected into a selected node of the response system. A local pinning-node analysis was conducted by combining several complementary indicators, and the obtained node-ranking result was found to be generally consistent with the closed-loop synchronization behavior. For the deployed controller, state boundedness under the actuator constraint was established analytically, while negative largest conditional Lyapunov exponents across the evaluated trajectories provided post-training local numerical evidence of average transverse error decay. These results support practical low-residual synchronization rather than a global or exact asymptotic stability guarantee. The empirical tests further show that the PPO-implemented controller can maintain effective synchronization under nominal and non-ideal settings, including parameter mismatch, impulse disturbance, Gaussian noise perturbation, and partial observation. Compared with the fixed-gain linear feedback baseline, the learned nonlinear controller exhibits better adaptability, especially when the pinning channel is less favorable.
+This study examines actuator placement and feedback-information availability in bounded single-input synchronization of a continuous-time Hopfield network. Its main finding is the actuator-dependent effect of observation composition: at a fixed four-dimensional input size, the alternative coordinate subset improves Node 2 but increases residuals and control effort at Node 3. This motivates considering actuator location together with available policy inputs within the studied setting, rather than treating low-residual synchronization at one node as transferable to another.
 
 The synchronized Hopfield chaotic trajectories were further applied to an image encryption scheme based on Logistic-map diffusion and three-round asymmetric DNA coding over the full $S_4$ symmetric group. A comprehensive security evaluation---including key-space analysis ($2^{465}$), differential attack resistance (NPCR~$= 99.60\%$, UACI~$= 33.35\%$), key sensitivity (Hamming distance~$\approx 50\%$ under $10^{-14}$ perturbation), information entropy ($7.9993$ bits), and correlation suppression---confirms that the encrypted images exhibit strong statistical security. Importantly, the guard-band quantization mechanism was shown to guarantee error-free decryption as long as the synchronization residual remains below the theoretical threshold of approximately $0.031$, which is comfortably satisfied by the PPO Node~3 controller (steady-state error~$\approx 0.0097$). These results demonstrate that DRL-based single-input pinning control is not only feasible for constrained synchronization of Hopfield chaotic neural networks, but also sufficient to support reliable and secure chaos-based image protection. Future work will focus on strengthening theoretical stability analysis and extending the framework to larger-scale or hardware-implemented chaotic neural networks.
 

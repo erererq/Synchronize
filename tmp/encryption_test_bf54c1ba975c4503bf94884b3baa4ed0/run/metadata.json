@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "shape": [
+    8,
+    8,
+    3
+  ],
+  "block_size": 8,
+  "pixel_sum": "18336"
+}

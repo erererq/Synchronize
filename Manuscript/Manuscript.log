@@ -1022,6 +1022,7 @@ Package pdftex.def Info: figures/test_hist.png  used on input line 1287.
 (pdftex.def)             Requested size: 421.49629pt x 140.41905pt.
 
 
+
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 1288.
 See the caption package documentation for explanation.

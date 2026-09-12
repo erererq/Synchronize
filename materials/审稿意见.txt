@@ -47,3 +47,5 @@ Minor points
 4. The synchronization error reported in the manuscript, which is on the order of $10^{-2}$, is insufficient to guarantee reliable recovery of the encrypted information by the response system. The authors should address whether this residual error induces signal distortion or message degradation during decryption.
 
 5. The authors should evaluate the robustness of the encryption/decryption process against parameter sensitivity, for example by computing the Hamming distance between the recovered and original information.
+
+

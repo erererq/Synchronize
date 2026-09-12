@@ -1,0 +1,154 @@
+项目运行环境与模型加载排查报告
+生成日期：2026-09-02
+
+一、最关键的问题
+
+当前 PowerShell 终端默认解析到的 Python 不是训练 PPO 模型所用的 Conda 环境：
+
+1. 默认 Python
+   路径：E:\python\python.exe
+   版本：Python 3.12.10
+   PyTorch：2.9.1+cpu
+   NumPy：2.2.6
+   Gymnasium：未安装
+   Stable-Baselines3：未安装
+
+2. 模型实际使用的 Python
+   Conda 环境名：lea
+   路径：E:\Users\anaconda3\envs\lea\python.exe
+   版本：Python 3.10.19（conda-forge，64 位）
+
+因此，直接运行“python xxx.py”会进入 E:\python 的 Python 3.12 环境，无法导入
+gymnasium 和 stable_baselines3，也无法正常加载 PPO 模型。使用 lea 环境的完整解释器
+路径运行时，PPO 模型可以成功加载。
+
+建议排查命令：
+
+E:\Users\anaconda3\envs\lea\python.exe -c "from stable_baselines3 import PPO; print('SB3 import OK')"
+
+当前已验证成功的模型加载命令：
+
+E:\Users\anaconda3\envs\lea\python.exe -c "from stable_baselines3 import PPO; m=PPO.load(r'models\hopfield\ppo_continuous_hopfield_node2_final_seed_42.zip', device='cpu'); print(m.observation_space, m.action_space)"
+
+输出为：
+Box(-inf, inf, (6,), float32) Box(-1.0, 1.0, (1,), float32)
+
+
+二、操作系统与硬件
+
+操作系统（注册表报告）：Windows 10 Home China，25H2，Build 26200.9168
+处理器：AMD Ryzen 9 8940HX with Radeon Graphics
+独立显卡：NVIDIA GeForce RTX 5070 Ti Laptop GPU
+显存：12227 MiB（约 12 GB）
+NVIDIA 驱动：596.13
+GPU Compute Capability：12.0
+
+
+三、CUDA 与 PyTorch
+
+系统 nvcc：CUDA Toolkit 13.0，V13.0.48
+nvcc 路径：D:\OfficeSoftware\bin\nvcc.exe
+PyTorch：2.10.0+cu128
+PyTorch 编译使用的 CUDA：12.8
+torch.cuda.is_available()：True
+PyTorch 识别到的 GPU：NVIDIA GeForce RTX 5070 Ti Laptop GPU
+
+说明：系统安装 CUDA Toolkit 13.0，而 PyTorch wheel 自带/对应 CUDA 12.8，这通常不构成
+冲突。PyTorch 主要依赖其对应运行库和兼容的 NVIDIA 驱动，不要求 nvcc 版本完全相同。
+
+
+四、lea 环境核心软件版本
+
+Python                 3.10.19
+pip                    26.0
+PyTorch                2.10.0+cu128
+Stable-Baselines3      2.7.1
+Gymnasium              1.2.3
+NumPy                  2.2.6
+SciPy                  1.15.2
+Pandas                 2.3.3
+Matplotlib             3.10.8
+Cloudpickle            3.1.2
+TensorBoard            2.20.0
+tqdm                    4.67.3
+rich                    14.3.3
+Seaborn                 0.13.2
+
+“python -m pip check”检查结果：No broken requirements found.
+
+
+五、现有模型内部记录的保存环境
+
+检查的 PPO Node 2、PPO Node 3 和 SAC 模型内部记录一致：
+
+OS：Windows 10.0.26200
+Python：3.10.19
+Stable-Baselines3：2.7.1
+PyTorch：2.10.0+cu128
+NumPy：2.2.6
+Cloudpickle：3.1.2
+Gymnasium：1.2.3
+GPU Enabled：True
+
+所以当前 lea 环境与模型保存环境一致，不存在 SB3、Python、Gymnasium 或 PyTorch
+版本不匹配。模型已在 CPU 加载模式下实际验证成功。
+
+
+六、PPO 模型与实验配置
+
+环境类：Code\env\continuous_hopfield_env.py 中的 ContinuousHopfieldEnv
+观测空间：6 维，即 3 个驱动系统状态 + 3 个同步误差，整体除以 5 归一化
+动作空间：1 维，归一化范围 [-1, 1]
+实际控制力范围：[-4, 4]
+积分方法：RK4
+积分步长：dt = 0.01
+每次策略动作保持：5 个 RK4 子步
+每回合策略步数：400
+对应物理仿真时间：约 20 s
+
+PPO 已保存模型参数：
+网络：策略网络和价值网络分别为两层 64 单元 Tanh MLP
+训练环境数：4
+总环境步数：400000
+n_steps：512（每个并行环境）
+batch_size：128
+learning_rate：3e-4
+gamma：0.99
+ent_coef：0.001
+训练脚本显式设置 device="cpu"
+
+
+七、代码中需要注意的一处命名不一致
+
+Code\main\train_continuous_hopfield.py 中仍存在：
+
+obs_dimention = 4
+
+该变量只被用于保存文件名，并没有改变环境的观测空间。当前 ContinuousHopfieldEnv 和已经
+保存的 PPO 模型实际都是 6 维观测。因此文件名中的 obs4 可能造成误解，但不是当前模型
+加载失败的原因。
+
+
+八、Conda 命令的异常
+
+在受限的 Codex 进程中执行“conda info --envs”时，Conda 25.7.0 在检测 CUDA 虚拟包的
+multiprocessing Pipe 阶段出现 PermissionError: [WinError 5]。这更可能与受限进程权限有关，
+因为直接调用 lea\python.exe、导入全部依赖和加载模型都已成功。
+
+建议在普通 Anaconda Prompt 中另外执行以下命令确认：
+
+conda info --envs
+conda activate lea
+where python
+python --version
+python -c "import torch, gymnasium, stable_baselines3; print(torch.__version__, gymnasium.__version__, stable_baselines3.__version__)"
+
+
+九、当前结论
+
+1. lea 环境本身完整且能够加载现有 PPO/SAC 模型。
+2. 最可能的问题是默认 PATH 指向 E:\python\python.exe，而不是 lea 环境解释器。
+3. 在修正终端/IDE/Codex 的 Python 解释器选择前，建议始终使用
+   E:\Users\anaconda3\envs\lea\python.exe 的完整路径运行训练和测试脚本。
+4. 若需要在其他电脑复现，应优先匹配 Python 3.10、SB3 2.7.1、Gymnasium 1.2.3、
+   PyTorch 2.10.0 和 NumPy 2.2.6；GPU不是加载模型的必要条件，可使用 device="cpu"。

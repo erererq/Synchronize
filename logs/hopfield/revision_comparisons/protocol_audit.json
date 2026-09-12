@@ -1,0 +1,52 @@
+{
+  "singleton_environment_node1_max_difference": 0.0,
+  "singleton_environment_node2_max_difference": 0.0,
+  "singleton_environment_node3_max_difference": 0.0,
+  "lqr_node2": {
+    "K": [
+      -0.11672683221369623,
+      3.871190768733918,
+      -5.502160975677844
+    ],
+    "care_residual": 1.3980333280058575e-13,
+    "closed_loop_real_parts": [
+      -1.2038231750281592,
+      -1.2038231750281592,
+      -1.8635444186776011
+    ]
+  },
+  "lqr_node3": {
+    "K": [
+      -0.17169753138784405,
+      -2.085640775581896,
+      3.8509859553313417
+    ],
+    "care_residual": 4.8514332587769905e-15,
+    "closed_loop_real_parts": [
+      -1.8603901523023907,
+      -1.8603901523023907,
+      -0.5302056507265578
+    ]
+  },
+  "metric_checks": "passed; initial sample, 81 tail samples, 201 post-pulse samples, summed energy",
+  "smc_node2_validation_count": 10,
+  "smc_node2_grid_best": {
+    "node": "2",
+    "reaching_gain": "16.0",
+    "boundary_width": "0.5",
+    "score": "1.0347991133437382",
+    "nominal_mae": "0.06808023821740924",
+    "mismatch_mae": "0.19211859061157815",
+    "pulse_mae": "0.5142619592009703"
+  },
+  "smc_node3_validation_count": 10,
+  "smc_node3_grid_best": {
+    "node": "3",
+    "reaching_gain": "16.0",
+    "boundary_width": "0.5",
+    "score": "0.6586177626064417",
+    "nominal_mae": "0.06451351015828623",
+    "mismatch_mae": "0.0825301405229081",
+    "pulse_mae": "0.35123276223768407"
+  }
+}
