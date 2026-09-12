@@ -1,5 +1,5 @@
 ﻿# ==============================================================================
-# 加密组极简核心资产白名单配置 (Minimalist Whitelist)
+# 极简核心资产白名单配置 (Minimalist Whitelist)
 # 策略：默认全盘忽略，仅放行支撑代码运行与审稿复现的最基础目录
 # ==============================================================================
 
@@ -24,7 +24,7 @@
 # 测试图像数据集与分析结果
 !/photo/
 
-# 手稿源码（仅放行内部 .tex）
+# 手稿源码（仅放行内部 .tex 与 .bib）
 !/Manuscript/
 
 # 审稿回复与修订工程
@@ -55,17 +55,13 @@ experiments/
 AGENTS.md
 AGENTS.MD
 
-# (4) Manuscript 手稿内部：除 .tex 源码外统统忽略
+# (4) Manuscript 手稿内部：除 .tex 和 .bib 源码外统统忽略
 Manuscript/**/*
 !Manuscript/**/
 !Manuscript/**/*.tex
+!Manuscript/**/*.bib
 
-# (5) 虚拟环境与个人编辑器配置
-/.venv/
-/venv/
-/env/
-!Code/env/
-!Code/env/**
+**
 .vscode/
 .idea/
 .DS_Store
@@ -73,3 +69,9 @@ Thumbs.db
 *.swp
 *~
 *.tmp
+告
+# ==========================================
+Code/encry/*.md
+Code/encry/**/*.md
+
+

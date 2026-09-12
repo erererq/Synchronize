@@ -1,5 +1,0 @@
-﻿node,mismatch,test_seed,method,continuous_mae,direct_key_word_disagreement,direct_key_bit_disagreement,direct_master_unique_values_per_stream,direct_master_entropy_bits,legacy_key_word_disagreement,legacy_key_bit_disagreement,legacy_master_unique_values_per_stream,legacy_master_entropy_bits,recovered_image_mae,recovered_image_psnr_db,exact_recovery
-2,2.0,100,PPO,0.018719614447036292,0.01171875,0.00390625,2.0,1.308901740588901,0.0,0.0,1.0,-0.0,0.0,361.20199909921956,True
-2,2.0,100,Fixed,2.1862782613364593,0.73046875,0.3776041666666667,2.0,1.308901740588901,0.75,0.5,1.0,-0.0,122.53352864583333,6.067882677495691,False
-2,2.0,100,LQR,0.03215224583861224,0.01171875,0.00390625,2.0,1.308901740588901,0.0,0.0,1.0,-0.0,0.0,361.20199909921956,True
-2,2.0,100,SMC,0.020809146607158862,0.01171875,0.00390625,2.0,1.308901740588901,0.0,0.0,1.0,-0.0,0.0,361.20199909921956,True
