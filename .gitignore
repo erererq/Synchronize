@@ -88,9 +88,10 @@ Code/encry/*.md
 Code/encry/**/*.md
 
 # ==========================================
-# 论文插图目录本身及其所有下属内容
+# Manuscript 目录下除 .tex 外全部忽略
 # ==========================================
-Manuscript/figures/
-Manuscript/figures/**
+Manuscript/**/*
+!Manuscript/**/
+!Manuscript/**/*.tex
 
 
